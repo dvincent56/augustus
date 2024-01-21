@@ -1353,7 +1353,15 @@ static translation_string all_strings[] = {
     {TR_BUILDING_OVERGROWN_GARDENS, "Overgrown Gardens" },
     {TR_WINDOW_ADVISOR_RELIGION_ALTARS_HEADER, "Altars"},
     {TR_REPLAY_MAP_NOT_FOUND_TITLE, "Unable to replay map"},
-    { TR_REPLAY_MAP_NOT_FOUND_MESSAGE, "The original map file for this saved game was not found.\nYou need the following file with either a .map or .mapx extension:"}
+    {TR_REPLAY_MAP_NOT_FOUND_MESSAGE, "The original map file for this saved game was not found.\nYou need the following file with either a .map or .mapx extension:"},
+    {TR_WINDOW_ADVISOR_EPITHETS, "Gods Epithets"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP, "What the gods can grant you"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_CERES, "Ceres gifts"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_NEPTUNE, "Neptune gifts"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_MERCURY, "Mercury gifts"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_MARS, "Mars gifts"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_VENUS, "Venus gifts"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_JUPITER, "Jupiter gifts"}
 };
 
 void translation_english(const translation_string **strings, int *num_strings)

@@ -1347,7 +1347,17 @@ static translation_string all_strings[] = {
     {TR_BUILDING_INFO_TOTAL_FOOD, "Total vivres :" },
     {TR_BUILDING_FORMAL_GARDENS, "Jardins aménagés" },
     {TR_BUILDING_OVERGROWN_GARDENS, "Jardins naturels" },
-    {TR_WINDOW_ADVISOR_RELIGION_ALTARS_HEADER, "Autels"}
+    {TR_WINDOW_ADVISOR_RELIGION_ALTARS_HEADER, "Autels"},
+    {TR_REPLAY_MAP_NOT_FOUND_TITLE, "Unable to replay map"},
+    {TR_REPLAY_MAP_NOT_FOUND_MESSAGE, "The original map file for this saved game was not found.\nYou need the following file with either a .map or .mapx extension:"},
+    {TR_WINDOW_ADVISOR_EPITHETS, "Epithètes des dieux"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP, "Ce que les dieux peuvent vous accorder"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_CERES, "Dons de Ceres"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_NEPTUNE, "Dons de Neptune"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_MERCURY, "Dons de Mercury"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_MARS, "Dons de Mars"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_VENUS, "Dons de Venus"},
+    {TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_JUPITER, "Dons de Jupiter"}
 };
 
 void translation_french(const translation_string **strings, int *num_strings)
