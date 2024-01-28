@@ -554,7 +554,9 @@ const uint8_t *lang_get_string(int group, int index)
                 }
                 break;
             case BUILDING_OVERGROWN_GARDENS:
-                return translation_for(TR_BUILDING_OVERGROWN_GARDENS);
+                return translation_for(TR_BUILDING_OVERGROWN_GARDENS);                
+            case BUILDING_LATRINE:
+                return translation_for(TR_BUILDING_LATRINE);
             default:
                 break;
         }

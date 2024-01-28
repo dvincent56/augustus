@@ -728,6 +728,27 @@ static void draw_well(const map_tile *tile, int x, int y)
     draw_building_tiles(x, y, 1, &blocked);
 }
 
+static void draw_latrine(const map_tile *tile, int x, int y)
+{
+    color_t color_mask;
+    int blocked = 0;
+    if (city_finance_out_of_money() || is_blocked_for_building(tile->grid_offset, 1, &blocked)) {
+        image_blend_footprint_color(x, y, COLOR_MASK_RED, data.scale);
+        color_mask = COLOR_MASK_BUILDING_GHOST_RED;
+    } else {
+        color_mask = COLOR_MASK_BUILDING_GHOST;
+    }
+
+    int image_id = assets_get_image_id("Health_Education", "Latrine_N");
+
+    if (config_get(CONFIG_UI_SHOW_WATER_STRUCTURE_RANGE)) {
+        city_water_ghost_draw_water_structure_ranges();
+        city_view_foreach_tile_in_range(tile->grid_offset, 1, map_water_supply_well_radius(), city_building_ghost_draw_well_range);
+    }
+    draw_building(image_id, x, y, color_mask);
+    draw_building_tiles(x, y, 1, &blocked);
+}
+
 static void draw_bathhouse(const map_tile *tile, int x, int y)
 {
     int grid_offset = tile->grid_offset;
@@ -1416,6 +1437,9 @@ void city_building_ghost_draw(const map_tile *tile)
             break;
         case BUILDING_GRAND_TEMPLE_NEPTUNE:
             draw_grand_temple_neptune(tile, x, y);
+            break;
+        case BUILDING_LATRINE:
+            draw_latrine(tile, x, y);
             break;
         default:
             draw_default(tile, x, y, type);

@@ -292,6 +292,9 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
         case BUILDING_SHRINE_VENUS:
             b->subtype.orientation = building_rotation_get_rotation();
             add_building(b);
+            break;            
+        case BUILDING_LATRINE:
+            add_building(b);
             break;
 
     }
