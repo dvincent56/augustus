@@ -4,13 +4,13 @@
 #include "city/constants.h"
 #include "city/gods.h"
 #include "core/image_group.h"
+#include "graphics/color.h"
 #include "graphics/generic_button.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
 #include "graphics/image_button.h"
 #include "graphics/lang_text.h"
 #include "graphics/panel.h"
-#include "graphics/scrollbar.h"
 #include "graphics/text.h"
 #include "graphics/window.h"
 #include "input/input.h"
@@ -18,11 +18,8 @@
 #include "window/message_dialog.h"
 #include "window/option_popup.h"
 
-#define MAX_EPITHETS_VISIBLE 1
-
 static void button_god(int god, int param2);
 static void button_close(int param1, int param2);
-static void on_scroll(void);
 
 
 static struct {
@@ -106,20 +103,18 @@ static struct {
 static int selected_god_id;
 
 static image_button image_buttons_bottom[] = {
-    {605, 345, 24, 24, IB_NORMAL, GROUP_CONTEXT_ICONS, 4, button_close, button_none, 0, 0, 1}
+    {605, 394, 24, 24, IB_NORMAL, GROUP_CONTEXT_ICONS, 4, button_close, button_none, 0, 0, 1}
 };
 
 static generic_button buttons_gods_size[] = {
-    {30, 70, 80, 90, button_god, button_none, 0, 0},
-    {130, 70, 80, 90, button_god, button_none, 1, 0},
-    {230, 70, 80, 90, button_god, button_none, 2, 0},
-    {330, 70, 80, 90, button_god, button_none, 3, 0},
-    {430, 70, 80, 90, button_god, button_none, 4, 0},
-    {530, 70, 80, 90, button_god, button_none, 5, 0},
-    {630, 70, 80, 90, button_god, button_none, 6, 0}
+    {30, 56, 80, 90, button_god, button_none, 0, 0},
+    {130, 56, 80, 90, button_god, button_none, 1, 0},
+    {230, 56, 80, 90, button_god, button_none, 2, 0},
+    {330, 56, 80, 90, button_god, button_none, 3, 0},
+    {430, 56, 80, 90, button_god, button_none, 4, 0},
+    {530, 56, 80, 90, button_god, button_none, 5, 0},
+    {630, 56, 80, 90, button_god, button_none, 6, 0}
 };
-
-static scrollbar_type scrollbar = { 1224, 496, 140, 540, MAX_EPITHETS_VISIBLE, on_scroll, 0, 4};
 
 static int focus_button_id;
 static int focus_image_button_id;
@@ -127,7 +122,6 @@ static int focus_image_button_id;
 static void init(void)
 {
     selected_god_id = 0;
-    scrollbar_init(&scrollbar, 0, 3);
 }
 
 static void draw_background(void)
@@ -136,23 +130,23 @@ static void draw_background(void)
 
     graphics_in_dialog();
 
-    outer_panel_draw(0, 0, 40, 24);
+    outer_panel_draw(0, 0, 40, 27);
     
     lang_text_draw_centered(CUSTOM_TRANSLATION, TR_WINDOW_ADVISOR_EPITHETS, 0, 15, 640, FONT_LARGE_BLACK);
 
     for (int god = 0; god < MAX_GODS + 1; god++) {
         if (god == selected_god_id) {
-            button_border_draw(100 * god + 26, 66, 90, 100, 1);
+            button_border_draw(100 * god + 26, 52, 90, 100, 1);
             if (god == MAX_GODS) {
-                image_draw(assets_get_image_id("UI", "Jupiter Portrait Selected"), 100 * god + 30, 70, COLOR_MASK_NONE, SCALE_NONE);
+                image_draw(assets_get_image_id("UI", "Jupiter Portrait Selected"), 100 * god + 30, 56, COLOR_MASK_NONE, SCALE_NONE);
             } else {
-                image_draw(image_group(GROUP_PANEL_WINDOWS) + god + 21, 100 * god + 30, 70, COLOR_MASK_NONE, SCALE_NONE);
+                image_draw(image_group(GROUP_PANEL_WINDOWS) + god + 21, 100 * god + 30, 56, COLOR_MASK_NONE, SCALE_NONE);
             }
         } else {
             if (god == MAX_GODS) {
-                image_draw(assets_get_image_id("UI", "Jupiter Portrait Unselected"), 100 * god + 30, 70, COLOR_MASK_NONE, SCALE_NONE);
+                image_draw(assets_get_image_id("UI", "Jupiter Portrait Unselected"), 100 * god + 30, 56, COLOR_MASK_NONE, SCALE_NONE);
             } else {
-                image_draw(image_group(GROUP_PANEL_WINDOWS) + god + 16, 100 * god + 30, 70, COLOR_MASK_NONE, SCALE_NONE);
+                image_draw(image_group(GROUP_PANEL_WINDOWS) + god + 16, 100 * god + 30, 56, COLOR_MASK_NONE, SCALE_NONE);
             }
         }
     }
@@ -165,27 +159,27 @@ static void draw_foreground(void)
 {
     graphics_in_dialog();
 
-    inner_panel_draw(30, 196, 34, 9);
+    inner_panel_draw(33, 170, 36, 14);
 
-    int module_id = scrollbar.scroll_position;
+    int offet_y = 0;
 
-    int module_name = epithets_options[selected_god_id * 3 + module_id].option.header;
-    text_draw_centered(translation_for(module_name), 50, 215, 490, FONT_NORMAL_PLAIN, 0);
-            
-    int module_desc = epithets_options[selected_god_id * 3 + module_id].option.desc;
-    text_draw_multiline(translation_for(module_desc), 50, 250, 490, FONT_NORMAL_WHITE, 0);
+    for (int i = 0; i < 3; i++) {
+        int module_name = epithets_options[selected_god_id * 3 + i].option.header;
+        text_draw_centered(translation_for(module_name), 53, 184 + offet_y , 540, FONT_NORMAL_WHITE, 0);
+                
+        int module_desc = epithets_options[selected_god_id * 3 + i].option.desc;
+        offet_y += text_draw_multiline(translation_for(module_desc), 53, 204 + offet_y, 540, FONT_SMALL_PLAIN, 0);
+        offet_y += 34;
+    }
 
     image_buttons_draw(0, 0, image_buttons_bottom, 1);
     
     graphics_reset_dialog();
-
-    scrollbar_draw(&scrollbar);
 }
 
 static void button_god(int god, int param2)
 {
     selected_god_id = god;
-    scrollbar_reset(&scrollbar, 0);
     window_invalidate();
 }
 
@@ -217,28 +211,11 @@ static void get_tooltip(tooltip_context *c)
     }
 }
 
-static void on_scroll(void)
-{
-    window_request_refresh();
-}
-
 static void handle_input(const mouse *m, const hotkeys *h)
 {
-    int handled = 0;
-    if (scrollbar_handle_mouse(&scrollbar, m, 1)) {
-        focus_button_id = 0;
-        handled = 1;
-    }
-
     const mouse *m_dialog = mouse_in_dialog(m);
-
-    if (handled == 0) {
-        handled = image_buttons_handle_mouse(m_dialog, 0, 0, image_buttons_bottom, 1, &focus_image_button_id);
-    }
-
-    if (handled == 0) {
-        handled = generic_buttons_handle_mouse(m_dialog, 0, 0, buttons_gods_size, 6, &focus_button_id);
-    }
+    int handled = image_buttons_handle_mouse(m_dialog, 0, 0, image_buttons_bottom, 1, &focus_image_button_id) | 
+    generic_buttons_handle_mouse(m_dialog, 0, 0, buttons_gods_size, 6, &focus_button_id);
 
     if (focus_image_button_id) {
         focus_button_id = 0;

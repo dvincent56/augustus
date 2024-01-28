@@ -19,7 +19,7 @@ static void button_epithets(int param1, int param2);
 
 static generic_button hold_festival_button[] = {
     {102, 340, 300, 20, button_hold_festival, button_none, 0, 0},
-    {465, 15, 158, 20, button_epithets, button_none, 0, 1}
+    {590, 20, 32, 24, button_epithets, button_none, 0, 1}
 };
 
 static int focus_button_id;
@@ -173,9 +173,10 @@ static void draw_foreground(void)
     if (!city_festival_is_planned()) {
         button_border_draw(102, 335, 300, 20, focus_button_id == 1);
     }
-    button_border_draw(465, 15, 158, 20, focus_button_id == 2);
 
-    text_draw_centered(translation_for(TR_WINDOW_ADVISOR_EPITHETS), 465, 19, 158, FONT_NORMAL_BLACK, 0);
+    button_border_draw(590, 20, 32, 24, focus_button_id == 2);
+
+    image_draw(982, 594, 24, COLOR_MASK_NONE, SCALE_NONE);
 }
 
 static int handle_mouse(const mouse *m)
