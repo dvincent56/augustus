@@ -739,7 +739,18 @@ static void draw_latrine(const map_tile *tile, int x, int y)
         color_mask = COLOR_MASK_BUILDING_GHOST;
     }
 
-    int image_id = assets_get_image_id("Health_Education", "Latrine_N");
+    int image_id;
+    switch (scenario_property_climate()) {
+        case CLIMATE_NORTHERN:
+            image_id = assets_get_image_id("Health_Education", "Latrine_N");
+            break;
+        case CLIMATE_DESERT:
+            image_id = assets_get_image_id("Health_Education", "Latrine_S");
+            break;
+        default:
+            image_id = assets_get_image_id("Health_Education", "Latrine_C");
+            break;
+    }
 
     if (config_get(CONFIG_UI_SHOW_WATER_STRUCTURE_RANGE)) {
         city_water_ghost_draw_water_structure_ranges();
@@ -1407,6 +1418,7 @@ void city_building_ghost_draw(const map_tile *tile)
         case BUILDING_FORT_LEGIONARIES:
         case BUILDING_FORT_JAVELIN:
         case BUILDING_FORT_MOUNTED:
+        case BUILDING_FORT_AUXILIA_INFANTRY:
             draw_fort(tile, x, y);
             break;
         case BUILDING_HIPPODROME:
