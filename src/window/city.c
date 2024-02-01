@@ -525,7 +525,7 @@ static void show_overlay_from_grid_offset(int grid_offset)
             overlay = OVERLAY_LOGISTICS;
             break;
         case BUILDING_DOCK:        
-        case BUILDING_LATRINE:
+        case BUILDING_LATRINES:
             overlay = OVERLAY_SICKNESS;
             break;
         case BUILDING_NONE:

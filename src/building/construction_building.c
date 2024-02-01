@@ -296,7 +296,7 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
             b->subtype.orientation = building_rotation_get_rotation();
             add_building(b);
             break;            
-        case BUILDING_LATRINE:
+        case BUILDING_LATRINES:
             add_building(b);
             break;
 

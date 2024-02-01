@@ -1348,7 +1348,12 @@ static translation_string all_strings[] = {
     {TR_BUILDING_FORMAL_GARDENS, "Jardins aménagés" },
     {TR_BUILDING_OVERGROWN_GARDENS, "Jardins naturels" },
     {TR_WINDOW_ADVISOR_RELIGION_ALTARS_HEADER, "Autels"},
-    {TR_BUILDING_LATRINE, "Latrine"},
+    {TR_REPLAY_MAP_NOT_FOUND_TITLE, "Impossible de rejouer la carte"},
+    {TR_REPLAY_MAP_NOT_FOUND_MESSAGE, "Le fichier de carte d'origine de cette partie enregistrée est introuvable.\nVous avez besoin du fichier avec une extension .map ou .mapx:"},
+    {TR_BUILDING_FORT_AUXILIA_INFANTRY, "Auxiliaires - Infanterie"},
+    {TR_WINDOW_ADVISOR_MILITARY_INFANTRY, "Fantassins"},
+    {TR_BUILDING_LATRINESS, "Latrines"},
+    {TR_BUILDING_LATRINESS_DESC, "Lieu d'aisance apprécié de la population pour parler des nouvelles du jour ou de leurs affaires"}
 };
 
 void translation_french(const translation_string **strings, int *num_strings)

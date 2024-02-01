@@ -950,7 +950,7 @@ int building_image_get(const building *b)
         }
         case BUILDING_OVERGROWN_GARDENS:
             return building_properties_for_type(BUILDING_OVERGROWN_GARDENS)->image_group;
-        case BUILDING_LATRINE:
+        case BUILDING_LATRINES:
             switch (scenario_property_climate()) {
                 case CLIMATE_NORTHERN:
                     return assets_get_image_id("Health_Education", "Latrine_N");

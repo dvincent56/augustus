@@ -29,7 +29,7 @@ static int show_building_sickness(const building *b)
     return b->type == BUILDING_HOSPITAL || b->type == BUILDING_DOCTOR ||
            b->type == BUILDING_BARBER || b->type == BUILDING_BATHHOUSE ||
            b->type == BUILDING_SMALL_MAUSOLEUM || b->type == BUILDING_LARGE_MAUSOLEUM ||
-           b->type == BUILDING_LATRINE;
+           b->type == BUILDING_LATRINES;
 }
 
 static int show_figure_barber(const figure *f)

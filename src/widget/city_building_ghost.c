@@ -1450,7 +1450,7 @@ void city_building_ghost_draw(const map_tile *tile)
         case BUILDING_GRAND_TEMPLE_NEPTUNE:
             draw_grand_temple_neptune(tile, x, y);
             break;
-        case BUILDING_LATRINE:
+        case BUILDING_LATRINES:
             draw_latrine(tile, x, y);
             break;
         default:

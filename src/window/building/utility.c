@@ -305,22 +305,13 @@ void window_building_draw_well(building_info_context *c)
 
 void window_building_draw_latrine(building_info_context *c)
 {
-    c->help_id = 62;
-    window_building_play_sound(c, "wavs/well.wav");
     outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
-    lang_text_draw_centered(109, 0, c->x_offset, c->y_offset + 10, BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK);
-    int well_necessity = map_water_supply_is_well_unnecessary(c->building_id, 2);
-    int text_id = 0;
-    if (well_necessity == WELL_NECESSARY) { // well is OK
-        text_id = 1;
-    } else if (well_necessity == WELL_UNNECESSARY_FOUNTAIN) { // all houses have fountain
-        text_id = 2;
-    } else if (well_necessity == WELL_UNNECESSARY_NO_HOUSES) { // no houses around
-        text_id = 3;
-    }
-    if (text_id) {
-        window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 160, 109, text_id);
-    }
+    lang_text_draw_centered(CUSTOM_TRANSLATION, TR_BUILDING_LATRINESS, c->x_offset, c->y_offset + 10, BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK);
+   
+    window_building_draw_description(c, CUSTOM_TRANSLATION, TR_BUILDING_LATRINESS_DESC);   
+
+    inner_panel_draw(c->x_offset + 16, c->y_offset + 105, c->width_blocks - 2, 4);
+    window_building_draw_employment_without_house_cover(c, 112); 
 }
 
 void window_building_draw_mission_post(building_info_context *c)

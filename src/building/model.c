@@ -304,7 +304,7 @@ const model_building *model_get_building(building_type type)
             return &MODEL_DEPOT;
         case BUILDING_OVERGROWN_GARDENS:
             return &buildings[BUILDING_GARDENS];        
-        case BUILDING_LATRINE:
+        case BUILDING_LATRINES:
             return &MODEL_LATRINE;
         default:
             break;
