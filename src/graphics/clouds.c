@@ -4,6 +4,7 @@
 #include "core/image.h"
 #include "core/random.h"
 #include "core/speed.h"
+#include "game/settings.h"
 #include "graphics/renderer.h"
 
 #include <math.h>
@@ -276,7 +277,7 @@ void clouds_draw(int x_offset, int y_offset, int x_limit, int y_limit, float bas
             (cloud->x - x_offset) / base_scale, (cloud->y - y_offset) / base_scale, COLOR_MASK_NONE,
             cloud->scale_x * base_scale, cloud->scale_y * base_scale, cloud->angle, 1);
 
-        cloud->x += speed_get_delta(&cloud->speed.x);
-        cloud->y += speed_get_delta(&cloud->speed.y);
+        cloud->x += speed_get_delta(&cloud->speed.x) * (setting_game_speed() / 10);
+        cloud->y += speed_get_delta(&cloud->speed.y) * (setting_game_speed() / 10);
     }
 }
