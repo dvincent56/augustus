@@ -1352,8 +1352,11 @@ static translation_string all_strings[] = {
     {TR_REPLAY_MAP_NOT_FOUND_MESSAGE, "Le fichier de carte d'origine de cette partie enregistrée est introuvable.\nVous avez besoin du fichier avec une extension .map ou .mapx:"},
     {TR_BUILDING_FORT_AUXILIA_INFANTRY, "Auxiliaires - Infanterie"},
     {TR_WINDOW_ADVISOR_MILITARY_INFANTRY, "Fantassins"},
-    {TR_BUILDING_LATRINESS, "Latrines"},
-    {TR_BUILDING_LATRINESS_DESC, "Lieu d'aisance apprécié de la population pour parler des nouvelles du jour ou de leurs affaires"}
+    {TR_BUILDING_LATRINES, "Latrines"},
+    {TR_BUILDING_LATRINES_DESC_1, "Lieu d'aisance apprécié de la population pour parler des nouvelles du jour ou de leurs affaires"},    
+    {TR_BUILDING_LATRINES_DESC_2, "Les latrines sont utilisées par les citoyens n'ayant accès qu'à un puits, et améliorent légèrement le rang de logement et l'hygiène. Les maisons avec accès à une fontaine ne feront pas usage des latrines publiques."},
+    {TR_BUILDING_LATRINES_MISSING_1, "Cette maison ne peut pas évoluer, car elle n'a pas accès à des latrines ou à l'eau propre d'une fontaine."},
+    {TR_BUILDING_LATRINES_MISSING_2, "Cette maison ne peut pas évoluer, car elle n'a pas accès à l'eau propre d'une fontaine."}
 };
 
 void translation_french(const translation_string **strings, int *num_strings)

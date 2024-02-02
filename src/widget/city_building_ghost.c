@@ -728,7 +728,7 @@ static void draw_well(const map_tile *tile, int x, int y)
     draw_building_tiles(x, y, 1, &blocked);
 }
 
-static void draw_latrine(const map_tile *tile, int x, int y)
+static void draw_latrines(const map_tile *tile, int x, int y)
 {
     color_t color_mask;
     int blocked = 0;
@@ -752,10 +752,8 @@ static void draw_latrine(const map_tile *tile, int x, int y)
             break;
     }
 
-    if (config_get(CONFIG_UI_SHOW_WATER_STRUCTURE_RANGE)) {
-        city_water_ghost_draw_water_structure_ranges();
-        city_view_foreach_tile_in_range(tile->grid_offset, 1, map_water_supply_well_radius(), city_building_ghost_draw_well_range);
-    }
+    city_view_foreach_tile_in_range(tile->grid_offset, 1, map_water_supply_latrines_radius(), city_building_ghost_draw_well_range);
+
     draw_building(image_id, x, y, color_mask);
     draw_building_tiles(x, y, 1, &blocked);
 }
@@ -1451,7 +1449,7 @@ void city_building_ghost_draw(const map_tile *tile)
             draw_grand_temple_neptune(tile, x, y);
             break;
         case BUILDING_LATRINES:
-            draw_latrine(tile, x, y);
+            draw_latrines(tile, x, y);
             break;
         default:
             draw_default(tile, x, y, type);

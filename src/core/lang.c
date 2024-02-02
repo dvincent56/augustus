@@ -558,7 +558,7 @@ const uint8_t *lang_get_string(int group, int index)
             case BUILDING_FORT_AUXILIA_INFANTRY:
                 return translation_for(TR_BUILDING_FORT_AUXILIA_INFANTRY);
             case BUILDING_LATRINES:
-                return translation_for(TR_BUILDING_LATRINESS);
+                return translation_for(TR_BUILDING_LATRINES);
             default:
                 break;
         }

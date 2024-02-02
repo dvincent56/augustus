@@ -1358,8 +1358,11 @@ static translation_string all_strings[] = {
     {TR_REPLAY_MAP_NOT_FOUND_MESSAGE, "The original map file for this saved game was not found.\nYou need the following file with either a .map or .mapx extension:"},
     {TR_BUILDING_FORT_AUXILIA_INFANTRY, "Auxiliaries - Infantry"},
     {TR_WINDOW_ADVISOR_MILITARY_INFANTRY, "Infantrymen"},    
-    {TR_BUILDING_LATRINESS, "Latrines"},    
-    {TR_BUILDING_LATRINESS_DESC, "A place of comfort appreciated by the population to talk about the news of the day or their business"}
+    {TR_BUILDING_LATRINES, "Latrines"},    
+    {TR_BUILDING_LATRINES_DESC_1, "A place of comfort appreciated by the population to talk about the news of the day or their business"},
+    {TR_BUILDING_LATRINES_DESC_2, "Latrines are used by citizens having only access to a well, and help to slightly improve the housing and health levels. Houses in range of a fountain won't make use of public latrines."},
+    {TR_BUILDING_LATRINES_MISSING_1, "This house cannot evolve, as it does not have access to a latrine or a clean water supply from a fountain."},
+    {TR_BUILDING_LATRINES_MISSING_2, "This house cannot evolve, as it does not have access to a clean water supply from a fountain."}
 };
 
 void translation_english(const translation_string **strings, int *num_strings)

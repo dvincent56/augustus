@@ -303,15 +303,15 @@ void window_building_draw_well(building_info_context *c)
     }
 }
 
-void window_building_draw_latrine(building_info_context *c)
+void window_building_draw_latrines(building_info_context *c)
 {
     outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
-    lang_text_draw_centered(CUSTOM_TRANSLATION, TR_BUILDING_LATRINESS, c->x_offset, c->y_offset + 10, BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK);
-   
-    window_building_draw_description(c, CUSTOM_TRANSLATION, TR_BUILDING_LATRINESS_DESC);   
-
-    inner_panel_draw(c->x_offset + 16, c->y_offset + 105, c->width_blocks - 2, 4);
-    window_building_draw_employment_without_house_cover(c, 112); 
+    lang_text_draw_centered(CUSTOM_TRANSLATION, TR_BUILDING_LATRINES, c->x_offset, c->y_offset + 10,
+        BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK);   
+    window_building_draw_description(c, CUSTOM_TRANSLATION, TR_BUILDING_LATRINES_DESC_1);  
+    inner_panel_draw(c->x_offset + 16, c->y_offset + 136, c->width_blocks - 2, 4);
+    window_building_draw_employment_without_house_cover(c, 142);
+    window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 136, CUSTOM_TRANSLATION, TR_BUILDING_LATRINES_DESC_2); 
 }
 
 void window_building_draw_mission_post(building_info_context *c)

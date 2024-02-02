@@ -4,6 +4,7 @@
 typedef struct {
     struct {
         int well;
+        int latrines;
         int fountain;
         int entertainment;
         int more_entertainment;

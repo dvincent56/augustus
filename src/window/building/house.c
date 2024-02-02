@@ -231,7 +231,13 @@ void window_building_draw_house(building_info_context *c)
         text_draw((uint8_t *) ")", c->x_offset + 32 + width, c->y_offset + 60, FONT_NORMAL_BLACK, 0);
         lang_text_draw_multiline(127, 41 + b->data.house.evolve_text_id,
             c->x_offset + 32, c->y_offset + 76, BLOCK_SIZE * (c->width_blocks - 4), FONT_NORMAL_BLACK);
-    } else {
+    } else if (b->data.house.evolve_text_id == 31) { // latrines missing
+        lang_text_draw_multiline(CUSTOM_TRANSLATION, TR_BUILDING_LATRINES_MISSING_1,
+            c->x_offset + 32, c->y_offset + 70, BLOCK_SIZE * (c->width_blocks - 4), FONT_NORMAL_BLACK);
+    } else if (b->data.house.evolve_text_id == 32) { // fontain missing
+        lang_text_draw_multiline(CUSTOM_TRANSLATION, TR_BUILDING_LATRINES_MISSING_2,
+            c->x_offset + 32, c->y_offset + 70, BLOCK_SIZE * (c->width_blocks - 4), FONT_NORMAL_BLACK);
+    }else {
         lang_text_draw_multiline(127, 40 + b->data.house.evolve_text_id,
             c->x_offset + 32, c->y_offset + 70, BLOCK_SIZE * (c->width_blocks - 4), FONT_NORMAL_BLACK);
     }
