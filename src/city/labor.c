@@ -91,7 +91,6 @@ static const int CATEGORY_FOR_BUILDING_TYPE[BUILDING_TYPE_MAX] = {
     [BUILDING_TAVERN]           = LABOR_CATEGORY_ENTERTAINMENT,
     [BUILDING_ARENA]            = LABOR_CATEGORY_ENTERTAINMENT,
 
-    [BUILDING_LATRINES]     = LABOR_CATEGORY_HEALTH_EDUCATION,
     [BUILDING_DOCTOR]       = LABOR_CATEGORY_HEALTH_EDUCATION,
     [BUILDING_HOSPITAL]     = LABOR_CATEGORY_HEALTH_EDUCATION,
     [BUILDING_BATHHOUSE]    = LABOR_CATEGORY_HEALTH_EDUCATION,
@@ -100,6 +99,7 @@ static const int CATEGORY_FOR_BUILDING_TYPE[BUILDING_TYPE_MAX] = {
     [BUILDING_ACADEMY]      = LABOR_CATEGORY_HEALTH_EDUCATION,
     [BUILDING_LIBRARY]      = LABOR_CATEGORY_HEALTH_EDUCATION,
     [BUILDING_MISSION_POST] = LABOR_CATEGORY_HEALTH_EDUCATION,
+    [BUILDING_LATRINES]     = LABOR_CATEGORY_HEALTH_EDUCATION,
     
     [BUILDING_SMALL_TEMPLE_CERES]   = LABOR_CATEGORY_GOVERNANCE_RELIGION,
     [BUILDING_SMALL_TEMPLE_NEPTUNE] = LABOR_CATEGORY_GOVERNANCE_RELIGION,
@@ -397,6 +397,7 @@ static void set_building_worker_weight(void)
                 b->percentage_houses_covered = water_per_10k_per_building;
             } else {
                 b->percentage_houses_covered = 0;
+                
                 if (b->houses_covered) {
                     b->percentage_houses_covered =
                         calc_percentage(100 * b->houses_covered,
@@ -478,6 +479,7 @@ static void allocate_workers_to_non_water_buildings(void)
             if (!should_have_workers(b, cat, 0) || b->percentage_houses_covered <= 0) {
                 continue;
             }
+            
             int required_workers = model_get_building(b->type)->laborers;
             if (category_workers_needed[cat - 1]) {
                 int num_workers = calc_adjust_with_percentage(

@@ -311,7 +311,13 @@ void window_building_draw_latrines(building_info_context *c)
     window_building_draw_description(c, CUSTOM_TRANSLATION, TR_BUILDING_LATRINES_DESC_1);  
     inner_panel_draw(c->x_offset + 16, c->y_offset + 136, c->width_blocks - 2, 4);
     window_building_draw_employment_without_house_cover(c, 142);
-    window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 136, CUSTOM_TRANSLATION, TR_BUILDING_LATRINES_DESC_2); 
+
+    building *b = building_get(c->building_id);
+    if (b->num_workers > 0) {
+        window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 136, CUSTOM_TRANSLATION, TR_BUILDING_LATRINES_DESC_2); 
+    } else {        
+        window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 136, CUSTOM_TRANSLATION, TR_BUILDING_LATRINES_NO_WORKERS); 
+    }
 }
 
 void window_building_draw_mission_post(building_info_context *c)

@@ -601,8 +601,6 @@ static special_attribute_mapping_t special_attribute_mappings_allowed_buildings[
     { .type = PARAMETER_TYPE_ALLOWED_BUILDING,            .text = "barracks",              .value = ALLOWED_BUILDING_BARRACKS,                    .key = TR_PARAMETER_VALUE_DYNAMIC_RESOLVE },
     { .type = PARAMETER_TYPE_ALLOWED_BUILDING,            .text = "military_academy",      .value = ALLOWED_BUILDING_MILITARY_ACADEMY,                    .key = TR_PARAMETER_VALUE_DYNAMIC_RESOLVE },
     { .type = PARAMETER_TYPE_ALLOWED_BUILDING,            .text = "monuments",             .value = ALLOWED_BUILDING_MONUMENTS,                    .key = TR_EDITOR_ALLOWED_BUILDINGS_MONUMENTS },
-    { .type = PARAMETER_TYPE_ALLOWED_BUILDING,            .text = "latrines",              .value = ALLOWED_BUILDING_LATRINES,                    .key = TR_BUILDING_LATRINES },
-
 };
 
 #define SPECIAL_ATTRIBUTE_MAPPINGS_ALLOWED_BUILDINGS_SIZE (sizeof(special_attribute_mappings_allowed_buildings) / sizeof(special_attribute_mapping_t))
