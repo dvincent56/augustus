@@ -166,8 +166,6 @@ int scenario_building_allowed(int type)
         case BUILDING_LOW_BRIDGE:
         case BUILDING_SHIP_BRIDGE:
             return scenario.allowed_buildings[ALLOWED_BUILDING_BRIDGE];
-        case BUILDING_LATRINES:
-            return scenario.allowed_buildings[ALLOWED_BUILDING_LATRINES];
     }
     return 1;
 }

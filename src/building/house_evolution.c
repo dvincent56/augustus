@@ -73,7 +73,7 @@ static int has_required_goods_and_services(building *house, int for_upgrade, int
                 return 0;
             } else if (level > HOUSE_SMALL_HOVEL && !house->has_latrines_access) {
                 return 0;
-            }         
+            }
         }
         if (water == 1) {
             if (!house->has_well_access) {
