@@ -298,7 +298,6 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
             break;            
         case BUILDING_LATRINES:
             add_building(b);
-            b->houses_covered = 100;
             break;
 
     }

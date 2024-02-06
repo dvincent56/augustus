@@ -620,7 +620,9 @@ void building_house_determine_evolve_text(building *house, int worst_desirabilit
         house->data.house.evolve_text_id = 1;
         return;
     }
-    if (water == 2 && !house->has_water_access) {
+    int as_water = level < HOUSE_SMALL_CASA && house->has_well_access && house->has_latrines_access;
+    
+    if (water == 2 && (!house->has_water_access && !as_water)) {
         house->data.house.evolve_text_id = 2;
         if (level < HOUSE_SMALL_CASA && !house->has_latrines_access) {
             house->data.house.evolve_text_id = 31;

@@ -236,7 +236,7 @@ static int is_industry_disabled(building *b)
 }
 
 static int should_have_workers(building *b, int category, int check_access)
-{
+{    
     if (category == LABOR_CATEGORY_NONE) {
         return 0;
     }
@@ -254,6 +254,7 @@ static int should_have_workers(building *b, int category, int check_access)
     if (category == LABOR_CATEGORY_ENGINEERING || category == LABOR_CATEGORY_WATER) {
         return 1;
     }
+
     if (check_access) {
         return b->houses_covered > 0 ? 1 : 0;
     }
@@ -476,7 +477,7 @@ static void allocate_workers_to_non_water_buildings(void)
                 continue;
             }
             b->num_workers = 0;
-            if (!should_have_workers(b, cat, 0) || b->percentage_houses_covered <= 0) {
+            if (b->type != BUILDING_LATRINES && (!should_have_workers(b, cat, 0) || b->percentage_houses_covered <= 0)) {
                 continue;
             }
             
