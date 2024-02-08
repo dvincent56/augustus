@@ -524,9 +524,11 @@ static void show_overlay_from_grid_offset(int grid_offset)
         case BUILDING_DEPOT:
             overlay = OVERLAY_LOGISTICS;
             break;
-        case BUILDING_DOCK:        
-        case BUILDING_LATRINES:
+        case BUILDING_DOCK:
             overlay = OVERLAY_SICKNESS;
+            break;
+        case BUILDING_LATRINES:
+            overlay = OVERLAY_HEALTH;
             break;
         case BUILDING_NONE:
             if (map_terrain_get(grid_offset) & TERRAIN_RUBBLE) {
