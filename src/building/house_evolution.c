@@ -619,20 +619,20 @@ void building_house_determine_evolve_text(building *house, int worst_desirabilit
         if (!house->has_well_access) {
             house->data.house.evolve_text_id = 1;
             return;
-        } else {
-            house->data.house.evolve_text_id = 67;        
+        } else if (!house->has_latrines_access) {
+            house->data.house.evolve_text_id = 67;
             return;
         }
     }
 
     if (water == 2 && !house->has_water_access) {
-        if (!house->has_well_access && !house->has_latrines_access) {
-            house->data.house.evolve_text_id = 2;
-            return;
-        } else if (house->has_well_access && !house->has_latrines_access) {
+        if (!house->has_latrines_access) {
             house->data.house.evolve_text_id = 67;        
             return;
-        }      
+        } else if (level >= HOUSE_LARGE_CASA) {
+            house->data.house.evolve_text_id = 2;
+            return;
+        }
     }
 
     // entertainment
@@ -775,9 +775,14 @@ void building_house_determine_evolve_text(building *house, int worst_desirabilit
     model = model_get_house(++level);
     // water
     water = model->water;
-    if (water == 1 && !house->has_water_access && !house->has_well_access) {
-        house->data.house.evolve_text_id = 31;
-        return;
+    if (water == 1 && !house->has_water_access) {
+        if (!house->has_well_access) {
+            house->data.house.evolve_text_id = 31;
+            return;
+        } else if (!house->has_latrines_access) {
+            house->data.house.evolve_text_id = 67;        
+            return;
+        }        
     }
 
     if (water == 2 && !house->has_water_access) {

@@ -201,6 +201,11 @@ void city_building_ghost_draw_fountain_range(int x, int y, int grid_offset)
     image_draw(image_group(GROUP_TERRAIN_FLAT_TILE), x, y, COLOR_MASK_BLUE, data.scale);
 }
 
+void city_building_ghost_draw_latrines_range(int x, int y, int grid_offset)
+{
+    image_draw(image_group(GROUP_TERRAIN_FLAT_TILE), x, y, COLOR_MASK_DARK_GREEN & ALPHA_FONT_SEMI_TRANSPARENT, data.scale);
+}
+
 static void image_draw_warehouse(int image_id, int x, int y, color_t color)
 {
     int image_id_space = image_group(GROUP_BUILDING_WAREHOUSE_STORAGE_EMPTY);
@@ -752,7 +757,7 @@ static void draw_latrines(const map_tile *tile, int x, int y)
             break;
     }
 
-    city_view_foreach_tile_in_range(tile->grid_offset, 1, map_water_supply_latrines_radius(), city_building_ghost_draw_well_range);
+    city_view_foreach_tile_in_range(tile->grid_offset, 1, map_water_supply_latrines_radius(), city_building_ghost_draw_latrines_range);
 
     draw_building(image_id, x, y, color_mask);
     draw_building_tiles(x, y, 1, &blocked);
