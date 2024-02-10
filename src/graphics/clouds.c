@@ -5,6 +5,7 @@
 #include "core/random.h"
 #include "core/speed.h"
 #include "game/settings.h"
+#include "game/state.h"
 #include "graphics/renderer.h"
 
 #include <math.h>
@@ -270,14 +271,22 @@ void clouds_draw(int x_offset, int y_offset, int x_limit, int y_limit, float bas
             cloud->status = STATUS_INACTIVE;
             continue;
         }
-        speed_set_target(&cloud->speed.x, -CLOUD_SPEED, SPEED_CHANGE_IMMEDIATE, 1);
-        speed_set_target(&cloud->speed.y, CLOUD_SPEED / 2, SPEED_CHANGE_IMMEDIATE, 1);
+
+        double cloudSpeed = 0;
+
+        if (!game_state_is_paused()) {
+            double speedShift = (100 - setting_game_speed()) / 100;
+            cloudSpeed = CLOUD_SPEED - speedShift;
+        }
+
+        speed_set_target(&cloud->speed.x, -cloudSpeed, SPEED_CHANGE_IMMEDIATE, 1);
+        speed_set_target(&cloud->speed.y, cloudSpeed / 2, SPEED_CHANGE_IMMEDIATE, 1);
 
         graphics_renderer()->draw_image_advanced(&cloud->img,
             (cloud->x - x_offset) / base_scale, (cloud->y - y_offset) / base_scale, COLOR_MASK_NONE,
             cloud->scale_x * base_scale, cloud->scale_y * base_scale, cloud->angle, 1);
 
-        cloud->x += speed_get_delta(&cloud->speed.x) * (setting_game_speed() / 10);
-        cloud->y += speed_get_delta(&cloud->speed.y) * (setting_game_speed() / 10);
+        cloud->x += speed_get_delta(&cloud->speed.x);
+        cloud->y += speed_get_delta(&cloud->speed.y);
     }
 }
