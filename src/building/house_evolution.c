@@ -620,7 +620,7 @@ void building_house_determine_evolve_text(building *house, int worst_desirabilit
             house->data.house.evolve_text_id = 1;
             return;
         } else if (!house->has_latrines_access) {
-            house->data.house.evolve_text_id = 67;
+            house->data.house.evolve_text_id = 68;
             return;
         }
     }
@@ -780,7 +780,7 @@ void building_house_determine_evolve_text(building *house, int worst_desirabilit
             house->data.house.evolve_text_id = 31;
             return;
         } else if (!house->has_latrines_access) {
-            house->data.house.evolve_text_id = 67;        
+            house->data.house.evolve_text_id = 68;        
             return;
         }        
     }

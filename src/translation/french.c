@@ -1355,7 +1355,8 @@ static translation_string all_strings[] = {
     {TR_BUILDING_LATRINES, "Latrines"},
     {TR_BUILDING_LATRINES_DESC_1, "Lieu d'aisance apprécié de la population pour parler des nouvelles du jour ou de leurs affaires."},    
     {TR_BUILDING_LATRINES_DESC_2, "Les latrines sont utilisées par les citoyens n'ayant accès qu'à un puits, et améliorent légèrement le rang de logement et l'hygiène. Les maisons avec accès à une fontaine ne feront pas usage des latrines publiques."},
-    {TR_BUILDING_LATRINES_MISSING, "Cette maison ne peut pas évoluer, car elle n'a pas accès à des latrines ou à l'eau propre d'une fontaine."},
+    {TR_BUILDING_LATRINES_MISSING_EVOLVE, "Cette maison ne peut pas évoluer, car elle n'a pas accès à des latrines ou à l'eau propre d'une fontaine."},
+    {TR_BUILDING_LATRINES_MISSING_DEVOLVE, "Cette maison va bientôt régresser, car elle n'a pas accès à des latrines ou à l'eau propre d'une fontaine."},
     {TR_BUILDING_LATRINES_NO_WORKERS, "Sans employés pour entretenir les latrines, les citoyens évitent de venir s'y relaxer."}
 };
 
