@@ -241,6 +241,10 @@ static int should_have_workers(building *b, int category, int check_access)
         return 0;
     }
 
+    if (b->type == BUILDING_LATRINES) {
+        return 1;
+    }
+
     if (category == LABOR_CATEGORY_ENTERTAINMENT) {
         if (b->type == BUILDING_HIPPODROME && b->prev_part_building_id) {
             return 0;
