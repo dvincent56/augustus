@@ -757,6 +757,9 @@ static void draw_latrines(const map_tile *tile, int x, int y)
             break;
     }
 
+    for (building *b = building_first_of_type(BUILDING_LATRINES); b; b = b->next_of_type) {
+        city_view_foreach_tile_in_range(b->grid_offset, 1, map_water_supply_latrines_radius(), city_building_ghost_draw_latrines_range);
+    }
     city_view_foreach_tile_in_range(tile->grid_offset, 1, map_water_supply_latrines_radius(), city_building_ghost_draw_latrines_range);
 
     draw_building(image_id, x, y, color_mask);
