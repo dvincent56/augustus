@@ -165,10 +165,12 @@ static void draw_foreground(void)
 
     for (int i = 0; i < 3; i++) {
         int module_name = epithets_options[selected_god_id * 3 + i].option.header;
-        text_draw_centered(translation_for(module_name), 53, 184 + offet_y , 540, FONT_NORMAL_WHITE, 0);
+        text_draw_centered(translation_for(module_name), 53, 184 + offet_y , 540, FONT_NORMAL_GREEN, 0);
                 
         int module_desc = epithets_options[selected_god_id * 3 + i].option.desc;
-        offet_y += text_draw_multiline(translation_for(module_desc), 53, 204 + offet_y, 540, FONT_SMALL_PLAIN, 0);
+         // Draw in black and then white to create shadow effect
+        text_draw_multiline(translation_for(module_desc), 53 + 1, 204 + offet_y + 1, 540, FONT_SMALL_PLAIN, COLOR_BLACK);
+        offet_y += text_draw_multiline(translation_for(module_desc), 53, 204 + offet_y, 540, FONT_SMALL_PLAIN, COLOR_WHITE);
         offet_y += 34;
     }
 
