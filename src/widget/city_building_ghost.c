@@ -468,7 +468,7 @@ static void draw_default(const map_tile *tile, int x_view, int y_view, building_
         type = building_connectable_gate_type(type);
     }
 
-    if (type == BUILDING_NYMPHAEUM || type == BUILDING_SMALL_MAUSOLEUM || type == BUILDING_LARGE_MAUSOLEUM) {
+    if (config_get(CONFIG_UI_SHOW_DESIRABILITY_RANGE) && (type == BUILDING_NYMPHAEUM || type == BUILDING_SMALL_MAUSOLEUM || type == BUILDING_LARGE_MAUSOLEUM)) {
         draw_mausoleum_desirability_range(tile, type, building_size);
     }
 
