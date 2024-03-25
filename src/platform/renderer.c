@@ -35,7 +35,7 @@
 #define HAS_TEXTURE_SCALE_MODE 0
 #endif
 
-#define MAX_UNPACKED_IMAGES 10
+#define MAX_UNPACKED_IMAGES 20
 
 #define MAX_PACKED_IMAGE_SIZE 64000
 
@@ -970,9 +970,9 @@ static void load_unpacked_image(const image *img, const color_t *pixels)
     if (data.paused) {
         return;
     }
-    int unpacked_image_id = img->atlas.id & IMAGE_ATLAS_BIT_MASK;
     int first_empty = -1;
     int oldest_texture_index = 0;
+    int unpacked_image_id = img->atlas.id & IMAGE_ATLAS_BIT_MASK;
     for (int i = 0; i < MAX_UNPACKED_IMAGES; i++) {
         if (data.unpacked_images[i].id == unpacked_image_id && data.unpacked_images[i].texture) {
             return;
@@ -1234,26 +1234,25 @@ void platform_renderer_clear(void)
     clear_screen();
 }
 
-#ifdef PLATFORM_USE_SOFTWARE_CURSOR
 static void draw_software_mouse_cursor(void)
 {
     const mouse *m = mouse_get();
-    if (!m->is_touch) {
-        cursor_shape current = platform_cursor_get_current_shape();
-        if (current == CURSOR_DISABLED) {
-            return;
-        }
-        int size = calc_adjust_with_percentage(data.cursors[current].size,
-            calc_percentage(100, platform_screen_get_scale()));
-        SDL_Rect dst;
-        dst.x = m->x - data.cursors[current].hotspot.x;
-        dst.y = m->y - data.cursors[current].hotspot.y;
-        dst.w = size;
-        dst.h = size;
-        SDL_RenderCopy(data.renderer, data.cursors[current].texture, NULL, &dst);
+    if (m->is_touch) {
+        return;
     }
+    cursor_shape current = platform_cursor_get_current_shape();
+    if (current == CURSOR_DISABLED) {
+        return;
+    }
+    int size = calc_adjust_with_percentage(data.cursors[current].size,
+        calc_percentage(100, platform_screen_get_scale()));
+    SDL_Rect dst;
+    dst.x = m->x - data.cursors[current].hotspot.x;
+    dst.y = m->y - data.cursors[current].hotspot.y;
+    dst.w = size;
+    dst.h = size;
+    SDL_RenderCopy(data.renderer, data.cursors[current].texture, NULL, &dst);
 }
-#endif
 
 void platform_renderer_render(void)
 {
@@ -1262,9 +1261,9 @@ void platform_renderer_render(void)
     }
     SDL_SetRenderTarget(data.renderer, NULL);
     SDL_RenderCopy(data.renderer, data.render_texture, NULL, NULL);
-#ifdef PLATFORM_USE_SOFTWARE_CURSOR
-    draw_software_mouse_cursor();
-#endif
+    if (platform_cursor_is_software()) {
+        draw_software_mouse_cursor();
+    }
     SDL_RenderPresent(data.renderer);
     SDL_SetRenderTarget(data.renderer, data.render_texture);
 }

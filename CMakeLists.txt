@@ -261,6 +261,7 @@ set(CORE_FILES
 
 set(BUILDING_FILES
     ${PROJECT_SOURCE_DIR}/src/building/animation.c
+    ${PROJECT_SOURCE_DIR}/src/building/armoury.c
     ${PROJECT_SOURCE_DIR}/src/building/barracks.c
     ${PROJECT_SOURCE_DIR}/src/building/building.c
     ${PROJECT_SOURCE_DIR}/src/building/caravanserai.c
@@ -303,6 +304,12 @@ set(BUILDING_FILES
     ${PROJECT_SOURCE_DIR}/src/building/temple.c
     ${PROJECT_SOURCE_DIR}/src/building/variant.c
     ${PROJECT_SOURCE_DIR}/src/building/warehouse.c
+)
+set(CAMPAIGN_FILES
+    ${PROJECT_SOURCE_DIR}/src/campaign/campaign.c
+    ${PROJECT_SOURCE_DIR}/src/campaign/file.c
+    ${PROJECT_SOURCE_DIR}/src/campaign/mission.c
+    ${PROJECT_SOURCE_DIR}/src/campaign/xml.c
 )
 set(CITY_FILES
     ${PROJECT_SOURCE_DIR}/src/city/buildings.c
@@ -503,6 +510,7 @@ set(GRAPHICS_FILES
     ${PROJECT_SOURCE_DIR}/src/graphics/image.c
     ${PROJECT_SOURCE_DIR}/src/graphics/image_button.c
     ${PROJECT_SOURCE_DIR}/src/graphics/lang_text.c
+    ${PROJECT_SOURCE_DIR}/src/graphics/list_box.c
     ${PROJECT_SOURCE_DIR}/src/graphics/menu.c
     ${PROJECT_SOURCE_DIR}/src/graphics/panel.c
     ${PROJECT_SOURCE_DIR}/src/graphics/rich_text.c
@@ -633,7 +641,7 @@ set(WINDOW_FILES
     ${PROJECT_SOURCE_DIR}/src/window/mission_briefing.c
     ${PROJECT_SOURCE_DIR}/src/window/mission_end.c
     ${PROJECT_SOURCE_DIR}/src/window/mission_selection.c
-    ${PROJECT_SOURCE_DIR}/src/window/new_career.c
+    ${PROJECT_SOURCE_DIR}/src/window/new_campaign.c
     ${PROJECT_SOURCE_DIR}/src/window/numeric_input.c
     ${PROJECT_SOURCE_DIR}/src/window/option_popup.c
     ${PROJECT_SOURCE_DIR}/src/window/overlay_menu.c
@@ -705,6 +713,7 @@ set(SOURCE_FILES
     ${PLATFORM_FILES}
     ${CORE_FILES}
     ${BUILDING_FILES}
+    ${CAMPAIGN_FILES}
     ${CITY_FILES}
     ${EMPIRE_FILES}
     ${FIGURE_FILES}

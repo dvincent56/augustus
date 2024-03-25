@@ -6,6 +6,7 @@
 #include "core/dir.h"
 #include "core/log.h"
 #include "graphics/renderer.h"
+#include "core/png_read.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -41,14 +42,16 @@ void assets_init(int force_reload, color_t **main_images, int *main_image_widths
 
     asset_image_load_all(main_images, main_image_widths);
 
+    group_set_for_external_files();
+
     // By default, if the requested image is not found, the roadblock image will be shown.
     // This ensures compatibility with previous release versions of Augustus, which only had roadblocks
-    data.roadblock_image_id = assets_get_group_id("Logistics");
+    data.roadblock_image_id = assets_get_group_id("Admin_Logistics");
     data.roadblock_image = asset_image_get_from_id(data.roadblock_image_id - IMAGE_MAIN_ENTRIES);
-    data.asset_lookup[ASSET_HIGHWAY_BASE_START] = assets_get_image_id("Logistics", "Highway_Base_Start");
-    data.asset_lookup[ASSET_HIGHWAY_BARRIER_START] = assets_get_image_id("Logistics", "Highway_Barrier_Start");
-    data.asset_lookup[ASSET_AQUEDUCT_WITH_WATER] = assets_get_image_id("Logistics", "Aqueduct_Bridge_Left_Water");
-    data.asset_lookup[ASSET_AQUEDUCT_WITHOUT_WATER] = assets_get_image_id("Logistics", "Aqueduct_Bridge_Left_Empty");
+    data.asset_lookup[ASSET_HIGHWAY_BASE_START] = assets_get_image_id("Admin_Logistics", "Highway_Base_Start");
+    data.asset_lookup[ASSET_HIGHWAY_BARRIER_START] = assets_get_image_id("Admin_Logistics", "Highway_Barrier_Start");
+    data.asset_lookup[ASSET_AQUEDUCT_WITH_WATER] = assets_get_image_id("Admin_Logistics", "Aqueduct_Bridge_Left_Water");
+    data.asset_lookup[ASSET_AQUEDUCT_WITHOUT_WATER] = assets_get_image_id("Admin_Logistics", "Aqueduct_Bridge_Left_Empty");
     data.asset_lookup[ASSET_GOLD_SHIELD] = assets_get_image_id("UI", "GoldShield");
     data.asset_lookup[ASSET_HAGIA_SOPHIA_FIX] = assets_get_image_id("UI", "H Sophia Fix");
     data.asset_lookup[ASSET_FIRST_ORNAMENT] = assets_get_image_id("UI", "First Ornament");
@@ -94,6 +97,16 @@ int assets_get_image_id(const char *assetlist_name, const char *image_name)
             return img->index + IMAGE_MAIN_ENTRIES;
         }
         img = asset_image_get_from_id(img->index + 1);
+    }
+    if (strcmp(assetlist_name, ASSET_EXTERNAL_FILE_LIST) == 0) {
+        asset_image *img = asset_image_create_external(image_name);
+        if (img) {
+            if (group->first_image_index == -1) {
+                group->first_image_index = img->index;
+            }
+            group->last_image_index = img->index;
+        }
+        return img->index + IMAGE_MAIN_ENTRIES;
     }
     log_info("Asset image not found: ", image_name, 0);
     log_info("Asset group is: ", assetlist_name, 0);

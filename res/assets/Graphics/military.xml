@@ -15,31 +15,26 @@
 	<!-- Note: Mess Hall ON animation reference DO NOT USE! -->
 	<image id="Mess_Hall_Anim_01" width="178" height="121">
 		<layer src="Mess_Hall_ON" x="12" y="62"/>
-		<layer src="Mess_Hall_Anim_01" x="70" y="48"/>
 		<layer src="Watchtower_ON_01" x="129" y="67"/>
 		<layer src="Watchtower_ON_01" x="169" y="48"/>
 	</image>
 	<image id="Mess_Hall_Anim_02" width="178" height="121">
 		<layer src="Mess_Hall_ON" x="12" y="62"/>
-		<layer src="Mess_Hall_Anim_02" x="70" y="48"/>
 		<layer src="Watchtower_ON_02" x="129" y="67"/>
 		<layer src="Watchtower_ON_02" x="169" y="48"/>
 	</image>
 	<image id="Mess_Hall_Anim_03" width="178" height="121">
 		<layer src="Mess_Hall_ON" x="12" y="62"/>
-		<layer src="Mess_Hall_Anim_03" x="70" y="48"/>
 		<layer src="Watchtower_ON_03" x="129" y="67"/>
 		<layer src="Watchtower_ON_03" x="169" y="48"/>
 	</image>
 	<image id="Mess_Hall_Anim_04" width="178" height="121">
 		<layer src="Mess_Hall_ON" x="12" y="62"/>
-		<layer src="Mess_Hall_Anim_04" x="70" y="48"/>
 		<layer src="Watchtower_ON_04" x="129" y="67"/>
 		<layer src="Watchtower_ON_04" x="169" y="48"/>
 	</image>
 	<image id="Mess_Hall_Anim_05" width="178" height="121">
 		<layer src="Mess_Hall_ON" x="12" y="62"/>
-		<layer src="Mess_Hall_Anim_05" x="70" y="48"/>
 		<layer src="Watchtower_ON_05" x="129" y="67"/>
 		<layer src="Watchtower_ON_05" x="169" y="48"/>
 	</image>
@@ -724,33 +719,28 @@
 	<!-- Note: Armoury ON animation reference DO NOT USE! -->
 	<image id="Armoury_Anim_01" width="118" height="83">
 		<layer src="Armoury_Top" x="1" y="25"/>
-		<layer src="Armoury_ON_01" x="44" y="35"/>
 		<layer src="Watchtower_ON_01" x="102" y="15"/>
 	</image>
 	<image id="Armoury_Anim_02" width="118" height="83">
 		<layer src="Armoury_Top" x="1" y="25"/>
-		<layer src="Armoury_ON_02" x="44" y="35"/>
 		<layer src="Watchtower_ON_02" x="102" y="15"/>
 	</image>
 	<image id="Armoury_Anim_03" width="118" height="83">
 		<layer src="Armoury_Top" x="1" y="25"/>
-		<layer src="Armoury_ON_03" x="44" y="35"/>
 		<layer src="Watchtower_ON_03" x="102" y="15"/>
 	</image>
 	<image id="Armoury_Anim_04" width="118" height="83">
 		<layer src="Armoury_Top" x="1" y="25"/>
-		<layer src="Armoury_ON_02" x="44" y="35"/>
 		<layer src="Watchtower_ON_04" x="102" y="15"/>
 	</image>
 	<image id="Armoury_Anim_05" width="118" height="83">
 		<layer src="Armoury_Top" x="1" y="25"/>
-		<layer src="Armoury_ON_01" x="44" y="35"/>
 		<layer src="Watchtower_ON_05" x="102" y="15"/>
 	</image>
 	<!-- Note: Armoury ON Animations for Central, North and South Climates respectively -->
 	<image id="Armoury_ON_C" isometric="true">
 		<layer group="this" image="Armoury_OFF_C"/>
-		<animation speed="6" x="0" y="0" reversible="false">
+		<animation speed="8" x="0" y="0" reversible="false">
 			<frame group="this" image="Armoury_Anim_01"/>
 			<frame group="this" image="Armoury_Anim_02"/>
 			<frame group="this" image="Armoury_Anim_03"/>
@@ -760,7 +750,7 @@
 	</image>
 	<image id="Armoury_ON_N" isometric="true">
 		<layer group="this" image="Armoury_OFF_N"/>
-		<animation speed="6" x="0" y="0" reversible="false">
+		<animation speed="8" x="0" y="0" reversible="false">
 			<frame group="this" image="Armoury_Anim_01"/>
 			<frame group="this" image="Armoury_Anim_02"/>
 			<frame group="this" image="Armoury_Anim_03"/>
@@ -770,7 +760,7 @@
 	</image>
 	<image id="Armoury_ON_S" isometric="true">
 		<layer group="this" image="Armoury_OFF_S"/>
-		<animation speed="6" x="0" y="0" reversible="false">
+		<animation speed="8" x="0" y="0" reversible="false">
 			<frame group="this" image="Armoury_Anim_01"/>
 			<frame group="this" image="Armoury_Anim_02"/>
 			<frame group="this" image="Armoury_Anim_03"/>
@@ -827,5 +817,55 @@
 	<image id="auxinf_banner_08">
 		<layer src="auxinf_banner_base"/>
 		<layer src="auxinf_banner_08" x="4" y="3"/>
+	</image>
+	<!-- Note: Auxiliary Archer Fort flag climate variants for Central, North and South Climates respectively. Assets by CaesarZX -->
+	<image id="fort_aux_arch_flag_central">
+		<layer group="66" image="2"/>
+		<layer src="auxarch_fort_flag" x="10" y="4"/>
+	</image>
+	<image id="fort_aux_arch_flag_north">
+		<layer group="66" image="2"/>
+		<layer src="Fort_Flag_Layer_North"/>
+		<layer src="auxarch_fort_flag" x="10" y="4"/>
+	</image>
+	<image id="fort_aux_arch_flag_south">
+		<layer group="66" image="2"/>
+		<layer src="Fort_Flag_Layer_South"/>
+		<layer src="auxarch_fort_flag" x="10" y="4"/>
+	</image>
+	<!-- Note: Auxiliary Archer banner static. Asset by CaesarZX -->
+	<image id="auxarch_banner_0" src="auxarch_banner_0"/>
+	<!-- Note: Auxiliary Archer banner animation frames. Assets by CaesarZX -->
+	<image id="auxarch_banner_01">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_01" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_02">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_02" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_03">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_03" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_04">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_044" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_05">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_05" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_06">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_06" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_07">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_07" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_08">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_08" x="4" y="3"/>
 	</image>
 </assetlist>
