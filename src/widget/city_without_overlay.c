@@ -473,8 +473,9 @@ static void draw_plague(building *b, int x, int y, color_t color_mask)
 
 static void draw_depot_ressource(building *b, int x, int y, color_t color_mask)
 {
+    int img_id;
+
     if (b->num_workers > 0) {
-        int img_id;
         switch(b->data.depot.current_order.resource_type) {
             case RESOURCE_VEGETABLES:
                 img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Vegetables");
@@ -527,9 +528,6 @@ static void draw_depot_ressource(building *b, int x, int y, color_t color_mask)
             case RESOURCE_STONE:
                 img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Stone");
                 break;
-            case RESOURCE_CONCRETE:
-                img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Wheat");
-                break;
             case RESOURCE_BRICKS:
                 img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Bricks");
                 break;
@@ -537,9 +535,11 @@ static void draw_depot_ressource(building *b, int x, int y, color_t color_mask)
             default:
                 img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Wheat");
                 break;
-        }
-        image_draw(img_id, x + 11, y, COLOR_MASK_NONE, draw_context.scale);
+        }        
+    } else {
+        img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Cat");
     }
+    image_draw(img_id, x + 11, y, COLOR_MASK_NONE, draw_context.scale);
 }
 
 static void draw_dock_workers(const building *b, int x, int y, color_t color_mask)
@@ -727,12 +727,12 @@ static void draw_animation(int x, int y, int grid_offset)
                     int overlay_id = assets_get_image_id("Monuments", "Col Base Overlay") + festival_id;
                     image_draw(overlay_id, x + extra_x, y + extra_y - y_offset, color_mask, draw_context.scale);
                 }
-                if (b->type == BUILDING_DEPOT) {
-                    draw_depot_ressource(b, x, y, color_mask);
-                }
             }
             if (b->has_plague) {
                 draw_plague(b, x, y, color_mask);
+            }
+            if (b->type == BUILDING_DEPOT) {
+                draw_depot_ressource(b, x, y, color_mask);
             }
         }
     } else if (map_property_is_draw_tile(grid_offset) && building_id && b->has_plague) {
