@@ -471,7 +471,7 @@ static void draw_plague(building *b, int x, int y, color_t color_mask)
     }
 }
 
-static void draw_depot_ressource(building *b, int x, int y, color_t color_mask)
+static void draw_depot_resource(building *b, int x, int y, color_t color_mask)
 {
     int img_id;
 
@@ -732,7 +732,7 @@ static void draw_animation(int x, int y, int grid_offset)
                 draw_plague(b, x, y, color_mask);
             }
             if (b->type == BUILDING_DEPOT) {
-                draw_depot_ressource(b, x, y, color_mask);
+                draw_depot_resource(b, x, y, color_mask);
             }
         }
     } else if (map_property_is_draw_tile(grid_offset) && building_id && b->has_plague) {
