@@ -273,9 +273,6 @@ static void draw_hippodrome_spectators(const building *b, int x, int y, color_t 
 
 static void draw_entertainment_spectators(building *b, int x, int y, color_t color_mask)
 {
-    if (b->type == BUILDING_AMPHITHEATER && b->num_workers > 0) {
-        image_draw(image_group(GROUP_BUILDING_AMPHITHEATER_SHOW), x + 36, y - 47, color_mask, draw_context.scale);
-    }
     if (b->type == BUILDING_HIPPODROME && building_main(b)->num_workers > 0
         && city_entertainment_hippodrome_has_race()) {
         draw_hippodrome_spectators(b, x, y, color_mask);
@@ -596,13 +593,13 @@ static void draw_granary_stores(const image *img, const building *b, int x, int 
 
 static void draw_ceres_module_crops(int x, int y, int image_offset, color_t color_mask)
 {
-    int image_id = assets_get_image_id("Religion", "Ceres Module 1 Crop");
+    int image_id = assets_get_image_id("Monuments", "Ceres Module 1 Crop");
     image_draw(image_id + image_offset, x, y, color_mask, draw_context.scale);
 }
 
 static void draw_neptune_fountain(int x, int y, int image_offset, color_t color_mask)
 {
-    int image_id = assets_get_image_id("Religion", "Neptune Module 2 Fountain");
+    int image_id = assets_get_image_id("Monuments", "Neptune Module 2 Fountain");
     image_draw(image_id + image_offset, x, y, color_mask, draw_context.scale);
 }
 
@@ -656,7 +653,7 @@ static void draw_animation(int x, int y, int grid_offset)
                     int festival_id = calc_bound(city_festival_games_active(), 0, 4);
                     int extra_x = festival_id ? 57 : 127;
                     int extra_y = festival_id ? 12 : 93;
-                    int overlay_id = assets_get_image_id("Entertainment", "Col Base Overlay") + festival_id;
+                    int overlay_id = assets_get_image_id("Monuments", "Col Base Overlay") + festival_id;
                     image_draw(overlay_id, x + extra_x, y + extra_y - y_offset, color_mask, draw_context.scale);
                 }
             }
