@@ -1400,7 +1400,18 @@ static translation_string all_strings[] = {
     {TR_WINDOW_ORIGINAL_CAMPAIGN_DESC, "The original Caesar 3 campaign, in all its 25 year old glory."},
     {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TITLE, "Not yet implemented" },
     {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TEXT, "The custom campaign support has not been implemented yet.\nPlease check a later build."},
-    
+    {TR_WINDOW_BARRACKS_PRIORITY, "Recruitment Priority:"},
+    {TR_WINDOW_BARRACKS_FORTS, "Forts"},
+    {TR_WINDOW_BARRACKS_TOWERS, "Towers"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_FORT, "Prioritize Legionary training"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_JAVELIN, "Prioritize Javelin training"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_MOUNTED, "Prioritize Cavalery training"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_AUXINF, "Prioritize Infantryman training"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_AUXARCH, "Prioritize Archer training"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_TOWER, "Prioritize Towers delivery"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_WATCHTOWER, "Prioritize Watchtowers delivery"},
+    {TR_TOOLTIP_BUTTON_REJECT_DELIVERY, "Stopping weapons delivery from Armory"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_DELIVERY, "Allowing weapons delivery from Armory"},
 };
 
 void translation_english(const translation_string **strings, int *num_strings)

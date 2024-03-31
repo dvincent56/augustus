@@ -177,7 +177,6 @@ static int get_height_id(void)
             case BUILDING_FOUNTAIN:
                 return 2;
 
-            case BUILDING_BARRACKS:
             case BUILDING_LARGE_TEMPLE_CERES:
             case BUILDING_LARGE_TEMPLE_NEPTUNE:
             case BUILDING_LARGE_TEMPLE_MERCURY:
@@ -206,12 +205,12 @@ static int get_height_id(void)
 
             case BUILDING_MESS_HALL:
             case BUILDING_CITY_MINT:
+            case BUILDING_BARRACKS:
                 return 7;
 
             case BUILDING_GRAND_TEMPLE_CERES:
             case BUILDING_GRAND_TEMPLE_NEPTUNE:
             case BUILDING_GRAND_TEMPLE_MERCURY:
-            case BUILDING_GRAND_TEMPLE_MARS:
             case BUILDING_GRAND_TEMPLE_VENUS:
             case BUILDING_PANTHEON:
             case BUILDING_HIPPODROME:
@@ -220,6 +219,9 @@ static int get_height_id(void)
 
             case BUILDING_GRANARY:
                 return 9;
+
+            case BUILDING_GRAND_TEMPLE_MARS:
+                return 10;
 
             default:
                 return 0;
@@ -453,7 +455,8 @@ static void init(int grid_offset)
         case 5: context.height_blocks = 24; break;
         case 6: context.height_blocks = 38; break;
         case 7: context.height_blocks = 26; break;
-        case 8: context.height_blocks = 40; context.width_blocks = 30; break;
+        case 8: context.height_blocks = 40; context.width_blocks = 30; break;        
+        case 10: context.height_blocks = 47; context.width_blocks = 30; break;
         case 9: context.height_blocks = 20; break;
         default: context.height_blocks = 22; break;
     }
@@ -1062,6 +1065,8 @@ static void get_tooltip(tooltip_context *c)
         } else if (!context.depot_selection.resource) {
             window_building_depot_get_tooltip_main(&translation);
         }
+    } else if (btype == BUILDING_BARRACKS ||btype == BUILDING_GRAND_TEMPLE_MARS) {
+        window_building_barracks_get_tooltip_priority(&translation);
     }
     if (!text_id && !group_id && !translation && !precomposed_text) {
         if (building_is_farm(btype) || building_is_raw_resource_producer(btype) || building_is_workshop(btype)) {

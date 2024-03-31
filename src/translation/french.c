@@ -226,7 +226,7 @@ static translation_string all_strings[] = {
     {TR_BUILDING_PANTHEON_DESC_MODULE_1, "Pantheum Ara Maxima"},
     {TR_BUILDING_PANTHEON_DESC_MODULE_2, "Pantheum Roma Aeterna"},
     {TR_BUILDING_GRAND_TEMPLE_MENU, "Temple monumental"},
-    {TR_BUILDING_WORK_CAMP, "Camp de travail"},
+    {TR_BUILDING_WORK_CAMP, "Chantier de construction"},
     {TR_BUILDING_WORK_CAMP_DESC, "Les ouvriers se rassemblent ici pour transporter les matériaux vers les chantiers de construction."},
     {TR_BUILDING_DEPOT, "Dépôt de charrettes"},
     {TR_BUILDING_CAT_DEPOT, "Dépôt de chat(rrettes)"},
@@ -1399,7 +1399,18 @@ static translation_string all_strings[] = {
     {TR_WINDOW_ORIGINAL_CAMPAIGN_DESC, "Campagne originelle de Caesar III, dans toute sa gloire d'antan et ses 25 ans d'âge."},
     {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TITLE, "En cours d'ajout" },
     {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TEXT, "La gestion des campagnes personnalisées est en cours d'ajout.\nVeuillez vérifier les prochaines versions."},
-
+    {TR_WINDOW_BARRACKS_PRIORITY, "Priorité de recrutement:"},
+    {TR_WINDOW_BARRACKS_FORTS, "Forts"},
+    {TR_WINDOW_BARRACKS_TOWERS, "Tours"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_FORT, "Prioriser la formation des Légionnaires"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_JAVELIN, "Prioriser la formation des Javelines"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_MOUNTED, "Prioriser la formation des Cavaliers"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_AUXINF, "Prioriser la formation des Fantassins"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_AUXARCH, "Prioriser la formation des Archers"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_TOWER, "Prioriser la livraison des Tours"},
+    {TR_TOOLTIP_BARRACKS_PRIORITY_WATCHTOWER, "Prioriser la livraison des Tours de guet"},
+    {TR_TOOLTIP_BUTTON_REJECT_DELIVERY, "Refuser la livraison d'armes par les Armureries"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_DELIVERY, "Accepter la livraison d'armes par les Armureries"},
 };
 
 void translation_french(const translation_string **strings, int *num_strings)
