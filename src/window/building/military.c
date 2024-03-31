@@ -124,15 +124,17 @@ static void draw_priority_buttons(int x, int y, int buttons)
         building *barracks = building_get(data.building_id);
         int priority = building_barracks_get_priority(barracks);
 
-        if (has_focus || priority == i) {
-            button_border_draw(x_adj - 3, y_adj - 3, 46, 46, 1);
-        }       
-
-        if (priority == i) {
-            image_draw(assets_get_image_id("UI", priority_forts[i + 7].image_id), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);
-        } else {            
-            image_draw(assets_get_image_id("UI", priority_forts[i].image_id), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);
-        }     
+        // TODO remove when archery available
+        if (i != 4) {
+            if (has_focus || priority == i) {
+                button_border_draw(x_adj - 3, y_adj - 3, 46, 46, 1);
+            }  
+            if (priority == i) {
+                image_draw(assets_get_image_id("UI", priority_forts[i + 7].image_id), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);
+            } else {            
+                image_draw(assets_get_image_id("UI", priority_forts[i].image_id), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);
+            } 
+        }            
     }
     
     window_request_refresh();
@@ -142,6 +144,7 @@ static void draw_delivery_buttons(int x, int y)
 {
     building *barracks = building_get(data.building_id);
     button_border_draw(x, y, 20, 20, data.focus_delivery_button_id);
+
     if (barracks->accept_delivery) {
         image_draw(assets_get_image_id("UI", "Allowed_Walker_Check"), x + 4, y + 4,
             COLOR_MASK_NONE, SCALE_NONE);    
@@ -234,24 +237,23 @@ void window_building_draw_barracks(building_info_context *c)
         }
     }
 
+    image_draw(image_group(GROUP_FIGURE_CARTPUSHER_CART) + 108, c->x_offset + 387, c->y_offset + 50, COLOR_MASK_NONE, SCALE_NONE); 
+
     lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_PRIORITY, c->x_offset + 32, c->y_offset + 170, FONT_NORMAL_BLACK); // "Priority"
     inner_panel_draw(c->x_offset + 16, c->y_offset + 188, c->width_blocks - 2, 5);
     
-    lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_FORTS, c->x_offset + 42, c->y_offset + 202, FONT_NORMAL_BROWN); // "Forts"
-    lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_TOWERS, c->x_offset + 324, c->y_offset + 202, FONT_NORMAL_BROWN); // "Towers"
+    lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_FORTS, c->x_offset + 42, c->y_offset + 200, FONT_NORMAL_BROWN); // "Forts"
+    lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_TOWERS, c->x_offset + 324, c->y_offset + 200, FONT_NORMAL_BROWN); // "Towers"
 
-    inner_panel_draw(c->x_offset + 16, c->y_offset + 280, c->width_blocks - 2, 4);
-    window_building_draw_employment(c, 282);
-    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, c->y_offset + 288);
-
-    image_draw(image_group(GROUP_FIGURE_CARTPUSHER_CART) + 108,
-        c->x_offset + 200, c->y_offset + 350, COLOR_MASK_NONE, SCALE_NONE); 
+    inner_panel_draw(c->x_offset + 16, c->y_offset + 290, c->width_blocks - 2, 4);
+    window_building_draw_employment(c, 294);
+    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, c->y_offset + 298);
 }
 
 void window_building_draw_barracks_foreground(building_info_context *c)
 {
-    draw_priority_buttons(c->x_offset + 42, c->y_offset + 220, 7);
-    draw_delivery_buttons(c->x_offset + 238, c->y_offset + 360);
+    draw_priority_buttons(c->x_offset + 42, c->y_offset + 218, 7);
+    draw_delivery_buttons(c->x_offset + 425, c->y_offset + 60);
 }
 
 void window_building_draw_priority_buttons(int x, int y)
@@ -266,9 +268,9 @@ void window_building_draw_delivery_buttons(int x, int y)
 
 int window_building_handle_mouse_barracks(const mouse *m, building_info_context *c)
 {
-    if (generic_buttons_handle_mouse(m, c->x_offset + 46, c->y_offset + 224,
+    if (generic_buttons_handle_mouse(m, c->x_offset + 46, c->y_offset + 222,
         priority_buttons, 7, &data.focus_priority_button_id) || 
-        generic_buttons_handle_mouse(m, c->x_offset + 238, c->y_offset + 360,
+        generic_buttons_handle_mouse(m, c->x_offset + 425, c->y_offset + 60,
         delivery_buttons, 1, &data.focus_delivery_button_id)) {
         window_invalidate();
         return 1;
@@ -641,7 +643,8 @@ void window_building_barracks_get_tooltip_priority(int *translation)
             *translation = TR_TOOLTIP_BARRACKS_PRIORITY_AUXINF;
             break;
         case 5:
-            *translation = TR_TOOLTIP_BARRACKS_PRIORITY_AUXARCH;
+            // TODO uncomment when archery available
+            // *translation = TR_TOOLTIP_BARRACKS_PRIORITY_AUXARCH;
             break;
         case 6:
             *translation = TR_TOOLTIP_BARRACKS_PRIORITY_TOWER;
