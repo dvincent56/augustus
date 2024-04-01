@@ -46,10 +46,6 @@
 	<image id="Venus M Icon" src="Venus_Temple_Complex_Module_Banner"/>
 	<image id="Venus M2 Icon" src="Venus_Temple_Complex_Module2_Banner"/>
 
-	<!-- Note: Portrait of Jupiter for Epithets descriptions -->
-	<image id="Jupiter Portrait Selected" src="Jupiter_selected"/>	
-	<image id="Jupiter Portrait Unselected" src="Jupiter_unselected"/>
-
 	<!-- Note: Banner images for Construction Sites -->
 	<image id="Const. Banner 01" src="Construction_Banner_01"/>
 	<image id="Const. Banner 02" src="Construction_Banner_02"/>
@@ -424,5 +420,6 @@
 		<layer src="Barracks_Priority_ON" x="0" y="0"/>
 	</image>
 	<!-- Note: Pantheon portrait for Epithet Advisor descriptions. Draw image borders and vignette in the same way as the Colosseum game selection buttons -->
+	<image id="Pantheon_Epithet_Button_01" src="Pantheon_Epithet_Button_01"/>
 	<image id="Pantheon_Epithet_Button_01" src="Pantheon_Epithet_Button_01"/>
 </assetlist>

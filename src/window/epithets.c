@@ -133,18 +133,30 @@ static void draw_background(void)
     outer_panel_draw(0, 0, 40, 27);
     
     lang_text_draw_centered(CUSTOM_TRANSLATION, TR_WINDOW_ADVISOR_EPITHETS, 0, 15, 640, FONT_LARGE_BLACK);
-
+    int border_image_id = assets_get_image_id("UI", "Image Border Small");
+    int highlight_image_id = assets_get_image_id("UI", "Highlight");
+    int base_image_id = assets_get_image_id("UI", "Pantheon_Epithet_Button_01");
+    color_t border_color =  COLOR_BORDER_ORANGE;
+    color_t highlight_color = COLOR_MASK_NONE;
+    
     for (int god = 0; god < MAX_GODS + 1; god++) {
         if (god == selected_god_id) {
-            button_border_draw(100 * god + 26, 52, 90, 100, 1);
+            button_border_draw(100 * god + 26, 52, 90, 100, 1);           
+
             if (god == MAX_GODS) {
-                image_draw(assets_get_image_id("UI", "Jupiter Portrait Selected"), 100 * god + 30, 56, COLOR_MASK_NONE, SCALE_NONE);
+                image_draw_border(border_image_id, 100 * god + 30, 56, border_color);
+                image_draw(base_image_id, 100 * god + 35, 61, COLOR_MASK_NONE, SCALE_NONE);
+                image_draw_border(highlight_image_id, 100 * god + 35, 61, highlight_color);
             } else {
                 image_draw(image_group(GROUP_PANEL_WINDOWS) + god + 21, 100 * god + 30, 56, COLOR_MASK_NONE, SCALE_NONE);
             }
         } else {
             if (god == MAX_GODS) {
-                image_draw(assets_get_image_id("UI", "Jupiter Portrait Unselected"), 100 * god + 30, 56, COLOR_MASK_NONE, SCALE_NONE);
+                highlight_color = COLOR_BLACK;
+                border_color =  COLOR_BORDER_BROWN;
+                image_draw_border(border_image_id, 100 * god + 30, 56, border_color);
+                image_draw(base_image_id, 100 * god + 35, 61, COLOR_MASK_NONE, SCALE_NONE);
+                image_draw_border(highlight_image_id, 100 * god + 35, 61, highlight_color);
             } else {
                 image_draw(image_group(GROUP_PANEL_WINDOWS) + god + 16, 100 * god + 30, 56, COLOR_MASK_NONE, SCALE_NONE);
             }
