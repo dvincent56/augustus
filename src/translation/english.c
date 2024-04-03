@@ -1400,6 +1400,11 @@ static translation_string all_strings[] = {
     {TR_WINDOW_ORIGINAL_CAMPAIGN_DESC, "The original Caesar 3 campaign, in all its 25 year old glory."},
     {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TITLE, "Not yet implemented" },
     {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TEXT, "The custom campaign support has not been implemented yet.\nPlease check a later build."},
+    {TR_TOOLTIP_BUTTON_ACCEPT_BARKEEP, "Allow barkeep to get food here"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_CARAVANSERAI, "Allow caravanserai supplier to get food here"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_ARMOURY, "Allow armoury to get weapons here"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_LIGHTHOUSE, "Allow lighthouse to get woods here"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_ARCHITECT, "Allow architect to get materials here"},
     
 };
 

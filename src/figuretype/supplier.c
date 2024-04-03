@@ -42,8 +42,10 @@ static int take_food_from_granary(figure *f, int market_id, int granary_id)
     if (!resource_is_food(resource)) {
         return 0;
     }
+
     building *granary = building_get(granary_id);
     building *market = building_get(market_id);
+
     int market_units = market->resources[resource];
     int max_units = 0;
     int granary_units = granary->resources[resource];
@@ -304,13 +306,22 @@ void figure_supplier_action(figure *f)
             f->image_id = assets_get_image_id("Walkers", "Barkeep NE 01") +
                 dir * 12 + f->image_offset;
         }
-    } else if (f->type == FIGURE_LIGHTHOUSE_SUPPLIER || f->type == FIGURE_CARAVANSERAI_SUPPLIER) {
+    } else if (f->type == FIGURE_LIGHTHOUSE_SUPPLIER) {
         int dir = figure_image_normalize_direction(f->direction < 8 ? f->direction : f->previous_tile_direction);
         if (f->action_state == FIGURE_ACTION_149_CORPSE) {
             f->image_id = assets_get_image_id("Walkers", "Slave death 01") +
                 figure_image_corpse_offset(f);
         } else {
             f->image_id = assets_get_image_id("Walkers", "Slave NE 01") +
+                dir * 12 + f->image_offset;
+        }
+    } else if (f->type == FIGURE_CARAVANSERAI_SUPPLIER) {
+        int dir = figure_image_normalize_direction(f->direction < 8 ? f->direction : f->previous_tile_direction);
+        if (f->action_state == FIGURE_ACTION_149_CORPSE) {
+            f->image_id = assets_get_image_id("Walkers", "M Hall death 01") +
+                figure_image_corpse_offset(f);
+        } else {
+            f->image_id = assets_get_image_id("Walkers", "M Hall NE 01") +
                 dir * 12 + f->image_offset;
         }
     } else {

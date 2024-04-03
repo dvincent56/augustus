@@ -484,7 +484,7 @@ void window_building_draw_amphitheater(building_info_context *c)
     } else {
         lang_text_draw(71, 9, c->x_offset + 32, c->y_offset + 234, FONT_NORMAL_BROWN);
     }
-    window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 80, 71, 1);
+    window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 90, 71, 1);
 }
 
 static void draw_entertainment_school(building_info_context *c, const char *sound_file, int group_id)
