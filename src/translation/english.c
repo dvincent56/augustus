@@ -1395,17 +1395,19 @@ static translation_string all_strings[] = {
     {TR_CHEAT_CLIMATE_CHANGE, "Climate change in effect" },
     {TR_MAIN_MENU_NEW_CAMPAIGN, "Start new campaign"},
     {TR_WINDOW_SELECT_CAMPAIGN, "Select a campaign"},
+    {TR_WINDOW_CAMPAIGN_AUTHOR, "Author:"},
     {TR_WINDOW_CAMPAIGN_NO_DESC, "No description"},
     {TR_WINDOW_ORIGINAL_CAMPAIGN_NAME, "Original campaign" },
-    {TR_WINDOW_ORIGINAL_CAMPAIGN_DESC, "The original Caesar 3 campaign, in all its 25 year old glory."},
-    {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TITLE, "Not yet implemented" },
-    {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TEXT, "The custom campaign support has not been implemented yet.\nPlease check a later build."},
+    {TR_WINDOW_ORIGINAL_CAMPAIGN_DESC, "The original Caesar 3 campaign, in all its decades old glory."},
+    {TR_WINDOW_INVALID_CAMPAIGN_TITLE, "Invalid campaign file" },
+    {TR_WINDOW_INVALID_CAMPAIGN_TEXT, "The provided campaign file is invalid.\nPlese check augustus-log.txt in your Augustus directory for details."},
+    {TR_WINDOW_CAMPAIGN_MISSION_FAILED_TO_LOAD_TITLE, "Unable to open mission"},
+    {TR_WINDOW_CAMPAIGN_MISSION_FAILED_TO_LOAD_TEXT, "The requested mission could not be opened.\nPlease check augustus-log.txt in your Augustus directory for details."},
     {TR_TOOLTIP_BUTTON_ACCEPT_BARKEEP, "Allow barkeep to get food here"},
     {TR_TOOLTIP_BUTTON_ACCEPT_CARAVANSERAI, "Allow caravanserai supplier to get food here"},
     {TR_TOOLTIP_BUTTON_ACCEPT_ARMOURY, "Allow armoury to get weapons here"},
     {TR_TOOLTIP_BUTTON_ACCEPT_LIGHTHOUSE, "Allow lighthouse to get woods here"},
     {TR_TOOLTIP_BUTTON_ACCEPT_ARCHITECT, "Allow architect to get materials here"},
-    
 };
 
 void translation_english(const translation_string **strings, int *num_strings)
