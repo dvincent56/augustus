@@ -1395,17 +1395,20 @@ static translation_string all_strings[] = {
     {TR_CHEAT_CLIMATE_CHANGE, "Climate change in effect" },
     {TR_MAIN_MENU_NEW_CAMPAIGN, "Start new campaign"},
     {TR_WINDOW_SELECT_CAMPAIGN, "Select a campaign"},
+    {TR_WINDOW_CAMPAIGN_AUTHOR, "Author:"},
     {TR_WINDOW_CAMPAIGN_NO_DESC, "No description"},
     {TR_WINDOW_ORIGINAL_CAMPAIGN_NAME, "Original campaign" },
-    {TR_WINDOW_ORIGINAL_CAMPAIGN_DESC, "The original Caesar 3 campaign, in all its 25 year old glory."},
-    {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TITLE, "Not yet implemented" },
-    {TR_WINDOW_CUSTOM_CAMPAIGNS_NOT_IMPLEMENTED_TEXT, "The custom campaign support has not been implemented yet.\nPlease check a later build."},
+    {TR_WINDOW_ORIGINAL_CAMPAIGN_DESC, "The original Caesar 3 campaign, in all its decades old glory."},
+    {TR_WINDOW_INVALID_CAMPAIGN_TITLE, "Invalid campaign file" },
+    {TR_WINDOW_INVALID_CAMPAIGN_TEXT, "The provided campaign file is invalid.\nPlese check augustus-log.txt in your Augustus directory for details."},
+    {TR_WINDOW_CAMPAIGN_MISSION_FAILED_TO_LOAD_TITLE, "Unable to open mission"},
+    {TR_WINDOW_CAMPAIGN_MISSION_FAILED_TO_LOAD_TEXT, "The requested mission could not be opened.\nPlease check augustus-log.txt in your Augustus directory for details."},
     {TR_BUILDING_LATRINES, "Latrines"},    
     {TR_BUILDING_LATRINES_DESC_1, "A place of comfort appreciated by the population to talk about the news of the day or their business."},
     {TR_BUILDING_LATRINES_DESC_2, "Latrines are used by citizens having only access to a well, and help to slightly improve the housing and health levels. Houses in range of a fountain won't make use of public latrines."},
     {TR_BUILDING_LATRINES_MISSING_EVOLVE, "This house cannot evolve, as it does not have access to a latrine or a clean water supply from a fountain."},
     {TR_BUILDING_LATRINES_MISSING_DEVOLVE, "This house will devolve soon, as it does not have access to a latrine or a clean water from a fountain."},
-    {TR_BUILDING_LATRINES_NO_WORKERS, "Without employees to maintain the latrines, citizens avoid coming to relax there."}
+    {TR_BUILDING_LATRINES_NO_WORKERS, "Without employees to maintain the latrines, citizens avoid coming to relax there."},
 };
 
 void translation_english(const translation_string **strings, int *num_strings)
