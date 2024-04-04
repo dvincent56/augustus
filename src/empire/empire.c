@@ -67,7 +67,7 @@ static void set_image_id(const char *path)
         char full_path[FILE_NAME_MAX];
         snprintf(full_path, FILE_NAME_MAX, "%s%s", paths[i], path);
         if (campaign_has_file(full_path) || file_exists(full_path, NOT_LOCALIZED)) {
-            data.image.id = assets_get_image_id(ASSET_EXTERNAL_FILE_LIST, full_path);
+            data.image.id = assets_get_external_image(full_path, 1);
             strncpy(data.image.path, path, FILE_NAME_MAX);
             return;
         }
@@ -402,7 +402,7 @@ void empire_load_state(buffer *buf)
 
 void empire_save_custom_map(buffer *buf)
 {
-    int path_length = strlen(data.image.path) + 1;
+    int path_length = (int) strlen(data.image.path) + 1;
     int buf_size = sizeof(int32_t) + 16 + path_length;
     uint8_t *buf_data = malloc(buf_size);
 

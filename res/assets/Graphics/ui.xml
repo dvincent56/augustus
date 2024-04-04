@@ -137,16 +137,6 @@
 		<layer src="Advisor_Button_H" x="0" y="0"/>
 		<layer src="Housing_Advisor_H" x="0" y="0"/>
 	</image>
-	<!-- Note: Button for Building Mothball -->
-	<!-- Button assets created by MSTVD -->
-	<image id="Mothball_1" src="Mothball_1"/>
-	<image id="Mothball_2" src="Mothball_2"/>
-	<image id="Mothball_3" src="Mothball_3"/>
-	<image id="Mothball_4" src="Mothball_4"/>
-	<image id="Unmothball_1" src="Unmothball_1"/>
-	<image id="Unmothball_2" src="Unmothball_2"/>
-	<image id="Unmothball_3" src="Unmothball_3"/>
-	<image id="Unmothball_4" src="Unmothball_4"/>
 	<!-- Note: Checkmark toggle for allowed walkers -->
 	<!-- Image created by Ouaz -->
 	<image id="Allowed_Walker_Check" src="Allowed_Walker_Checkmark"/>
@@ -254,9 +244,194 @@
 	<image id="Denied_Walker_Checkmark" src="Denied_Walker_Checkmark"/>
 	<!-- Note: UI button for accessing Housing Advisor -->
 	<image id="Housing_Advisor_S" src="Housing_Advisor_S"/>
-	<!-- Note: Empire map icons for crude Roman trade cities and non-trade cities respectively -->
+	<!-- Note: Empire map icons for Roman trade towns and non-trade towns respectively -->
 	<image id="Empire_Icon_Roman_01" src="Empire_Icon_Roman_01"/>
 	<image id="Empire_Icon_Roman_02" src="Empire_Icon_Roman_02"/>
-	<!-- Note: Empire map icons for alternative distant cities -->
+	<!-- Note: Empire map icons for Roman trade villages and non-trade villages respectively -->
+	<image id="Empire_Icon_Roman_01" src="Empire_Icon_Roman_01"/>
+	<image id="Empire_Icon_Roman_02" src="Empire_Icon_Roman_02"/>
+	<!-- Note: Empire map icons for distant towns -->
 	<image id="Empire_Icon_Distant_01" src="Empire_Icon_Distant_01"/>
+	<!-- Note: Empire map icons for distant villages -->
+	<image id="Empire_Icon_Distant_02" src="Empire_Icon_Distant_02"/>
+	<!-- Note: Legion banner base -->
+	<image id="Legion_Banner_Base" width="32" height="29">
+		<layer group="126" image="8"/>
+		<layer src="Legion_Banner_Base" x="0" y="0"/>
+	</image>
+	<!-- Note: Auxiliary Infantry banner static. Asset by CaesarZX -->
+	<image id="auxinf_banner_0" width="32" height="29">
+		<layer group="this" image="Legion_Banner_Base"/>
+		<layer src="auxinf_banner_0" x="0" y="0"/>
+	</image>
+	<!-- Note: Auxiliary Infantry banner animation frames. Assets by CaesarZX -->
+	<image id="auxinf_banner_01">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxinf_banner_01" x="4" y="3"/>
+	</image>
+	<image id="auxinf_banner_02">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxinf_banner_02" x="4" y="3"/>
+	</image>
+	<image id="auxinf_banner_03">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxinf_banner_03" x="4" y="3"/>
+	</image>
+	<image id="auxinf_banner_04">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxinf_banner_04" x="4" y="3"/>
+	</image>
+	<image id="auxinf_banner_05">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxinf_banner_05" x="4" y="3"/>
+	</image>
+	<image id="auxinf_banner_06">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxinf_banner_06" x="4" y="3"/>
+	</image>
+	<image id="auxinf_banner_07">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxinf_banner_07" x="4" y="3"/>
+	</image>
+	<image id="auxinf_banner_08">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxinf_banner_08" x="4" y="3"/>
+	</image>
+	<!-- Note: Auxiliary Archer banner static. Asset by CaesarZX -->
+	<image id="auxarch_banner_0" width="32" height="29">
+		<layer group="this" image="Legion_Banner_Base"/>
+		<layer src="auxarch_banner_0" x="0" y="0"/>
+	</image>
+	<!-- Note: Auxiliary Archer banner animation frames. Assets by CaesarZX -->
+	<image id="auxarch_banner_01">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_01" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_02">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_02" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_03">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_03" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_04">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_044" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_05">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_05" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_06">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_06" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_07">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_07" x="4" y="3"/>
+	</image>
+	<image id="auxarch_banner_08">
+		<layer src="auxinf_banner_base"/>
+		<layer src="auxarch_banner_08" x="4" y="3"/>
+	</image>
+	<!-- Note: Unit flags for Tower and Watchtower Sentries -->
+	<image id="tower_banner_0" width="32" height="29">
+		<layer group="this" image="Legion_Banner_Base"/>
+		<layer src="tower_banner_0" x="0" y="0"/>
+	</image>
+	<image id="watchtower_banner_0" width="32" height="29">
+		<layer group="this" image="Legion_Banner_Base"/>
+		<layer src="watchtower_banner_0" x="0" y="0"/>
+	</image>
+	<!-- Note: Barracks UI buttons -->
+	<image id="Barracks_Priority_Legionaries_OFF" width="40" height="40">
+		<layer src="Barracks_Priority_Base" x="5" y="4"/>
+		<layer group="126" image="8" x="4" y="6"/>
+		<layer src="Barracks_Priority_OFF" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Legionaries_ON" width="40" height="40">
+		<layer group="this" image="Barracks_Priority_Legionaries_OFF"/>
+		<layer src="Barracks_Priority_ON" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Javelin_OFF" width="40" height="40">
+		<layer src="Barracks_Priority_Base" x="5" y="4"/>
+		<layer group="126" image="17" x="4" y="6"/>
+		<layer src="Barracks_Priority_OFF" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Javelin_ON" width="40" height="40">
+		<layer group="this" image="Barracks_Priority_Javelin_OFF"/>
+		<layer src="Barracks_Priority_ON" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Mounted_OFF" width="40" height="40">
+		<layer src="Barracks_Priority_Base" x="5" y="4"/>
+		<layer group="126" image="26" x="4" y="6"/>
+		<layer src="Barracks_Priority_OFF" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Mounted_ON" width="40" height="40">
+		<layer group="this" image="Barracks_Priority_Mounted_OFF"/>
+		<layer src="Barracks_Priority_ON" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Auxinf_OFF" width="40" height="40">
+		<layer src="Barracks_Priority_Base" x="5" y="4"/>
+		<layer group="this" image="auxinf_banner_0" x="4" y="6"/>
+		<layer src="Barracks_Priority_OFF" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Auxinf_ON" width="40" height="40">
+		<layer group="this" image="Barracks_Priority_Auxinf_OFF"/>
+		<layer src="Barracks_Priority_ON" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Auxarch_OFF" width="40" height="40">
+		<layer src="Barracks_Priority_Base" x="5" y="4"/>
+		<layer group="this" image="auxarch_banner_0" x="4" y="6"/>
+		<layer src="Barracks_Priority_OFF" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Auxarch_ON" width="40" height="40">
+		<layer group="this" image="Barracks_Priority_Auxarch_OFF"/>
+		<layer src="Barracks_Priority_ON" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Tower_OFF" width="40" height="40">
+		<layer src="Barracks_Priority_Base" x="5" y="4"/>
+		<layer group="this" image="tower_banner_0" x="4" y="6"/>
+		<layer src="Barracks_Priority_OFF" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Tower_ON" width="40" height="40">
+		<layer group="this" image="Barracks_Priority_Tower_OFF"/>
+		<layer src="Barracks_Priority_ON" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Watchtower_OFF" width="40" height="40">
+		<layer src="Barracks_Priority_Base" x="5" y="4"/>
+		<layer group="this" image="watchtower_banner_0" x="4" y="6"/>
+		<layer src="Barracks_Priority_OFF" x="0" y="0"/>
+	</image>
+	<image id="Barracks_Priority_Watchtower_ON" width="40" height="40">
+		<layer group="this" image="Barracks_Priority_Watchtower_OFF"/>
+		<layer src="Barracks_Priority_ON" x="0" y="0"/>
+	</image>
+	<!-- Note: Pantheon portrait for Epithet Advisor descriptions. Draw image borders and vignette in the same way as the Colosseum game selection buttons -->
+	<image id="Pantheon_Epithet_Button_01" src="Pantheon_Epithet_Button_01"/>
+	<!-- Note: Large cross widget, for use in walker exception buttons -->
+	<image id="Large_Widget_Cross" src="Large_Widget_Cross"/>
+	<!-- Note: Buttons for Building Mothball -->
+	<!-- Button assets created by MSTVD -->
+	<image id="Unmothball_1" src="Unmothball_1"/>
+	<image id="Unmothball_2" src="Unmothball_2"/>
+	<image id="Unmothball_3" src="Unmothball_3"/>
+	<image id="Unmothball_4" src="Unmothball_4"/>
+	<image id="Mothball_1" src="Mothball_1">
+		<layer group="this" image="Unmothball_1"/>
+		<layer src="Risk_Widget_Cross" x="1" y="2"/>
+	</image>
+	<image id="Mothball_2" src="Mothball_2">
+		<layer group="this" image="Unmothball_2"/>
+		<layer src="Risk_Widget_Cross" x="1" y="2"/>
+	</image>
+	<image id="Mothball_3" src="Mothball_3">
+		<layer group="this" image="Unmothball_3"/>
+		<layer src="Risk_Widget_Cross" x="1" y="2"/>
+	</image>
+	<image id="Mothball_4" src="Mothball_4">
+		<layer group="this" image="Unmothball_4"/>
+		<layer src="Risk_Widget_Cross" x="1" y="2"/>
+	</image>
 </assetlist>
