@@ -603,9 +603,6 @@ static void draw_grand_temple_mars_military(building_info_context *c)
     inner_panel_draw(c->x_offset + 16, c->y_offset + 108, c->width_blocks - 2, 5);   
     lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_FORTS, c->x_offset + 50, c->y_offset + 113, FONT_NORMAL_BROWN); // "Forts"
     lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_TOWERS, c->x_offset + 327, c->y_offset + 113, FONT_NORMAL_BROWN); // "Towers"
-
-    image_draw(image_group(GROUP_FIGURE_CARTPUSHER_CART) + 108,
-        c->x_offset + 402, c->y_offset + 42, COLOR_MASK_NONE, SCALE_NONE); 
 }
 
 static void draw_temple(building_info_context *c, const char *sound_file, int group_id)
@@ -757,8 +754,8 @@ void window_building_draw_grand_temple_foreground(building_info_context *c)
             16 * (c->width_blocks - 10), FONT_NORMAL_BLACK, 0);
     }
     if (b->type == BUILDING_GRAND_TEMPLE_MARS) {
-        window_building_draw_priority_buttons(c->x_offset + 50, c->y_offset + 133);
-        window_building_draw_delivery_buttons(c->x_offset + 440, c->y_offset + 52);
+        window_building_draw_priority_buttons(c->x_offset + 50, c->y_offset + 133, b->id);
+        window_building_draw_delivery_buttons(c->x_offset + 408, c->y_offset + 40, b->id);
     }
 }
 

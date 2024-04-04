@@ -47,7 +47,7 @@ static generic_button priority_buttons[] = {
 };
 
 static generic_button delivery_buttons[] = {
-    {0, 0, 20, 20, button_delivery, button_none, 0, 0},
+    {0, 0, 52, 52, button_delivery, button_none, 0, 0},
 };
 
 static generic_button return_button[] = {
@@ -110,7 +110,7 @@ static struct {
     }
 };
 
-static void draw_priority_buttons(int x, int y, int buttons)
+static void draw_priority_buttons(int x, int y, int buttons, int building_id)
 {
     for (int i = 0; i < buttons; i++) {
         int has_focus = 0;
@@ -121,7 +121,7 @@ static void draw_priority_buttons(int x, int y, int buttons)
         }
         int x_adj = x + priority_buttons[i].x;
         int y_adj = y + priority_buttons[i].y;
-        building *barracks = building_get(data.building_id);
+        building *barracks = building_get(building_id);
         int priority = building_barracks_get_priority(barracks);
 
         // TODO remove when archery available
@@ -140,15 +140,25 @@ static void draw_priority_buttons(int x, int y, int buttons)
     window_request_refresh();
 }
 
-static void draw_delivery_buttons(int x, int y)
-{
-    building *barracks = building_get(data.building_id);
-    button_border_draw(x, y, 20, 20, data.focus_delivery_button_id);
+static void draw_delivery_buttons(int x, int y, int building_id)
+{    
+    building *barracks = building_get(building_id);
 
-    if (barracks->accept_delivery) {
-        image_draw(assets_get_image_id("UI", "Allowed_Walker_Check"), x + 4, y + 4,
-            COLOR_MASK_NONE, SCALE_NONE);    
+    int accept_delivery = barracks->accept_delivery;
+    
+    if (!accept_delivery) {
+        inner_panel_draw(x + 2, y + 2, 3, 3);
     }
+
+    image_draw(image_group(GROUP_FIGURE_CARTPUSHER_CART) + 104, x + 7, y + 7, COLOR_MASK_NONE, SCALE_NONE);
+
+    if (!accept_delivery) {
+        image_draw(assets_get_image_id("UI", "Large_Widget_Cross"), x + 15, y + 15,
+        COLOR_MASK_NONE, SCALE_NONE);
+    }
+    
+    button_border_draw(x, y, 52, 52, data.focus_delivery_button_id || !accept_delivery ? 1 : 0);
+
     window_request_refresh();    
 }
 
@@ -237,8 +247,6 @@ void window_building_draw_barracks(building_info_context *c)
         }
     }
 
-    image_draw(image_group(GROUP_FIGURE_CARTPUSHER_CART) + 108, c->x_offset + 387, c->y_offset + 50, COLOR_MASK_NONE, SCALE_NONE); 
-
     lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_PRIORITY, c->x_offset + 32, c->y_offset + 170, FONT_NORMAL_BLACK); // "Priority"
     inner_panel_draw(c->x_offset + 16, c->y_offset + 188, c->width_blocks - 2, 5);
     
@@ -252,25 +260,25 @@ void window_building_draw_barracks(building_info_context *c)
 
 void window_building_draw_barracks_foreground(building_info_context *c)
 {
-    draw_priority_buttons(c->x_offset + 42, c->y_offset + 218, 7);
-    draw_delivery_buttons(c->x_offset + 425, c->y_offset + 60);
+    draw_priority_buttons(c->x_offset + 42, c->y_offset + 218, 7, data.building_id);
+    draw_delivery_buttons(c->x_offset + 392, c->y_offset + 40, data.building_id);
 }
 
-void window_building_draw_priority_buttons(int x, int y)
+void window_building_draw_priority_buttons(int x, int y, int building_id)
 {
-    draw_priority_buttons(x, y, 7);
+    draw_priority_buttons(x, y, 7, building_id);
 }
 
-void window_building_draw_delivery_buttons(int x, int y)
+void window_building_draw_delivery_buttons(int x, int y, int building_id)
 {
-    draw_delivery_buttons(x, y);
+    draw_delivery_buttons(x, y, building_id);
 }
 
 int window_building_handle_mouse_barracks(const mouse *m, building_info_context *c)
 {
     if (generic_buttons_handle_mouse(m, c->x_offset + 46, c->y_offset + 222,
         priority_buttons, 7, &data.focus_priority_button_id) || 
-        generic_buttons_handle_mouse(m, c->x_offset + 425, c->y_offset + 60,
+        generic_buttons_handle_mouse(m, c->x_offset + 392, c->y_offset + 40,
         delivery_buttons, 1, &data.focus_delivery_button_id)) {
         window_invalidate();
         return 1;
@@ -283,7 +291,7 @@ int window_building_handle_mouse_grand_temple_mars(const mouse *m, building_info
 {
     if (generic_buttons_handle_mouse(m, c->x_offset + 50, c->y_offset + 135,
         priority_buttons, 7, &data.focus_priority_button_id) ||
-        generic_buttons_handle_mouse(m, c->x_offset + 440, c->y_offset + 52,
+        generic_buttons_handle_mouse(m, c->x_offset + 408, c->y_offset + 40,
         delivery_buttons, 1, &data.focus_delivery_button_id)
         ) {
         window_invalidate();
@@ -660,7 +668,7 @@ void window_building_barracks_get_tooltip_priority(int *translation)
     }
 
     if (data.focus_delivery_button_id) {
-        building *barracks = building_get(data.building_id);
+        building *barracks = building_get(data.building_id); // the building here is the last barracks open instead of grand temple
         if (barracks->accept_delivery) {
             *translation = TR_TOOLTIP_BUTTON_REJECT_DELIVERY;
         } else {
@@ -722,13 +730,13 @@ static void button_layout(int index, int param2)
 
 static void button_priority(int index, int param2)
 {
-    building *barracks = building_get(data.building_id);
+    building *barracks = building_get(data.building_id); // the building here is the last barracks open instead of grand temple
     building_barracks_set_priority(barracks, index);    
 }
 
 static void button_delivery(int index, int param2)
 {
-    building *barracks = building_get(data.building_id);
+    building *barracks = building_get(data.building_id); // the building here is the last barracks open instead of grand temple
     building_barracks_toggle_delivery(barracks);    
 }
 
