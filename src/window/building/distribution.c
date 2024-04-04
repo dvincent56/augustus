@@ -206,7 +206,7 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
         image_group(GROUP_EMPIRE_TRADE_ROUTE_TYPE),
         assets_get_image_id("Walkers", "Barkeep SW 01"),
         image_group(GROUP_FIGURE_CARTPUSHER_CART) + 80,
-        assets_get_image_id("Walkers", "architect_sw_01")
+        assets_get_image_id("Walkers", "Slave SW 01"),
     };
 
     int image_offset_x, image_offset_y;
@@ -226,7 +226,7 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
         image_draw(images_permission[i], x + image_offset_x, y + image_offset_y, COLOR_MASK_NONE, SCALE_NONE);
 
         if (!permissionState) {
-            image_draw(assets_get_image_id("UI", "Risk_Widget_Cross"), x + 13, y + 13,
+            image_draw(assets_get_image_id("UI", "Large_Widget_Cross"), x + 15, y + 15,
             COLOR_MASK_NONE, SCALE_NONE);
         }
         
@@ -246,12 +246,12 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
 static void draw_granary_permissions_buttons(int x, int y, int buttons)
 {   
     int images_permission[] = {
-        assets_get_image_id("Walkers", "marketbuyer_sw_01"),
-        image_group(GROUP_FIGURE_TOWER_SENTRY) + 4,
+        assets_get_image_id("Walkers", "marketbuyer_sw_01"),        
+        assets_get_image_id("Walkers", "M Hall SW 01"),
         image_group(GROUP_FIGURE_TRADE_CARAVAN) + 4,
         image_group(GROUP_EMPIRE_TRADE_ROUTE_TYPE),
         assets_get_image_id("Walkers", "Barkeep SW 01"),
-        assets_get_image_id("Walkers", "M Hall SW 01")
+        assets_get_image_id("Walkers", "Slave SW 01"),
     };
 
     int image_offset_x, image_offset_y;
@@ -270,7 +270,7 @@ static void draw_granary_permissions_buttons(int x, int y, int buttons)
         image_draw(images_permission[i], x + image_offset_x, y + image_offset_y, COLOR_MASK_NONE, SCALE_NONE);
 
         if (!permissionState) {
-            image_draw(assets_get_image_id("UI", "Risk_Widget_Cross"), x + 13, y + 13,
+            image_draw(assets_get_image_id("UI", "Large_Widget_Cross"), x + 15, y + 15,
             COLOR_MASK_NONE, SCALE_NONE);
         }
         
