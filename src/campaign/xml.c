@@ -15,20 +15,20 @@
 #define CAMPAIGN_XML_VERSION 1
 
 static int xml_start_campaign(void);
-static int xml_start_intro(void);
-static void xml_intro_text(const char *text);
+static int xml_start_description(void);
+static void xml_description_text(const char *text);
 static int xml_start_missions(void);
 static int xml_start_mission(void);
-static int xml_start_option(void);
+static int xml_start_scenario(void);
 
 static void xml_end_mission(void);
 
 static const xml_parser_element xml_elements[XML_TOTAL_ELEMENTS] = {
     { "campaign", xml_start_campaign },
-    { "intro", xml_start_intro, 0, "campaign", xml_intro_text },
+    { "description", xml_start_description, 0, "campaign", xml_description_text },
     { "missions", xml_start_missions, 0, "campaign" },
     { "mission", xml_start_mission, xml_end_mission, "missions" },
-    { "option", xml_start_option, 0, "mission" }
+    { "scenario", xml_start_scenario, 0, "mission" }
 };
 
 static struct {
@@ -37,6 +37,9 @@ static struct {
     int missions_list_parsed;
     int success;
 } data;
+
+static const char *FANFARE_TYPES[3] = { "none", "peaceful", "military" };
+static const char *FANFARE_FILES[3] = { 0, "fanfare_nu1.wav", "fanfare_nu5.wav" };
 
 static int xml_start_campaign(void)
 {
@@ -61,13 +64,19 @@ static const uint8_t *copy_string_from_xml(const char *text)
     return result;
 }
 
-static int xml_start_intro(void)
+static int xml_start_description(void)
 {
     data.info->name = copy_string_from_xml(xml_parser_get_attribute_string("title"));
+    data.info->author = copy_string_from_xml(xml_parser_get_attribute_string("author"));
+    if (!data.info->name) {
+        log_error("Problem parsing campaign file - missing name", 0, 0);
+        data.success = 0;
+        return 0;
+    }
     return 1;
 }
 
-static void xml_intro_text(const char *text)
+static void xml_description_text(const char *text)
 {
     data.info->description = copy_string_from_xml(text);
 }
@@ -91,11 +100,35 @@ static int xml_start_missions(void)
     return 1;
 }
 
-static int check_file_from_xml(const char *path, const char *file)
+static const char *create_full_campaign_path(const char *path, const char *file)
 {
-    char full_path[FILE_NAME_MAX];
-    snprintf(full_path, FILE_NAME_MAX, "%s/%s", path, file);
-    return campaign_file_exists(full_path);
+    size_t full_path_length = sizeof(CAMPAIGNS_DIRECTORY "/") + strlen(path) + strlen(file) + 1;
+    char *full_path = malloc(full_path_length);
+    if (!full_path) {
+        return 0;
+    }
+    snprintf(full_path, full_path_length, "%s/%s/%s", CAMPAIGNS_DIRECTORY, path, file);
+    const char *filename = campaign_file_remove_prefix(full_path);
+    if (!filename || !campaign_file_exists(filename)) {
+        free(full_path);
+        return 0;
+    }
+    return full_path;
+}
+
+static const char *create_full_regular_path(const char *path, const char *file)
+{
+    size_t full_path_length = strlen(path) + strlen(file) + 2;
+    char *full_path = malloc(full_path_length);
+    if (!full_path) {
+        return 0;
+    }
+    snprintf(full_path, full_path_length, "%s/%s", path, file);
+    if (!file_exists(full_path, MAY_BE_LOCALIZED)) {
+        free(full_path);
+        return 0;
+    }
+    return full_path; 
 }
 
 static int xml_start_mission(void)
@@ -110,51 +143,92 @@ static int xml_start_mission(void)
         return 0;
     }
     data.info->number_of_missions++;
+    data.current_mission->title = copy_string_from_xml(xml_parser_get_attribute_string("title"));
     data.current_mission->background_image = xml_parser_copy_attribute_string("background_image");
-    if (xml_parser_has_attribute("file") && !xml_start_option()) {
+    const char *intro_video = xml_parser_get_attribute_string("video");
+    if (intro_video) {
+        data.current_mission->intro_video = create_full_campaign_path("video", intro_video);
+        if (!data.current_mission->intro_video) {
+            if (file_has_extension(intro_video, "smk")) {
+                data.current_mission->intro_video = create_full_regular_path("smk", intro_video);
+            } else if (file_has_extension(intro_video, "mpg")) {
+                data.current_mission->intro_video = create_full_regular_path("mpg", intro_video);
+            }
+        }
+    }
+    if (xml_parser_has_attribute("file") && !xml_start_scenario()) {
         return 0;
     }
     return 1;
 }
 
-static int xml_start_option(void)
+static int xml_start_scenario(void)
 {
     if (!data.success) {
         return 0;
     }
-    campaign_mission_option *option = campaign_mission_new_option();
-    if (!option) {
+    campaign_scenario *scenario = campaign_mission_new_scenario();
+    if (!scenario) {
         log_error("Problem parsing campaign file - memory full", 0, 0);
         data.success = 0;
         return 0;
     }
-    option->x = xml_parser_get_attribute_int("x");
-    option->y = xml_parser_get_attribute_int("y");
-    option->name = xml_parser_copy_attribute_string("name");
-    option->description = xml_parser_copy_attribute_string("description");
-    option->path = xml_parser_copy_attribute_string("file");
+    scenario->x = xml_parser_get_attribute_int("x");
+    scenario->y = xml_parser_get_attribute_int("y");
+    scenario->name = copy_string_from_xml(xml_parser_get_attribute_string("name"));
+    scenario->description = copy_string_from_xml(xml_parser_get_attribute_string("description"));
+    if (xml_parser_has_attribute("fanfare")) {
+        const char *fanfare = 0;
+        int default_fanfare = xml_parser_get_attribute_enum("fanfare", FANFARE_TYPES, 3, 0);
+        if (default_fanfare > 0) {
+            fanfare = FANFARE_FILES[default_fanfare];
+        } else if (default_fanfare == -1) {
+            fanfare = xml_parser_get_attribute_string("fanfare");
+        }
+        if (fanfare) {
+            scenario->fanfare = create_full_campaign_path("audio", fanfare);
+            if (!scenario->fanfare) {
+                if (file_has_extension(fanfare, "wav")) {
+                    scenario->fanfare = create_full_regular_path("wavs", fanfare);
+                } else if (file_has_extension(fanfare, "mp3")) {
+                    scenario->fanfare = create_full_regular_path("mp3", fanfare);
+                }
+            }
+        }
+    }
 
-    option->image.path = xml_parser_copy_attribute_string("image");
-    option->image.x = xml_parser_get_attribute_int("image_x");
-    option->image.y = xml_parser_get_attribute_int("image_y");
 
-    if (!option->path) {
-        log_error("Problem parsing campaign file - missing path for mission option", 0, 0);
+    const char *scenario_path = xml_parser_get_attribute_string("file");
+    if (!scenario_path) {
+        log_error("Problem parsing campaign file - missing path for mission scenario", 0, 0);
         data.success = 0;
         return 0;
     }
-    if (!check_file_from_xml("scenario", option->path)) {
-        log_error("Problem parsing campaign file - scenario file does not exist", option->path, 0);
+    scenario->path = create_full_campaign_path("scenario", scenario_path);
+    if (!scenario->path) {
+        log_error("Problem parsing campaign file - scenario file does not exist", scenario_path, 0);
         // Files in directories are debug only - don't prevent opening them even if files are missing
         if (campaign_file_is_zip()) {
             data.success = 0;
             return 0;
         }
     }
-    if (option->image.path && !check_file_from_xml("image", option->image.path)) {
-        log_info("Problem parsing campaign file - image file does not exist", option->image.path, 0);
+    const char *image_path = xml_parser_get_attribute_string("briefing_image");
+    if (image_path) {
+        scenario->briefing_image_path = create_full_campaign_path("image", image_path);
     }
-    data.current_mission->last_option = option->id;
+
+    if (!scenario->name) {
+        char name[FILE_NAME_MAX];
+        snprintf(name, FILE_NAME_MAX, "Scenario %d", scenario->id);
+        scenario->name = copy_string_from_xml(name);
+        if (!scenario->name) {
+            log_error("Problem parsing campaign file - memory full", 0, 0);
+            data.success = 0;
+            return 0;
+        }
+    }
+    data.current_mission->last_scenario = scenario->id;
     return 1;
 }
 
@@ -164,8 +238,8 @@ static void xml_end_mission(void)
         data.current_mission = 0;
         return;
     }
-    if (data.current_mission->last_option < data.current_mission->first_option) {
-        log_error("Problem parsing campaign file - mission with no options. Mission index:",
+    if (data.current_mission->last_scenario < data.current_mission->first_scenario) {
+        log_error("Problem parsing campaign file - mission with no scenarios. Mission index:",
             0, data.current_mission->id);
         data.success = 0;
     }
