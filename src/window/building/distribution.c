@@ -133,12 +133,12 @@ static generic_button warehouse_order_buttons[] = {
 };
 
 static generic_button go_to_caravanserai_action_button[] = {
-        {0, 0, 400, 100, button_caravanserai_policy, button_none, 0, 0}
+    {0, 0, 400, 100, button_caravanserai_policy, button_none, 0, 0}
 };
 
 static image_button image_buttons_maintain[] = {
-    {324, 0, 30, 19, IB_NORMAL, 0, 0, storage_toggle_permissions, button_none, 5, 0, 1, "UI", "Maintain_1"},
-    {324, 0, 30, 19, IB_NORMAL, 0, 0, storage_toggle_permissions, button_none, 5, 0, 1, "UI", "Stop_Maintain_1"},
+    {0, 0, 30, 19, IB_NORMAL, 0, 0, storage_toggle_permissions, button_none, 5, 0, 1, "UI", "Maintain_1"},
+    {0, 0, 30, 19, IB_NORMAL, 0, 0, storage_toggle_permissions, button_none, 5, 0, 1, "UI", "Stop_Maintain_1"},
 };
 
 static struct {
@@ -212,8 +212,9 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
     int image_offset_x, image_offset_y;
 
     for (int i = 0; i < buttons; i++) {
-        int is_sea_trade_route = images_permission[i] == image_group(GROUP_EMPIRE_TRADE_ROUTE_TYPE);
         int permission = warehouse_distribution_permissions_buttons[i].parameter1 - 1;
+        int is_sea_trade_route = permission == BUILDING_STORAGE_PERMISSION_DOCK;
+        
         int permissionState = building_storage_get_permission(permission, building_get(data.building_id));
         
         if (!permissionState) {
@@ -233,6 +234,13 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
 
         x += 62;
     }
+
+    building *b = building_get(c->building_id);
+    int button = 1;
+    if (building_storage_get_permission(BUILDING_STORAGE_PERMISSION_WORKER, b)) {
+        button = 2;
+    }
+    image_buttons_draw(c->x_offset + 421, c->y_offset + 10, image_buttons_maintain, button);
 }
 
 static void draw_granary_permissions_buttons(int x, int y, int buttons)
@@ -249,8 +257,8 @@ static void draw_granary_permissions_buttons(int x, int y, int buttons)
     int image_offset_x, image_offset_y;
 
     for (int i = 0; i < buttons; i++) {
-        int is_sea_trade_route = images_permission[i] == image_group(GROUP_EMPIRE_TRADE_ROUTE_TYPE);
         int permission = granary_distribution_permissions_buttons[i].parameter1 - 1;
+        int is_sea_trade_route = permission == BUILDING_STORAGE_PERMISSION_DOCK;
         int permissionState = building_storage_get_permission(permission, building_get(data.building_id));
         
         if (!permissionState) {
@@ -1078,7 +1086,7 @@ int window_building_handle_mouse_warehouse(const mouse *m, building_info_context
     if (building_storage_get_permission(BUILDING_STORAGE_PERMISSION_WORKER, b)) {
         button = 2;
     }
-    if (image_buttons_handle_mouse(m, c->x_offset + 64, c->y_offset + BLOCK_SIZE * c->height_blocks - 75,
+    if (image_buttons_handle_mouse(m, c->x_offset + 421, c->y_offset + 10,
         image_buttons_maintain, button, &data.image_button_focus_id)) {
         return 1;
     }
