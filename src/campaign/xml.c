@@ -144,7 +144,10 @@ static int xml_start_mission(void)
     }
     data.info->number_of_missions++;
     data.current_mission->title = copy_string_from_xml(xml_parser_get_attribute_string("title"));
-    data.current_mission->background_image = xml_parser_copy_attribute_string("background_image");
+    const char *background_image = xml_parser_get_attribute_string("background_image");
+    if (background_image) {        
+        data.current_mission->background_image = create_full_campaign_path("image", background_image);
+    }
     const char *intro_video = xml_parser_get_attribute_string("video");
     if (intro_video) {
         data.current_mission->intro_video = create_full_campaign_path("video", intro_video);
@@ -216,6 +219,10 @@ static int xml_start_scenario(void)
     const char *image_path = xml_parser_get_attribute_string("briefing_image");
     if (image_path) {
         scenario->briefing_image_path = create_full_campaign_path("image", image_path);
+    }
+    image_path = xml_parser_get_attribute_string("victory_image");
+    if (image_path) {
+        scenario->victory_image_path = create_full_campaign_path("image", image_path);
     }
 
     if (!scenario->name) {
