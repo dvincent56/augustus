@@ -118,7 +118,7 @@ void figure_workcamp_worker_action(figure *f)
                 }
                 if (warehouse_id) {
                     building *b = building_get(warehouse_id);                    
-                    if (!building_storage_get_permission(BUILDING_STORAGE_PERMISSION_ARCHITECT, b)) {
+                    if (!building_storage_get_permission(BUILDING_STORAGE_PERMISSION_WORKCAMP, b)) {
                         continue;
                     }
                 }

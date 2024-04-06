@@ -1408,8 +1408,8 @@ static translation_string all_strings[] = {
     {TR_TOOLTIP_BUTTON_ACCEPT_BARKEEP, "Allow barkeep to get food here"},
     {TR_TOOLTIP_BUTTON_ACCEPT_CARAVANSERAI, "Allow caravanserai supplier to get food here"},
     {TR_TOOLTIP_BUTTON_ACCEPT_ARMOURY, "Allow armoury to get weapons here"},
-    {TR_TOOLTIP_BUTTON_ACCEPT_LIGHTHOUSE, "Allow lighthouse to get woods here"},
-    {TR_TOOLTIP_BUTTON_ACCEPT_ARCHITECT, "Allow architect to get materials here"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_LIGHTHOUSE, "Allow lighthouse keeper to get timber here"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_WORKCAMP, "Allow architect to get materials here"},
 };
 
 void translation_english(const translation_string **strings, int *num_strings)

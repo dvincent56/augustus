@@ -1398,10 +1398,10 @@ static translation_string all_strings[] = {
     {TR_WINDOW_ORIGINAL_CAMPAIGN_NAME, "Campagne d'origine" },
     {TR_WINDOW_ORIGINAL_CAMPAIGN_DESC, "Campagne originelle de Caesar III, dans toute sa gloire d'antan et ses 25 ans d'âge."},
     {TR_TOOLTIP_BUTTON_ACCEPT_BARKEEP, "Autoriser les tavernières à acheter ici"},
-    {TR_TOOLTIP_BUTTON_ACCEPT_CARAVANSERAI, "Autoriser les fournisseurs des caravansérails à acheter ici"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_CARAVANSERAI, "Autoriser le fournisseur du caravansérail à acheter ici"},
     {TR_TOOLTIP_BUTTON_ACCEPT_ARMOURY, "Autoriser les armureries à se fournir ici"},
-    {TR_TOOLTIP_BUTTON_ACCEPT_LIGHTHOUSE, "Autoriser les intendants du phare à se fournir ici"},
-    {TR_TOOLTIP_BUTTON_ACCEPT_ARCHITECT, "Autoriser les architectes à se fournir ici"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_LIGHTHOUSE, "Autoriser le gardien du phare à obtenir du bois ici"},
+    {TR_TOOLTIP_BUTTON_ACCEPT_WORKCAMP, "Autoriser les architectes à se fournir ici"},
 };
 
 void translation_french(const translation_string **strings, int *num_strings)

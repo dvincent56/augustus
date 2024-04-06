@@ -251,7 +251,7 @@ static void draw_granary_permissions_buttons(int x, int y, int buttons)
         image_group(GROUP_FIGURE_TRADE_CARAVAN) + 4,
         image_group(GROUP_EMPIRE_TRADE_ROUTE_TYPE),
         assets_get_image_id("Walkers", "Barkeep SW 01"),
-        assets_get_image_id("Walkers", "Slave SW 01"),
+        assets_get_image_id("Walkers", "caravanserai_walker_sw_01"),
     };
 
     int image_offset_x, image_offset_y;
@@ -1183,7 +1183,7 @@ void window_building_warehouse_get_tooltip_distribution_permissions(int *transla
             *translation = TR_TOOLTIP_BUTTON_ACCEPT_LIGHTHOUSE;
             break;
         case 7:
-            *translation = TR_TOOLTIP_BUTTON_ACCEPT_ARCHITECT;
+            *translation = TR_TOOLTIP_BUTTON_ACCEPT_WORKCAMP;
             break;
         default:
             break;
