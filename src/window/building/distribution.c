@@ -215,9 +215,9 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
         int permission = warehouse_distribution_permissions_buttons[i].parameter1 - 1;
         int is_sea_trade_route = permission == BUILDING_STORAGE_PERMISSION_DOCK;
         
-        int permissionState = building_storage_get_permission(permission, building_get(data.building_id));
+        int permission_state = building_storage_get_permission(permission, building_get(data.building_id));
         
-        if (!permissionState) {
+        if (!permission_state) {
             inner_panel_draw(x + 2, y + 2, 3, 3);
         }
         image_offset_x = is_sea_trade_route ? 12 : 7;
@@ -225,12 +225,12 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
         
         image_draw(images_permission[i], x + image_offset_x, y + image_offset_y, COLOR_MASK_NONE, SCALE_NONE);
 
-        if (!permissionState) {
+        if (!permission_state) {
             image_draw(assets_get_image_id("UI", "Large_Widget_Cross"), x + 15, y + 15,
             COLOR_MASK_NONE, SCALE_NONE);
         }
         
-        button_border_draw(x, y, 52, 52, data.permission_focus_button_id == i + 1 || !permissionState ? 1 : 0);
+        button_border_draw(x, y, 52, 52, data.permission_focus_button_id == i + 1 || !permission_state);
 
         x += 62;
     }
@@ -259,9 +259,9 @@ static void draw_granary_permissions_buttons(int x, int y, int buttons)
     for (int i = 0; i < buttons; i++) {
         int permission = granary_distribution_permissions_buttons[i].parameter1 - 1;
         int is_sea_trade_route = permission == BUILDING_STORAGE_PERMISSION_DOCK;
-        int permissionState = building_storage_get_permission(permission, building_get(data.building_id));
+        int permission_state = building_storage_get_permission(permission, building_get(data.building_id));
         
-        if (!permissionState) {
+        if (!permission_state) {
             inner_panel_draw(x + 2, y + 2, 3, 3);
         }
         image_offset_x = is_sea_trade_route ? 12 : 7;
@@ -269,12 +269,12 @@ static void draw_granary_permissions_buttons(int x, int y, int buttons)
         
         image_draw(images_permission[i], x + image_offset_x, y + image_offset_y, COLOR_MASK_NONE, SCALE_NONE);
 
-        if (!permissionState) {
+        if (!permission_state) {
             image_draw(assets_get_image_id("UI", "Large_Widget_Cross"), x + 15, y + 15,
             COLOR_MASK_NONE, SCALE_NONE);
         }
         
-        button_border_draw(x, y, 52, 52, data.permission_focus_button_id == i + 1 || !permissionState ? 1 : 0);
+        button_border_draw(x, y, 52, 52, data.permission_focus_button_id == i + 1 || !permission_state);
 
         x += 76;
     }
