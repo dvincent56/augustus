@@ -3,6 +3,7 @@
 #include "assets/assets.h"
 #include "building/model.h"
 #include "building/properties.h"
+#include "campaign/campaign.h"
 #include "city/view.h"
 #include "core/config.h"
 #include "core/hotkey_config.h"
@@ -56,6 +57,7 @@ int game_pre_init(void)
     config_load();
     hotkey_config_load();
     scenario_settings_init();
+    campaign_clear();
     game_state_unpause();
 
     if (!lang_load(0)) {
@@ -109,7 +111,7 @@ int game_init(void)
     sound_system_init();
     game_state_init();
     resource_init();
-    int missing_assets = !assets_get_image_id("Logistics", "roadblock"); // If can't find roadblocks asset, extra assets not installed properly
+    int missing_assets = !assets_get_image_id("Admin_Logistics", "roadblock"); // If can't find roadblocks asset, extra assets not installed properly
     window_logo_show(missing_fonts ? MESSAGE_MISSING_FONTS : (is_unpatched() ? MESSAGE_MISSING_PATCH : (missing_assets ? MESSAGE_MISSING_EXTRA_ASSETS : MESSAGE_NONE)));
     return 1;
 }

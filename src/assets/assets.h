@@ -5,6 +5,8 @@
 
 #define ASSETS_IMAGE_PATH "Graphics"
 
+#define ASSET_EXTERNAL_FILE_LIST "***EXTERNAL_FILES***"
+
 #define PATH_ROTATE_OFFSET 56
 
 typedef enum {
@@ -28,6 +30,8 @@ int assets_load_single_group(const char *file_name, color_t **main_images, int *
 int assets_get_group_id(const char *assetlist_name);
 
 int assets_get_image_id(const char *assetlist_name, const char *image_name);
+
+int assets_get_external_image(const char *path, int force_reload);
 
 int assets_lookup_image_id(asset_id id);
 

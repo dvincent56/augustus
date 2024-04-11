@@ -262,9 +262,9 @@ void window_building_draw_legion_info(building_info_context *c)
     }
     if (m->figure_type == FIGURE_FORT_INFANTRY) {
         if (m->is_halted) {
-            flag_image_id = assets_get_image_id("Military", "auxinf_banner_0");
+            flag_image_id = assets_get_image_id("UI", "auxinf_banner_0");
         } else {
-            flag_image_id = assets_get_image_id("Military", "auxinf_banner_01");
+            flag_image_id = assets_get_image_id("UI", "auxinf_banner_01");
         }
     }
 
@@ -618,4 +618,30 @@ void window_building_draw_palisade(building_info_context *c)
     text_draw_centered(translation_for(TR_BUILDING_PALISADE), c->x_offset, c->y_offset + 10, BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK, 0);
     window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 158, CUSTOM_TRANSLATION,
         TR_BUILDING_PALISADE_DESC);
+}
+
+void window_building_draw_armoury(building_info_context *c)
+{
+    c->help_id = 85;
+    building *b = building_get(c->building_id);
+
+    window_building_play_sound(c, "wavs/tower3.wav");
+
+    outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
+    text_draw_centered(translation_for(TR_BUILDING_ARMOURY), c->x_offset, c->y_offset + 10, BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK, 0);
+
+    if (!c->has_road_access) {
+        window_building_draw_description(c, 69, 25);
+    } else if (b->num_workers <= 0) {
+        window_building_draw_description(c, CUSTOM_TRANSLATION, TR_BUILDING_ARMOURY_NO_EMPLOYEES);
+    } else if (c->worker_percentage <= 50) {
+        window_building_draw_description(c, CUSTOM_TRANSLATION, TR_BUILDING_ARMOURY_SOME_EMPLOYEES);
+    } else if (c->worker_percentage < 100) {
+        window_building_draw_description(c, CUSTOM_TRANSLATION, TR_BUILDING_ARMOURY_MANY_EMPLOYEES);
+    } else {
+        window_building_draw_description(c, CUSTOM_TRANSLATION, TR_BUILDING_ARMOURY_DESC);
+    }
+    inner_panel_draw(c->x_offset + 16, c->y_offset + 136, c->width_blocks - 2, 4);
+    window_building_draw_employment(c, 142);
+    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, c->y_offset + 144);
 }

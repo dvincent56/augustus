@@ -165,6 +165,7 @@ extern struct scenario_t {
     int start_year;
     scenario_climate climate;
     int player_rank;
+    uint16_t caesar_salary;
 
     int initial_funds;
     int rescue_loan;
@@ -177,6 +178,7 @@ extern struct scenario_t {
     int is_open_play;
     int open_play_scenario_id;
     int intro_custom_message_id;
+    int victory_custom_message_id;
 
     scenario_win_criteria win_criteria;
 
@@ -251,15 +253,18 @@ extern struct scenario_t {
     } native_images;
 
     struct { // used to be stored in the settings file
-        int campaign_rank;
-        int campaign_mission;
         int is_custom;
         int starting_favor;
         int starting_personal_savings;
         uint8_t player_name[MAX_PLAYER_NAME];
-        /** Temp storage for carrying over player name to next campaign mission */
-        uint8_t campaign_player_name[MAX_PLAYER_NAME];
     } settings;
+
+    struct {
+        int rank;
+        int mission;
+        /** Temp storage for carrying over player name to next campaign mission */
+        uint8_t player_name[MAX_PLAYER_NAME];
+    } campaign;
 
     int is_saved;
 } scenario;

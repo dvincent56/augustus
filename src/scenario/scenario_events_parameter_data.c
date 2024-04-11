@@ -675,6 +675,8 @@ static special_attribute_mapping_t special_attribute_mappings_standard_message[]
 static special_attribute_mapping_t special_attribute_mappings_media_type[] = {
     { .type = PARAMETER_TYPE_MEDIA_TYPE,                  .text = "sound",                     .value = 1,          .key = TR_PARAMETER_VALUE_MEDIA_TYPE_SOUND },
     { .type = PARAMETER_TYPE_MEDIA_TYPE,                  .text = "video",                     .value = 2,          .key = TR_PARAMETER_VALUE_MEDIA_TYPE_VIDEO },
+    { .type = PARAMETER_TYPE_MEDIA_TYPE,                  .text = "speech",                    .value = 3,          .key = TR_PARAMETER_VALUE_MEDIA_TYPE_SPEECH },
+    { .type = PARAMETER_TYPE_MEDIA_TYPE,                  .text = "background_image",          .value = 4,          .key = TR_PARAMETER_VALUE_MEDIA_TYPE_BACKGROUND_IMAGE },
 };
 
 #define SPECIAL_ATTRIBUTE_MAPPINGS_MEDIA_TYPE_SIZE (sizeof(special_attribute_mappings_media_type) / sizeof(special_attribute_mapping_t))
@@ -850,7 +852,7 @@ int scenario_events_parameter_data_get_default_value_for_parameter(xml_data_attr
         case PARAMETER_TYPE_DIFFICULTY:
             return DIFFICULTY_NORMAL;
         case PARAMETER_TYPE_ENEMY_TYPE:
-            return ENEMY_0_BARBARIAN;
+            return ENEMY_UNDEFINED;
         case PARAMETER_TYPE_RESOURCE:
             return RESOURCE_WHEAT;
         case PARAMETER_TYPE_POP_CLASS:

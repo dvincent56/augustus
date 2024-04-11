@@ -38,6 +38,8 @@ enum {
     OVERLAY_SICKNESS = 38,
     OVERLAY_EFFICIENCY = 39,
     OVERLAY_STORAGES = 40,
+    OVERLAY_HEALTH = 41,
+    OVERLAY_EMPLOYMENT = 42,
 };
 
 void game_state_init(void);

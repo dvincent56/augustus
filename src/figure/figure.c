@@ -170,6 +170,13 @@ void figure_delete(figure *f)
                 }
             }
             break;
+        case FIGURE_WAREHOUSEMAN:
+            if (f->id == b->figure_id4) {
+                b->figure_id4 = 0;
+            } else if (f->id == b->figure_id) {
+                b->figure_id = 0;
+            }
+            break;
         case FIGURE_CART_PUSHER:
         case FIGURE_WORK_CAMP_ARCHITECT:
         case FIGURE_WORK_CAMP_WORKER:
@@ -211,7 +218,7 @@ int figure_is_enemy(const figure *f)
 
 int figure_is_legion(const figure *f)
 {
-    return f->type >= FIGURE_FORT_JAVELIN && f->type <= FIGURE_FORT_LEGIONARY || f->type == FIGURE_FORT_INFANTRY;
+    return (f->type >= FIGURE_FORT_JAVELIN && f->type <= FIGURE_FORT_LEGIONARY) || f->type == FIGURE_FORT_INFANTRY;
 }
 
 int figure_is_herd(const figure *f)
