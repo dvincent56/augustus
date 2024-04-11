@@ -112,6 +112,8 @@ static struct {
 
 static void draw_priority_buttons(int x, int y, int buttons, int building_id)
 {
+    data.building_id = building_id;
+
     for (int i = 0; i < buttons; i++) {
         int has_focus = 0;
         if (data.focus_priority_button_id) {
@@ -121,7 +123,8 @@ static void draw_priority_buttons(int x, int y, int buttons, int building_id)
         }
         int x_adj = x + priority_buttons[i].x;
         int y_adj = y + priority_buttons[i].y;
-        building *barracks = building_get(building_id);
+
+        building *barracks = building_get(data.building_id);
         int priority = building_barracks_get_priority(barracks);
 
         // TODO remove when archery available
@@ -142,7 +145,9 @@ static void draw_priority_buttons(int x, int y, int buttons, int building_id)
 
 static void draw_delivery_buttons(int x, int y, int building_id)
 {    
-    building *barracks = building_get(building_id);
+    data.building_id = building_id;
+
+    building *barracks = building_get(data.building_id);
 
     int accept_delivery = barracks->accept_delivery;
     
