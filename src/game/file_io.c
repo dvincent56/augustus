@@ -1179,11 +1179,19 @@ static void set_viewport(int *x, int *y, int *width, int *height)
     *height = minimap_data.city_height;
 }
 
-int game_file_io_read_scenario_info(const char *filename, scenario_info *info)
+int game_file_io_read_scenario_info(const char *filename, saved_game_info *info)
 {
+    if (!info) {
+        return SAVEGAME_STATUS_INVALID;
+    }
+    memset(info, 0, sizeof(saved_game_info));
+
     scenario_version_t version = 0;
     if (!load_scenario_to_buffers(filename, &version)) {
-        return (version > SCENARIO_CURRENT_VERSION) ? SAVEGAME_STATUS_NEWER_VERSION : SAVEGAME_STATUS_INVALID;
+        if (version > SCENARIO_CURRENT_VERSION) {
+            return SAVEGAME_STATUS_NEWER_VERSION;
+        }
+        return game_file_io_read_saved_game_info(filename, info);
     }
 
     const scenario_state *state = &scenario_data.state;
@@ -1341,6 +1349,7 @@ static void savegame_write_to_file(FILE *fp, memory_block *compress_buffer)
 static int get_savegame_versions_from_buffer(buffer *buf, savegame_version_t *save_version,
     resource_version_t *resource_version)
 {
+    buffer_skip(buf, 4);
     *save_version = buffer_read_i32(buf);
     if (*save_version > SAVE_GAME_LAST_STATIC_RESOURCES) {
         *resource_version = buffer_read_i32(buf);
@@ -1399,7 +1408,7 @@ int game_file_io_read_save_game_from_buffer(buffer *buf)
     }
     savegame_load_from_state(&savegame_data.state, save_version);
     clear_savegame_pieces();
-    return 1;
+    return FILE_LOAD_SUCCESS;
 }
 
 int game_file_io_read_saved_game(const char *filename, int offset)
@@ -1662,6 +1671,18 @@ static savegame_load_status savegame_read_file_info(FILE *fp, saved_game_info *i
     city_data_load_basic_info(&city_data.buf, &info->population, &info->treasury, &minimap_data.caravanserai_id, version);
     game_time_load_basic_info(&game_time.buf, &info->month, &info->year);
 
+    scenario_description_from_buffer(&scenario_piece.buf, info->description, version);
+    info->image_id = scenario_image_id_from_buffer(&scenario_piece.buf, version);
+    info->climate = scenario_climate_from_buffer(&scenario_piece.buf, version);
+    info->total_invasions = scenario_invasions_from_buffer(&scenario_piece.buf, version);
+    info->player_rank = scenario_rank_from_buffer(&scenario_piece.buf, version);
+    info->start_year = scenario_start_year_from_buffer(&scenario_piece.buf, version);
+    scenario_open_play_info_from_buffer(&scenario_piece.buf, version, &info->is_open_play, &info->open_play_id);
+
+    if (!info->is_open_play) {
+        scenario_objectives_from_buffer(&scenario_piece.buf, version, &info->win_criteria);
+    }
+
     int grid_start;
     int grid_border_size;
 
@@ -1692,6 +1713,10 @@ static savegame_load_status savegame_read_file_info(FILE *fp, saved_game_info *i
 
 int game_file_io_read_saved_game_info(const char *filename, saved_game_info *info)
 {
+    if (!info) {
+        return SAVEGAME_STATUS_INVALID;
+    }
+    memset(info, 0, sizeof(saved_game_info));
     FILE *fp = file_open(dir_get_file(filename, NOT_LOCALIZED), "rb");
     if (!fp) {
         return SAVEGAME_STATUS_INVALID;

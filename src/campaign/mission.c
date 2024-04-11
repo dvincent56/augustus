@@ -85,7 +85,6 @@ void campaign_mission_clear(void)
         free((uint8_t *) scenario->description);
         free((char *) scenario->fanfare);
         free((char *) scenario->path);
-        free((char *) scenario->briefing_image_path);
     }
     array_clear(data.scenarios);
 }

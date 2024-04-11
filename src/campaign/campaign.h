@@ -4,11 +4,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define CAMPAIGN_NO_RANK -1
+
 typedef struct {
     const uint8_t *name;
     const uint8_t *author;
     const uint8_t *description;
     int number_of_missions;
+    int starting_rank;
 } campaign_info;
 
 typedef struct {
@@ -18,7 +21,6 @@ typedef struct {
     const uint8_t *name;
     const uint8_t *description;
     const char *path;
-    const char *briefing_image_path;
     const char *fanfare;
 } campaign_scenario;
 
@@ -26,6 +28,8 @@ typedef struct {
     const uint8_t *title;
     const char *intro_video;
     const char *background_image;
+    int next_rank;
+    int max_personal_savings;
     int first_scenario;
     int total_scenarios;
 } campaign_mission_info;

@@ -41,6 +41,7 @@ void scenario_editor_create(int map_size)
     string_copy(lang_get_string(44, 37), scenario.brief_description, MAX_BRIEF_DESCRIPTION);
     string_copy(lang_get_string(44, 38), scenario.briefing, MAX_BRIEFING);
 
+    scenario.caesar_salary = 100;
     scenario.initial_funds = 1000;
     scenario.rescue_loan = 500;
     scenario.start_year = -500;
@@ -400,6 +401,17 @@ void scenario_editor_set_player_rank(int rank)
     scenario.is_saved = 0;
 }
 
+void scenario_editor_set_caesar_salary(int salary)
+{
+    if (salary <= 0) {
+        salary = 100;
+    } else if (salary > 60000) {
+        salary = 60000;
+    }
+    scenario.caesar_salary = salary;
+    scenario.is_saved = 0;
+}
+
 void scenario_editor_set_initial_funds(int amount)
 {
     scenario.initial_funds = amount;
@@ -569,4 +581,14 @@ int scenario_editor_get_custom_message_introduction(void)
 void scenario_editor_set_custom_message_introduction(int id)
 {
     scenario.intro_custom_message_id = id;
+}
+
+int scenario_editor_get_custom_victory_message(void)
+{
+    return scenario.victory_custom_message_id;
+}
+
+void scenario_editor_set_custom_victory_message(int id)
+{
+    scenario.victory_custom_message_id = id;
 }
