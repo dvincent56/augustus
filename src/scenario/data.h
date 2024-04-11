@@ -165,6 +165,7 @@ extern struct scenario_t {
     int start_year;
     scenario_climate climate;
     int player_rank;
+    uint16_t caesar_salary;
 
     int initial_funds;
     int rescue_loan;
@@ -177,6 +178,7 @@ extern struct scenario_t {
     int is_open_play;
     int open_play_scenario_id;
     int intro_custom_message_id;
+    int victory_custom_message_id;
 
     scenario_win_criteria win_criteria;
 
