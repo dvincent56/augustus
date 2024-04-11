@@ -272,15 +272,15 @@ void clouds_draw(int x_offset, int y_offset, int x_limit, int y_limit, float bas
             continue;
         }
 
-        double cloudSpeed = 0;
+        double cloud_speed = 0;
 
         if (!game_state_is_paused()) {
-            double speedShift = (100 - setting_game_speed()) / 100;
-            cloudSpeed = CLOUD_SPEED - speedShift;
+            double speed_shift = (100 - setting_game_speed()) / 100;
+            cloud_speed = CLOUD_SPEED - speed_shift;
         }
 
-        speed_set_target(&cloud->speed.x, -cloudSpeed, SPEED_CHANGE_IMMEDIATE, 1);
-        speed_set_target(&cloud->speed.y, cloudSpeed / 2, SPEED_CHANGE_IMMEDIATE, 1);
+        speed_set_target(&cloud->speed.x, -cloud_speed, SPEED_CHANGE_IMMEDIATE, 1);
+        speed_set_target(&cloud->speed.y, cloud_speed / 2, SPEED_CHANGE_IMMEDIATE, 1);
 
         graphics_renderer()->draw_image_advanced(&cloud->img,
             (cloud->x - x_offset) / base_scale, (cloud->y - y_offset) / base_scale, COLOR_MASK_NONE,
