@@ -673,7 +673,7 @@ void window_building_barracks_get_tooltip_priority(int *translation)
     }
 
     if (data.focus_delivery_button_id) {
-        building *barracks = building_get(data.building_id); // the building here is the last barracks open instead of grand temple
+        building *barracks = building_get(data.building_id);
         if (barracks->accept_delivery) {
             *translation = TR_TOOLTIP_BUTTON_REJECT_DELIVERY;
         } else {
@@ -735,13 +735,13 @@ static void button_layout(int index, int param2)
 
 static void button_priority(int index, int param2)
 {
-    building *barracks = building_get(data.building_id); // the building here is the last barracks open instead of grand temple
+    building *barracks = building_get(data.building_id);
     building_barracks_set_priority(barracks, index);    
 }
 
 static void button_delivery(int index, int param2)
 {
-    building *barracks = building_get(data.building_id); // the building here is the last barracks open instead of grand temple
+    building *barracks = building_get(data.building_id);
     building_barracks_toggle_delivery(barracks);    
 }
 
