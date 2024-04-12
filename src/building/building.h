@@ -199,7 +199,6 @@ typedef struct building {
     unsigned char fumigation_direction;
     short resources[RESOURCE_MAX];
     unsigned char accepted_goods[RESOURCE_MAX];
-    unsigned char accept_delivery;
 } building;
 
 building *building_get(int id);

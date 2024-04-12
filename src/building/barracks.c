@@ -40,7 +40,7 @@ int building_get_barracks_for_weapon(int x, int y, int resource, int road_networ
         if (b->resources[RESOURCE_WEAPONS] >= MAX_WEAPONS_BARRACKS) {
             continue;
         }
-        if (!b->accept_delivery) {
+        if (!b->accepted_goods[RESOURCE_WEAPONS]) {
             continue;
         }
         int dist = calc_maximum_distance(b->x, b->y, x, y);
@@ -54,7 +54,7 @@ int building_get_barracks_for_weapon(int x, int y, int resource, int road_networ
     if (monument && monument->monument.phase == MONUMENT_FINISHED &&
         is_valid_destination(monument, road_network_id) &&
         (monument->resources[RESOURCE_WEAPONS] < MAX_WEAPONS_BARRACKS) &&
-        monument->accept_delivery) {
+        monument->accepted_goods[RESOURCE_WEAPONS]) {
         int dist = calc_maximum_distance(monument->x, monument->y, x, y);
         dist += 8 * monument->resources[RESOURCE_WEAPONS];
         if (dist < min_dist) {
@@ -272,7 +272,7 @@ void building_barracks_set_priority(building *barracks, int priority)
 
 void building_barracks_toggle_delivery(building *barracks)
 {
-    barracks->accept_delivery = barracks->accept_delivery ? 0 : 1;
+    barracks->accepted_goods[RESOURCE_WEAPONS] = barracks->accepted_goods[RESOURCE_WEAPONS] ? 0 : 1;
 }
 
 int building_barracks_get_priority(building *barracks)

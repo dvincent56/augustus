@@ -149,7 +149,7 @@ static void draw_delivery_buttons(int x, int y, int building_id)
 
     building *barracks = building_get(data.building_id);
 
-    int accept_delivery = barracks->accept_delivery;
+    int accept_delivery = barracks->accepted_goods[RESOURCE_WEAPONS];
     
     if (!accept_delivery) {
         inner_panel_draw(x + 2, y + 2, 3, 3);
@@ -674,7 +674,7 @@ void window_building_barracks_get_tooltip_priority(int *translation)
 
     if (data.focus_delivery_button_id) {
         building *barracks = building_get(data.building_id);
-        if (barracks->accept_delivery) {
+        if (barracks->accepted_goods[RESOURCE_WEAPONS]) {
             *translation = TR_TOOLTIP_BUTTON_REJECT_DELIVERY;
         } else {
             *translation = TR_TOOLTIP_BUTTON_ACCEPT_DELIVERY;
