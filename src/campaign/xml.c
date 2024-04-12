@@ -7,6 +7,7 @@
 #include "core/log.h"
 #include "core/xml_parser.h"
 
+#include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +23,12 @@ static int xml_start_mission(void);
 static int xml_start_scenario(void);
 
 static void xml_end_mission(void);
+
+static const char *RANKS[] = {
+    "citizen", "clerk", "engineer", "architect", "quaestor",
+    "procurator", "aedile", "praetor", "consul", "proconsul",
+    "caesar"
+};
 
 static const xml_parser_element xml_elements[XML_TOTAL_ELEMENTS] = {
     { "campaign", xml_start_campaign },
@@ -97,6 +104,7 @@ static int xml_start_missions(void)
         data.success = 0;
         return 0;
     }
+    data.info->starting_rank = xml_parser_get_attribute_enum("starting_rank", &RANKS[1], 10, 1);
     return 1;
 }
 
@@ -144,7 +152,10 @@ static int xml_start_mission(void)
     }
     data.info->number_of_missions++;
     data.current_mission->title = copy_string_from_xml(xml_parser_get_attribute_string("title"));
-    data.current_mission->background_image = xml_parser_copy_attribute_string("background_image");
+    const char *background_image = xml_parser_get_attribute_string("background_image");
+    if (background_image) {        
+        data.current_mission->background_image = create_full_campaign_path("image", background_image);
+    }
     const char *intro_video = xml_parser_get_attribute_string("video");
     if (intro_video) {
         data.current_mission->intro_video = create_full_campaign_path("video", intro_video);
@@ -155,6 +166,13 @@ static int xml_start_mission(void)
                 data.current_mission->intro_video = create_full_regular_path("mpg", intro_video);
             }
         }
+    }
+    data.current_mission->next_rank = xml_parser_get_attribute_enum("next_rank", RANKS, 11, 0);
+
+    if (xml_parser_has_attribute("max_personal_savings")) {
+        data.current_mission->max_personal_savings = xml_parser_get_attribute_int("max_personal_savings");
+    } else {
+        data.current_mission->max_personal_savings = INT_MAX;
     }
     if (xml_parser_has_attribute("file") && !xml_start_scenario()) {
         return 0;
@@ -212,10 +230,6 @@ static int xml_start_scenario(void)
             data.success = 0;
             return 0;
         }
-    }
-    const char *image_path = xml_parser_get_attribute_string("briefing_image");
-    if (image_path) {
-        scenario->briefing_image_path = create_full_campaign_path("image", image_path);
     }
 
     if (!scenario->name) {

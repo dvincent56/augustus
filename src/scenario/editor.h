@@ -73,6 +73,7 @@ int scenario_editor_is_building_allowed(int id);
 void scenario_editor_toggle_building_allowed(int id);
 
 void scenario_editor_set_player_rank(int rank);
+void scenario_editor_set_caesar_salary(int salary);
 
 void scenario_editor_set_initial_funds(int amount);
 void scenario_editor_set_rescue_loan(int amount);
@@ -107,5 +108,8 @@ void scenario_editor_set_survival_time(int years);
 
 int scenario_editor_get_custom_message_introduction(void);
 void scenario_editor_set_custom_message_introduction(int id);
+
+int scenario_editor_get_custom_victory_message(void);
+void scenario_editor_set_custom_victory_message(int id);
 
 #endif // SCENARIO_EDITOR_H

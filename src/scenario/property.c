@@ -61,6 +61,11 @@ int scenario_starting_personal_savings(void)
     return scenario.settings.starting_personal_savings;
 }
 
+void scenario_set_starting_personal_savings(int personal_savings)
+{
+    scenario.settings.starting_personal_savings = personal_savings;
+}
+
 const uint8_t *scenario_name(void)
 {
     return scenario.scenario_name;
@@ -126,6 +131,11 @@ int scenario_property_player_rank(void)
     return scenario.player_rank;
 }
 
+int scenario_property_caesar_salary(void)
+{
+    return scenario.caesar_salary;
+}
+
 int scenario_image_id(void)
 {
     return scenario.image_id;
@@ -149,6 +159,11 @@ int scenario_rescue_loan(void)
 int scenario_intro_message(void)
 {
     return scenario.intro_custom_message_id;
+}
+
+int scenario_victory_message(void)
+{
+    return scenario.victory_custom_message_id;
 }
 
 void scenario_change_climate_cheat(scenario_climate climate)

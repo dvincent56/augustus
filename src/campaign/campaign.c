@@ -116,11 +116,15 @@ static int fill_mission_info(const campaign_mission *mission)
         data.mission_info.background_image = 0;
         data.mission_info.first_scenario = 0;
         data.mission_info.total_scenarios = 0;
+        data.mission_info.max_personal_savings = 0;
+        data.mission_info.next_rank = CAMPAIGN_NO_RANK;
         return 0;
     } else {
         data.mission_info.title = mission->title;
         data.mission_info.intro_video = mission->intro_video;
         data.mission_info.background_image = mission->background_image;
+        data.mission_info.max_personal_savings = mission->max_personal_savings;
+        data.mission_info.next_rank = mission->next_rank;
         data.mission_info.first_scenario = mission->first_scenario;
         data.mission_info.total_scenarios = mission->last_scenario - mission->first_scenario + 1;
         return 1;
@@ -157,7 +161,8 @@ int campaign_load_scenario(int scenario_id)
     if (!scenario_data) {
         return 0;
     }
-    int is_save_game = file_has_extension(scenario->path, ".sav") || file_has_extension(scenario->path, ".svx");
+    log_info("Loading custom campaign scenario", scenario->path, scenario->id);
+    int is_save_game = file_has_extension(scenario->path, "sav") || file_has_extension(scenario->path, "svx");
     int result = game_file_start_scenario_from_buffer(scenario_data, (int) length, is_save_game);
     free(scenario_data);
     return result;

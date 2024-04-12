@@ -6,6 +6,7 @@
 #include "core/string.h"
 #include "core/xml_parser.h"
 #include "scenario/custom_messages.h"
+#include "scenario/editor.h"
 #include "scenario/scenario_events_parameter_data.h"
 #include "window/plain_message_dialog.h"
 
@@ -119,13 +120,21 @@ static int xml_start_media(void)
 
     const char *value = xml_parser_get_attribute_string("type");
     special_attribute_mapping_t *found = scenario_events_parameter_data_get_attribute_mapping_by_text(PARAMETER_TYPE_MEDIA_TYPE, value);
-    if (found == 0) {
+    if (!found) {
         display_and_log_error("Media type invalid");
         return 0;
     }
 
-    const char *media_filename = xml_parser_get_attribute_string("filename");
-    data.current_message->linked_media = custom_media_create(found->value, string_from_ascii(media_filename), CUSTOM_MEDIA_LINK_TYPE_CUSTOM_MESSAGE_AS_MAIN, data.current_message->id);
+    const char *media_location = xml_parser_get_attribute_string("filename");
+    if (!media_location) {
+        media_location = xml_parser_get_attribute_string("location");
+    }
+    if (!media_location) {
+        display_and_log_error("No media location provided");
+        return 0;
+    }
+    data.current_message->linked_media[found->value] = custom_media_create(found->value,
+        string_from_ascii(media_location), CUSTOM_MEDIA_LINK_TYPE_CUSTOM_MESSAGE_AS_MAIN, data.current_message->id);
     return 1;
 }
 
@@ -137,7 +146,8 @@ static int xml_start_background_music(void)
     }
 
     const char *media_filename = xml_parser_get_attribute_string("filename");
-    data.current_message->linked_background_music = custom_media_create(1, string_from_ascii(media_filename), CUSTOM_MEDIA_LINK_TYPE_CUSTOM_MESSAGE_AS_BACKGROUND_MUSIC, data.current_message->id);
+    data.current_message->linked_background_music = custom_media_create(1, string_from_ascii(media_filename),
+        CUSTOM_MEDIA_LINK_TYPE_CUSTOM_MESSAGE_AS_BACKGROUND_MUSIC, data.current_message->id);
     return 1;
 }
 
@@ -173,6 +183,8 @@ static int parse_xml(char *buf, int buffer_length)
 {
     reset_data();
     custom_messages_clear_all();
+    scenario_editor_set_custom_message_introduction(0);
+    scenario_editor_set_custom_victory_message(0);
     data.success = 1;
     if (!xml_parser_init(xml_elements, XML_TOTAL_ELEMENTS)) {
         data.success = 0;
