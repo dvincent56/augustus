@@ -202,7 +202,7 @@ void building_state_save_to_buffer(buffer *buf, const building *b)
     // accepted goods
     for (int i = 0; i < RESOURCE_MAX; i++) {
         buffer_write_u8(buf, b->accepted_goods[i]);
-    }   
+    }
 
     // New building state code should always be added at the end to preserve savegame retrocompatibility
     // Also, don't forget to update BUILDING_STATE_CURRENT_BUFFER_SIZE and if possible, add a new macro like

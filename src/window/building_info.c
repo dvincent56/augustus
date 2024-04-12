@@ -455,9 +455,9 @@ static void init(int grid_offset)
         case 5: context.height_blocks = 24; break;
         case 6: context.height_blocks = 38; break;
         case 7: context.height_blocks = 26; break;
-        case 8: context.height_blocks = 40; context.width_blocks = 30; break;        
-        case 10: context.height_blocks = 47; context.width_blocks = 30; break;
+        case 8: context.height_blocks = 40; context.width_blocks = 30; break;
         case 9: context.height_blocks = 20; break;
+        case 10: context.height_blocks = 47; context.width_blocks = 30; break;
         default: context.height_blocks = 22; break;
     }
     if (screen_height() <= 600) {
@@ -1065,7 +1065,7 @@ static void get_tooltip(tooltip_context *c)
         } else if (!context.depot_selection.resource) {
             window_building_depot_get_tooltip_main(&translation);
         }
-    } else if (btype == BUILDING_BARRACKS ||btype == BUILDING_GRAND_TEMPLE_MARS) {
+    } else if (btype == BUILDING_BARRACKS || btype == BUILDING_GRAND_TEMPLE_MARS) {
         window_building_barracks_get_tooltip_priority(&translation);
     }
     if (!text_id && !group_id && !translation && !precomposed_text) {

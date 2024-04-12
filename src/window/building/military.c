@@ -63,56 +63,10 @@ static struct {
     building_info_context *context_for_callback;
 } data;
 
-static struct {
-    const char image_id[64];
-} priority_forts[14] = {    
-    {
-        "Barracks_Priority_Legionaries_OFF"
-    },   
-    {
-        "Barracks_Priority_Javelin_OFF"
-    },
-    {
-        "Barracks_Priority_Mounted_OFF"
-    }, 
-    {
-        "Barracks_Priority_Auxinf_OFF"
-    },
-    {
-        "Barracks_Priority_Auxarch_OFF"
-    },     
-    {
-        "Barracks_Priority_Tower_OFF"
-    },   
-    {
-        "Barracks_Priority_Watchtower_OFF"
-    },
-    {
-        "Barracks_Priority_Legionaries_ON"
-    },   
-    {
-        "Barracks_Priority_Javelin_ON"
-    },
-    {
-        "Barracks_Priority_Mounted_ON"
-    }, 
-    {
-        "Barracks_Priority_Auxinf_ON"
-    },
-    {
-        "Barracks_Priority_Auxarch_ON"
-    },
-    {
-        "Barracks_Priority_Tower_ON"
-    },
-    {
-        "Barracks_Priority_Watchtower_ON"
-    }
-};
-
 static void draw_priority_buttons(int x, int y, int buttons, int building_id)
 {
-    data.building_id = building_id;
+    int base_priority_image_id = assets_get_image_id("UI", "Barracks_Priority_Legionaries_OFF");
+    data.building_id = building_id;    
 
     for (int i = 0; i < buttons; i++) {
         int has_focus = 0;
@@ -131,12 +85,8 @@ static void draw_priority_buttons(int x, int y, int buttons, int building_id)
         if (i != 4) {
             if (has_focus || priority == i) {
                 button_border_draw(x_adj - 3, y_adj - 3, 46, 46, 1);
-            }  
-            if (priority == i) {
-                image_draw(assets_get_image_id("UI", priority_forts[i + 7].image_id), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);
-            } else {            
-                image_draw(assets_get_image_id("UI", priority_forts[i].image_id), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);
-            } 
+            }
+            image_draw(base_priority_image_id + i * 2 + (i == priority ? 1 : 0), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);            
         }            
     }
     
