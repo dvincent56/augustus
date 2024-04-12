@@ -343,7 +343,8 @@ static int start_scenario(const uint8_t *scenario_name, const char *scenario_fil
     int rank = scenario_campaign_rank();
     map_bookmarks_clear();
     if (scenario_is_custom()) {
-        if (!load_custom_scenario(scenario_name, scenario_file)) {
+        if (!load_custom_scenario(scenario_name, scenario_file) &&
+            game_file_load_saved_game(scenario_file) != FILE_LOAD_SUCCESS) {
             return 0;
         }
         scenario_set_player_name(setting_player_name());
@@ -369,9 +370,7 @@ static int start_scenario(const uint8_t *scenario_name, const char *scenario_fil
     scenario_events_process_all();
     building_menu_update();
     city_message_init_scenario();
-    if (scenario_intro_message()) {
-        city_message_post(1, MESSAGE_CUSTOM_MESSAGE, scenario_intro_message(), 0);
-    }
+
     return 1;
 }
 
@@ -422,7 +421,8 @@ int game_file_start_scenario_from_buffer(uint8_t *data, int length, int is_save_
     scenario_set_custom(2);
     city_data_init_campaign_mission();
     scenario_set_campaign_mission(mission);
-    scenario_settings_init_mission();
+    scenario_settings_init_favor();
+    scenario_set_starting_personal_savings(setting_personal_savings_for_mission(0));
     city_emperor_init_scenario(scenario_campaign_rank());
 
     tutorial_init();
@@ -447,15 +447,6 @@ int game_file_start_scenario_by_name(const uint8_t *scenario_name)
         return 1;
     }
     return start_scenario(scenario_name, get_scenario_filename(scenario_name, "mapx", 1));
-}
-
-int game_file_start_scenario(const char *scenario_file)
-{
-    uint8_t scenario_name[FILE_NAME_MAX];
-    encoding_from_utf8(scenario_file, scenario_name, FILE_NAME_MAX);
-    file_remove_extension((char *) scenario_name);
-    scenario_set_custom(2);
-    return start_scenario(scenario_name, scenario_file);
 }
 
 int game_file_load_saved_game(const char *filename)
