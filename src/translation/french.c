@@ -1377,6 +1377,8 @@ static translation_string all_strings[] = {
     {TR_WINDOW_ADVISOR_MILITARY_INFANTRY, "Fantassins"},
     {TR_TOOLTIP_BUTTON_ROADBLOCK_ORDER_ACCEPT_ALL, "Autoriser tous les marcheurs"},
     {TR_TOOLTIP_BUTTON_ROADBLOCK_ORDER_REJECT_ALL, "Refuser tous les marcheurs"},
+    {TR_TOOLTIP_BUTTON_STORAGE_ORDER_ACCEPT_ALL, "Autoriser toutes les marchandises"},
+    {TR_TOOLTIP_BUTTON_STORAGE_ORDER_REJECT_ALL, "Refuser toutes les marchandises"},
     {TR_FIGURE_TYPE_BEGGAR, "Mendiant"},
     {TR_BUILDING_ARMOURY, "Armurerie" },
     {TR_BUILDING_ARMOURY_NO_EMPLOYEES, "L'armurerie n'ayant pas de main-d'œuvre, aucune arme n'est livrée aux soldats. Puisse Mars nous protéger à la place de nos légions !"},

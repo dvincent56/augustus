@@ -262,6 +262,7 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
             building_monument_set_phase(b, MONUMENT_START);
             if (type == BUILDING_GRAND_TEMPLE_MARS) {
                 b->accepted_goods[RESOURCE_WEAPONS] = 1;
+                b->accepted_goods[RESOURCE_NONE] = 1;
             }
             break;
         case BUILDING_MESS_HALL:
@@ -300,7 +301,8 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
             add_building(b);
             break;            
         case BUILDING_BARRACKS:
-            b->accepted_goods[RESOURCE_WEAPONS] = 1;            
+            b->accepted_goods[RESOURCE_WEAPONS] = 1;
+            b->accepted_goods[RESOURCE_NONE] = 1;
             add_building(b);
             break;
 
