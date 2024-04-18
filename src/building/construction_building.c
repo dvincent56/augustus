@@ -260,6 +260,10 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
         case BUILDING_PANTHEON:
             map_tiles_update_area_roads(b->x, b->y, 9);
             building_monument_set_phase(b, MONUMENT_START);
+            if (type == BUILDING_GRAND_TEMPLE_MARS) {
+                b->accepted_goods[RESOURCE_WEAPONS] = 1;
+                b->accepted_goods[RESOURCE_NONE] = 1;
+            }
             break;
         case BUILDING_MESS_HALL:
             b->data.market.is_mess_hall = 1;
@@ -296,10 +300,14 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
             b->subtype.orientation = building_rotation_get_rotation();
             add_building(b);
             break;            
+        case BUILDING_BARRACKS:
+            b->accepted_goods[RESOURCE_WEAPONS] = 1;
+            b->accepted_goods[RESOURCE_NONE] = 1;
+            add_building(b);
+            break;            
         case BUILDING_LATRINES:
             add_building(b);
             break;
-
     }
     map_routing_update_land();
     map_routing_update_walls();

@@ -326,12 +326,7 @@ static int load_campaign_mission(int mission_id)
     if (!game_file_io_read_saved_game(MISSION_PACK_FILE, offset)) {
         return 0;
     }
-
-    if (mission_id == 0) {
-        scenario_set_player_name(setting_player_name());
-    } else {
-        scenario_restore_campaign_player_name();
-    }
+    scenario_restore_campaign_player_name();
     initialize_saved_game();
     city_data_init_campaign_mission();
     return 1;
@@ -342,10 +337,17 @@ static int start_scenario(const uint8_t *scenario_name, const char *scenario_fil
     int mission = scenario_campaign_mission();
     int rank = scenario_campaign_rank();
     map_bookmarks_clear();
+    int is_save_game = 0;
     if (scenario_is_custom()) {
-        if (!load_custom_scenario(scenario_name, scenario_file) &&
-            game_file_load_saved_game(scenario_file) != FILE_LOAD_SUCCESS) {
-            return 0;
+        if (!load_custom_scenario(scenario_name, scenario_file)) {
+            uint8_t scenario_mapx_name[FILE_NAME_MAX];
+            string_copy(scenario_name, scenario_mapx_name, FILE_NAME_MAX);
+            if (game_file_load_saved_game(scenario_file) == FILE_LOAD_SUCCESS) {
+                is_save_game = 1;
+                scenario_set_name(scenario_mapx_name);
+            } else {
+                return 0;
+            }
         }
         scenario_set_player_name(setting_player_name());
     } else {
@@ -366,8 +368,10 @@ static int start_scenario(const uint8_t *scenario_name, const char *scenario_fil
 
     tutorial_init();
 
-    scenario_events_init();
-    scenario_events_process_all();
+    if (!is_save_game) {
+        scenario_events_init();
+        scenario_events_process_all();
+    }
     building_menu_update();
     city_message_init_scenario();
 
@@ -421,14 +425,17 @@ int game_file_start_scenario_from_buffer(uint8_t *data, int length, int is_save_
     scenario_set_custom(2);
     city_data_init_campaign_mission();
     scenario_set_campaign_mission(mission);
+    scenario_restore_campaign_player_name();
     scenario_settings_init_favor();
     scenario_set_starting_personal_savings(setting_personal_savings_for_mission(0));
     city_emperor_init_scenario(scenario_campaign_rank());
 
     tutorial_init();
 
-    scenario_events_init();
-    scenario_events_process_all();
+    if (!is_save_game) {
+        scenario_events_init();
+        scenario_events_process_all();
+    }
     building_menu_update();
     city_message_init_scenario();
 
