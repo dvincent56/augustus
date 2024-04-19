@@ -81,13 +81,10 @@ static void draw_priority_buttons(int x, int y, int buttons, int building_id)
         building *barracks = building_get(data.building_id);
         int priority = building_barracks_get_priority(barracks);
 
-        // TODO remove when archery available
-        if (i != 4) {
-            if (has_focus || priority == i) {
-                button_border_draw(x_adj - 3, y_adj - 3, 46, 46, 1);
-            }
-            image_draw(base_priority_image_id + i * 2 + (i == priority ? 1 : 0), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);            
-        }            
+        if (has_focus || priority == i) {
+            button_border_draw(x_adj - 3, y_adj - 3, 46, 46, 1);
+        }
+        image_draw(base_priority_image_id + i * 2 + (i == priority ? 1 : 0), x_adj, y_adj, COLOR_MASK_NONE, SCALE_NONE);
     }
     
     window_request_refresh();
@@ -327,6 +324,13 @@ void window_building_draw_legion_info(building_info_context *c)
             flag_image_id = assets_get_image_id("UI", "auxinf_banner_0");
         } else {
             flag_image_id = assets_get_image_id("UI", "auxinf_banner_01");
+        }
+    }
+    if (m->figure_type == FIGURE_FORT_ARCHER) {
+        if (m->is_halted) {
+            flag_image_id = assets_get_image_id("UI", "auxarch_banner_0");
+        } else {
+            flag_image_id = assets_get_image_id("UI", "auxarch_banner_01");
         }
     }
 
@@ -606,8 +610,7 @@ void window_building_barracks_get_tooltip_priority(int *translation)
             *translation = TR_TOOLTIP_BARRACKS_PRIORITY_AUXINF;
             break;
         case 5:
-            // TODO uncomment when archery available
-            // *translation = TR_TOOLTIP_BARRACKS_PRIORITY_AUXARCH;
+            *translation = TR_TOOLTIP_BARRACKS_PRIORITY_AUXARCH;
             break;
         case 6:
             *translation = TR_TOOLTIP_BARRACKS_PRIORITY_TOWER;
