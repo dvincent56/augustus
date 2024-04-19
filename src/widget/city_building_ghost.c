@@ -1265,7 +1265,7 @@ static void draw_concrete_maker(const map_tile *tile, int x, int y)
     } else {
         blocked = is_blocked_for_building(grid_offset, building_size, blocked_tiles);
     }
-    int image_id = assets_get_image_id("Industry", "Concrete_Maker_C_ON");
+    int image_id = get_new_building_image_id(grid_offset, BUILDING_CONCRETE_MAKER);
 
     if (blocked) {
         color = COLOR_MASK_BUILDING_GHOST_RED;
@@ -1461,6 +1461,7 @@ void city_building_ghost_draw(const map_tile *tile)
         case BUILDING_FORT_JAVELIN:
         case BUILDING_FORT_MOUNTED:
         case BUILDING_FORT_AUXILIA_INFANTRY:
+        case BUILDING_FORT_ARCHERS:
             draw_fort(tile, x, y);
             break;
         case BUILDING_HIPPODROME:
