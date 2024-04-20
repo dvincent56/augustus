@@ -96,21 +96,21 @@ static generic_button orders_partial_resource_buttons[] = {
 
 static generic_button warehouse_distribution_permissions_buttons[] = {
      {0, 0, 52, 52, storage_toggle_permissions, button_none, 1, 0},
-     {58, 0, 52, 52, storage_toggle_permissions, button_none, 2, 0},
-     {118, 0, 52, 52, storage_toggle_permissions, button_none, 3, 0},
-     {198, 0, 52, 52, storage_toggle_permissions, button_none, 6, 0},
-     {256, 0, 52, 52, storage_toggle_permissions, button_none, 10, 0},
-     {314, 0, 52, 52, storage_toggle_permissions, button_none, 9, 0},
+     {62, 0, 52, 52, storage_toggle_permissions, button_none, 2, 0},
+     {124, 0, 52, 52, storage_toggle_permissions, button_none, 3, 0},
+     {186, 0, 52, 52, storage_toggle_permissions, button_none, 6, 0},
+     {248, 0, 52, 52, storage_toggle_permissions, button_none, 10, 0},
+     {310, 0, 52, 52, storage_toggle_permissions, button_none, 9, 0},
      {372, 0, 52, 52, storage_toggle_permissions, button_none, 8, 0},
 };
 
 static generic_button granary_distribution_permissions_buttons[] = {
      {0, 0, 52, 52, storage_toggle_permissions, button_none, 1, 0},
-     {58, 0, 52, 52, storage_toggle_permissions, button_none, 2, 0},
-     {118, 0, 52, 52, storage_toggle_permissions, button_none, 3, 0},
-     {210, 0, 52, 52, storage_toggle_permissions, button_none, 6, 0},
-     {268, 0, 52, 52, storage_toggle_permissions, button_none, 4, 0},
-     {326, 0, 52, 52, storage_toggle_permissions, button_none, 7, 0},
+     {76, 0, 52, 52, storage_toggle_permissions, button_none, 2, 0},
+     {152, 0, 52, 52, storage_toggle_permissions, button_none, 3, 0},
+     {228, 0, 52, 52, storage_toggle_permissions, button_none, 6, 0},
+     {304, 0, 52, 52, storage_toggle_permissions, button_none, 4, 0},
+     {380, 0, 52, 52, storage_toggle_permissions, button_none, 7, 0},
 };
 
 static generic_button dock_distribution_permissions_buttons[20];
@@ -239,7 +239,7 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
         image_group(GROUP_FIGURE_CARTPUSHER_CART) + 80
     };
 
-    int image_offset_x, image_offset_y, gap;
+    int image_offset_x, image_offset_y;
 
     for (int i = 0; i < buttons; i++) {
         int permission = warehouse_distribution_permissions_buttons[i].parameter1 - 1;
@@ -252,7 +252,6 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
         }
         image_offset_x = is_sea_trade_route ? 12 : 7;
         image_offset_y = is_sea_trade_route ? 16 : 7;
-        gap = is_sea_trade_route ? 22 : 0;
         
         image_draw(images_permission[i], x + image_offset_x, y + image_offset_y, COLOR_MASK_NONE, SCALE_NONE);
 
@@ -263,7 +262,7 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
         
         button_border_draw(x, y, 52, 52, data.permission_focus_button_id == i + 1 || !permission_state);
 
-        x += 58 + gap;
+        x += 62;
     }
 
     building *b = building_get(c->building_id);
@@ -285,7 +284,7 @@ static void draw_granary_permissions_buttons(int x, int y, int buttons)
         assets_get_image_id("Walkers", "caravanserai_walker_sw_01"),
     };
 
-    int image_offset_x, image_offset_y, gap;
+    int image_offset_x, image_offset_y;
 
     for (int i = 0; i < buttons; i++) {
         int permission = granary_distribution_permissions_buttons[i].parameter1 - 1;
@@ -297,7 +296,6 @@ static void draw_granary_permissions_buttons(int x, int y, int buttons)
         }
         image_offset_x = is_sea_trade_route ? 12 : 7;
         image_offset_y = is_sea_trade_route ? 16 : 7;
-        gap = is_sea_trade_route ? 34 : 0;
         
         image_draw(images_permission[i], x + image_offset_x, y + image_offset_y, COLOR_MASK_NONE, SCALE_NONE);
 
@@ -308,7 +306,7 @@ static void draw_granary_permissions_buttons(int x, int y, int buttons)
         
         button_border_draw(x, y, 52, 52, data.permission_focus_button_id == i + 1 || !permission_state);
 
-        x += 58 + gap;
+        x += 76;
     }
 }
 
@@ -816,7 +814,7 @@ void window_building_draw_granary(building_info_context *c)
 void window_building_draw_granary_foreground(building_info_context *c)
 {
     // Permissions buttons
-    draw_granary_permissions_buttons(c->x_offset + 40, c->y_offset + BLOCK_SIZE * c->height_blocks - 108, 6);
+    draw_granary_permissions_buttons(c->x_offset + 16, c->y_offset + BLOCK_SIZE * c->height_blocks - 108, 6);
 
     // special orders
     button_border_draw(c->x_offset + 80, c->y_offset + BLOCK_SIZE * c->height_blocks - 34,
@@ -828,7 +826,7 @@ void window_building_draw_granary_foreground(building_info_context *c)
 int window_building_handle_mouse_granary(const mouse *m, building_info_context *c)
 {
     data.building_id = c->building_id;
-    if (generic_buttons_handle_mouse(m, c->x_offset + 40, c->y_offset + BLOCK_SIZE * c->height_blocks - 108,
+    if (generic_buttons_handle_mouse(m, c->x_offset + 16, c->y_offset + BLOCK_SIZE * c->height_blocks - 108,
         granary_distribution_permissions_buttons, 6, &data.permission_focus_button_id)) {
     }
     return generic_buttons_handle_mouse(
