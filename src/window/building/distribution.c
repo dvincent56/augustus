@@ -275,14 +275,15 @@ static void draw_permissions_buttons(int x, int y, int buttons, building_info_co
 
 static void draw_granary_permissions_buttons(int x, int y, int buttons)
 {   
-    int images_permission[] = {
-        assets_get_image_id("Walkers", "marketbuyer_sw_01"),   
-        image_group(GROUP_FIGURE_TRADE_CARAVAN) + 4,
-        image_group(GROUP_EMPIRE_TRADE_ROUTE_TYPE),     
-        assets_get_image_id("Walkers", "Barkeep SW 01"),
-        assets_get_image_id("Walkers", "M Hall SW 01"),
-        assets_get_image_id("Walkers", "caravanserai_walker_sw_01"),
-    };
+    static int images_permission[6];
+    if (!images_permission[0]) {
+        images_permission[0] = assets_get_image_id("Walkers", "marketbuyer_sw_01");
+        images_permission[1] = image_group(GROUP_FIGURE_TRADE_CARAVAN) + 4;
+        images_permission[2] = image_group(GROUP_EMPIRE_TRADE_ROUTE_TYPE);
+        images_permission[3] = assets_get_image_id("Walkers", "Barkeep SW 01");
+        images_permission[4] = assets_get_image_id("Walkers", "M Hall SW 01");
+        images_permission[5] = assets_get_image_id("Walkers", "caravanserai_walker_sw_01");
+    }
 
     int image_offset_x, image_offset_y;
 
