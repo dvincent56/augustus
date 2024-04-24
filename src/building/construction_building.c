@@ -45,7 +45,7 @@ static void add_fort(int type, building *fort)
         fort->subtype.fort_figure_type = FIGURE_FORT_MOUNTED;
     } else if (type == BUILDING_FORT_AUXILIA_INFANTRY) {
         fort->subtype.fort_figure_type = FIGURE_FORT_INFANTRY;
-    } else if (BUILDING_FORT_ARCHERS) {
+    } else if (type == BUILDING_FORT_ARCHERS) {
         fort->subtype.fort_figure_type = FIGURE_FORT_ARCHER;
     }
 
@@ -143,6 +143,13 @@ static void add_depot(building *b)
     add_building(b);
 }
 
+static void add_granary(building *b)
+{
+    b->storage_id = building_storage_create(b->id);
+    add_building(b);
+    map_tiles_update_area_roads(b->x, b->y, 5);
+}
+
 static void add_to_map(int type, building *b, int size, int orientation, int waterside_orientation_abs)
 {
     if (building_variant_has_variants(b->type)) {
@@ -168,9 +175,7 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
             break;
         // distribution
         case BUILDING_GRANARY:
-            b->storage_id = building_storage_create(b->id);
-            add_building(b);
-            map_tiles_update_area_roads(b->x, b->y, 5);
+            add_granary(b);
             break;
         // Don't autodistribute wine for new Venus temples
         case BUILDING_SMALL_TEMPLE_VENUS:
