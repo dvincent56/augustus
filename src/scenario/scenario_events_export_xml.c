@@ -12,19 +12,20 @@
 #include "scenario/scenario_events_parameter_data.h"
 #include "window/plain_message_dialog.h"
 
-#include <string.h>
+#include <stdio.h>
 
 #define XML_EXPORT_MAX_SIZE 5000000
+#define ERROR_MESSAGE_LENGTH 200
 
 static struct {
     int success;
-    char error_message[200];
+    char error_message[ERROR_MESSAGE_LENGTH];
 } data;
 
 static void log_exporting_error(const char *msg)
 {
     data.success = 0;
-    strcpy(data.error_message, msg);
+    snprintf(data.error_message, ERROR_MESSAGE_LENGTH, "%s", msg);
     log_error("Error while exporting scenario events to XML. ", data.error_message, 0);
 
     window_plain_message_dialog_show_with_extra(
@@ -80,16 +81,18 @@ static int export_attribute_resource(xml_data_attribute_t *attr, int target)
     }
 
     const char *resource_name = resource_get_data(target)->xml_attr_name;
-    char resource_name_to_use[50] = " ";
+    char resource_name_to_use[50];
 
     const char *next = strchr(resource_name, '|');
-    size_t length = next ? (size_t) (next - resource_name) : strlen(resource_name);
-    if (length > 48) {
-        length = 48;
+    if (next) {
+        size_t length = ((size_t) (next - resource_name) + 1) * sizeof(char);
+        if (length > sizeof(resource_name_to_use)) {
+            length = sizeof(resource_name_to_use);
+        }
+        snprintf(resource_name_to_use, length, "%s", resource_name);
+        resource_name = resource_name_to_use;
     }
-    strncpy(resource_name_to_use, resource_name, length);
-
-    xml_exporter_add_attribute_text(attr->name, string_from_ascii(resource_name_to_use));
+    xml_exporter_add_attribute_text(attr->name, string_from_ascii(resource_name));
     return 1;
 }
 

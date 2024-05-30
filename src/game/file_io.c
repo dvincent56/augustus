@@ -936,7 +936,7 @@ static int read_compressed_chunk_from_buffer(buffer *buf, void *dst, size_t byte
 {
     int input_size = buffer_read_i32(buf);
     if ((unsigned int) input_size == UNCOMPRESSED) {
-        return buffer_read_raw(buf, dst, bytes_to_read) == bytes_to_read;
+        return buffer_read_raw(buf, dst, (int) bytes_to_read) == bytes_to_read;
     } else {
         if (!core_memory_block_ensure_size(compress_buffer, input_size)) {
             return 0;
@@ -1079,7 +1079,7 @@ static int load_scenario_from_buffer(buffer *buf)
 
 static int load_scenario_to_buffers(const char *filename, scenario_version_t *version)
 {
-    FILE *fp = file_open(dir_get_file(filename, NOT_LOCALIZED), "rb");
+    FILE *fp = file_open(filename, "rb");
     if (!fp) {
         return 0;
     }
@@ -1279,7 +1279,7 @@ static int savegame_read_from_buffer(buffer *buf, savegame_version_t version)
     core_memory_block_init(&compress_buffer, COMPRESS_BUFFER_INITIAL_SIZE);
     for (int i = 0; i < savegame_data.num_pieces; i++) {
         file_piece *piece = &savegame_data.pieces[i];
-        int result = 0;
+        size_t result = 0;
         if (!prepare_dynamic_piece_from_buffer(buf, piece)) {
             continue;
         }
@@ -1291,7 +1291,7 @@ static int savegame_read_from_buffer(buffer *buf, savegame_version_t version)
         }
         // The last piece may be smaller than buf.size
         if (!result && i != (savegame_data.num_pieces - 1)) {
-            log_info("Incorrect buffer size, got", 0, result);
+            log_info("Incorrect buffer size, got", 0, (int) result);
             log_info("Incorrect buffer size, expected", 0, (int) piece->buf.size);
             core_memory_block_free(&compress_buffer);
             return 0;
@@ -1414,7 +1414,7 @@ int game_file_io_read_save_game_from_buffer(buffer *buf)
 int game_file_io_read_saved_game(const char *filename, int offset)
 {
     log_info("Loading saved game", filename, 0);
-    FILE *fp = file_open(dir_get_file(filename, NOT_LOCALIZED), "rb");
+    FILE *fp = file_open(filename, "rb");
     if (!fp) {
         log_error("Unable to load game, unable to open file.", 0, 0);
         return FILE_LOAD_DOES_NOT_EXIST;
@@ -1717,7 +1717,7 @@ int game_file_io_read_saved_game_info(const char *filename, saved_game_info *inf
         return SAVEGAME_STATUS_INVALID;
     }
     memset(info, 0, sizeof(saved_game_info));
-    FILE *fp = file_open(dir_get_file(filename, NOT_LOCALIZED), "rb");
+    FILE *fp = file_open(filename, "rb");
     if (!fp) {
         return SAVEGAME_STATUS_INVALID;
     }

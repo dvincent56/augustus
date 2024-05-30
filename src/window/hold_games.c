@@ -48,9 +48,9 @@ static generic_button buttons_games_size[] = {
 };
 
 static struct {
-    int focus_button_id;
-    int focus_image_button_id;
-    int focus_game_button_id;
+    unsigned int focus_button_id;
+    unsigned int focus_image_button_id;
+    unsigned int focus_game_button_id;
     int return_to_city;
     int game_possible;
 } data;
@@ -86,7 +86,7 @@ static void draw_background(void)
         image_draw(base_image_id + i, 100 * i + 175, 101, COLOR_MASK_NONE, SCALE_NONE);
         image_draw_border(highlight_image_id, 100 * i + 175, 101, highlight_color);
     }
-    text_draw_multiline(translation_for(game->description_key), 70, 222, 500, FONT_NORMAL_BLACK, 0);
+    text_draw_multiline(translation_for(game->description_key), 70, 222, 500, 0, FONT_NORMAL_BLACK, 0);
 
     int width = text_draw(translation_for(TR_WINDOW_GAMES_COST), 120, 300, FONT_NORMAL_BLACK, 0);
     width += text_draw_money(city_games_money_cost(selected_game_id), 120 + width, 300, FONT_NORMAL_BLACK);

@@ -22,7 +22,7 @@ void buffer_set(buffer *buf, int offset)
     buf->index = offset;
 }
 
-static int check_size(buffer *buf, int size)
+static int check_size(buffer *buf, size_t size)
 {
     if (buf->index + size > buf->size) {
         buf->overflow = 1;
@@ -81,7 +81,7 @@ void buffer_write_i32(buffer *buf, int32_t value)
     }
 }
 
-void buffer_write_raw(buffer *buf, const void *value, int size)
+void buffer_write_raw(buffer *buf, const void *value, size_t size)
 {
     if (check_size(buf, size)) {
         memcpy(&buf->data[buf->index], value, size);
@@ -155,7 +155,7 @@ int32_t buffer_read_i32(buffer *buf)
     }
 }
 
-size_t buffer_read_raw(buffer *buf, void *value, int max_size)
+size_t buffer_read_raw(buffer *buf, void *value, size_t max_size)
 {
     size_t size = buf->size - buf->index;
     if (size > max_size) {
@@ -166,7 +166,7 @@ size_t buffer_read_raw(buffer *buf, void *value, int max_size)
     return size;
 }
 
-void buffer_skip(buffer *buf, int size)
+void buffer_skip(buffer *buf, size_t size)
 {
     buf->index += size;
 }

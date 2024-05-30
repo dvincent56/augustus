@@ -8,6 +8,7 @@
 #include "core/time.h"
 #include "game/system.h"
 #include "graphics/renderer.h"
+#include "platform/file_manager.h"
 #include "sound/device.h"
 #include "sound/music.h"
 #include "sound/speech.h"
@@ -87,7 +88,7 @@ static int load_mpg(const char *filename)
         return 0;
     }
     char mpg_filename[FILE_NAME_MAX];
-    strncpy(mpg_filename, filename, FILE_NAME_MAX - 1);
+    snprintf(mpg_filename, FILE_NAME_MAX, "%s", filename);
     file_change_extension(mpg_filename, "mpg");
     if (strncmp(mpg_filename, "smk/", 4) == 0 || strncmp(mpg_filename, "smk\\", 4) == 0) {
         mpg_filename[0] = 'm';
@@ -101,7 +102,13 @@ static int load_mpg(const char *filename)
         data.plm = plm_create_with_memory(video_buffer, length, 1);
     }
     if (!data.plm) {
-        const char *path = dir_get_file(mpg_filename, MAY_BE_LOCALIZED);
+        const char *path;
+        const char *community_location = platform_file_manager_get_directory_for_location(PATH_LOCATION_COMMUNITY, 0);
+        if (strncmp(community_location, mpg_filename, strlen(community_location)) == 0) {
+            path = filename;
+        } else {
+            path = dir_get_file(mpg_filename, MAY_BE_LOCALIZED);
+        }
         if (!path) {
             return 0;
         }

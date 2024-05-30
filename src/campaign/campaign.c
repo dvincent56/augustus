@@ -62,7 +62,7 @@ int campaign_load(const char *filename)
     campaign_file_set_path(filename);
     get_campaign_data();
     if (data.active) {
-        strncpy(data.file_name, filename, FILE_NAME_MAX);
+        snprintf(data.file_name, FILE_NAME_MAX, "%s", filename);
     }
     return data.active;
 }
@@ -161,7 +161,7 @@ int campaign_load_scenario(int scenario_id)
     if (!scenario_data) {
         return 0;
     }
-    log_info("Loading custom campaign scenario", scenario->path, scenario->id);
+    log_info("Loading custom campaign scenario", file_remove_directory(scenario->path), scenario->id);
     int is_save_game = file_has_extension(scenario->path, "sav") || file_has_extension(scenario->path, "svx");
     int result = game_file_start_scenario_from_buffer(scenario_data, (int) length, is_save_game);
     free(scenario_data);
@@ -178,7 +178,7 @@ const campaign_scenario *campaign_get_scenario(int scenario_id)
 
 void campaign_suspend(void)
 {
-    strncpy(data.suspended_filename, data.file_name, FILE_NAME_MAX);
+    snprintf(data.suspended_filename, FILE_NAME_MAX, "%s", data.file_name);
     data.active = 0;
 }
 

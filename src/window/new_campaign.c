@@ -33,7 +33,7 @@
 static void start_mission(int param1, int param2);
 static void button_back(int param1, int param2);
 static void draw_campaign_item(const list_box_item *item);
-static void select_campaign(int index, int is_double_click);
+static void select_campaign(unsigned int index, int is_double_click);
 static void campaign_name_tooltip(const list_box_item *item, tooltip_context *c);
 
 static image_button image_buttons[] = {
@@ -94,7 +94,7 @@ static void init(void)
     if (string_equals(player_name_input.placeholder, data.player_name)) {
         *data.player_name = 0;
     }
-    data.campaign_list = dir_find_all_subdirectories(CAMPAIGNS_DIR_NAME);
+    data.campaign_list = dir_find_all_subdirectories_at_location(PATH_LOCATION_CAMPAIGN);
     data.campaign_list = dir_append_files_with_extension("campaign");
     calculate_input_box_width();
     input_box_start(&player_name_input);
@@ -202,7 +202,7 @@ static void button_back(int param1, int param2)
     window_go_back();
 }
 
-static void select_campaign(int index, int is_double_click)
+static void select_campaign(unsigned int index, int is_double_click)
 {
     if (index == ORIGINAL_CAMPAIGN_ID) {
         campaign_clear();

@@ -44,7 +44,7 @@ static const int FIGURE_TYPE_TO_BIG_FIGURE_IMAGE[] = {
     8, 8, 34, 39, 33, 43, 27, 48, 63, 8, //50-59
     8, 8, 8, 8, 53, 8, 38, 62, 54, 55, //60-69
     56, 8, 8, 58, 0, 7, 50, 0, 14, 3, //70-79
-    3, 58, 50, 0, 0, 3, 15, 15, 0, 3, //80-89
+    3, 58, 50, 0, 0, 3, 15, 15, 0, 51, //80-89
     0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, //90-99
 };
 // Starting with FIGURE_WORK_CAMP_WORKER = 73,
@@ -70,8 +70,8 @@ static generic_button depot_figure_buttons[] = {
 
 static struct {
     int figure_images[7];
-    int focus_button_id;
-    int depot_focus_button_id;
+    unsigned int focus_button_id;
+    unsigned int depot_focus_button_id;
     building_info_context *context_for_callback;
 } data;
 
@@ -79,9 +79,9 @@ static int big_people_image(figure_type type)
 {
     switch (type) {
         case FIGURE_WORK_CAMP_SLAVE:
-        case FIGURE_LIGHTHOUSE_SUPPLIER:
             return assets_get_image_id("Walkers", "Slave Portrait");
         case FIGURE_CARAVANSERAI_SUPPLIER:
+            return assets_get_image_id("Walkers", "caravanserai_overseer_portrait");
         case FIGURE_CARAVANSERAI_COLLECTOR:
             return assets_get_image_id("Walkers", "caravanserai_walker_portrait");
         case FIGURE_MESS_HALL_COLLECTOR:
@@ -99,9 +99,11 @@ static int big_people_image(figure_type type)
         case FIGURE_DEPOT_CART_PUSHER:
             return assets_lookup_image_id(ASSET_OX);
         case FIGURE_MARKET_SUPPLIER:
-            return assets_get_image_id("Walkers", "marketbuyer_portrait_overlay");
+            return assets_get_image_id("Walkers", "marketbuyer_portrait");
         case FIGURE_WORK_CAMP_ARCHITECT:
             return assets_get_image_id("Walkers", "architect_portrait");
+        case FIGURE_WORK_CAMP_WORKER:
+            return assets_get_image_id("Walkers", "overseer_portrait");
         default:
             break;
     }
@@ -325,8 +327,12 @@ static void draw_cartpusher(building_info_context *c, figure *f)
         image_draw(big_people_image(f->type), c->x_offset + 28, c->y_offset + 112, COLOR_MASK_NONE, SCALE_NONE);
     }
     lang_text_draw(65, f->name, c->x_offset + 90, c->y_offset + 108, FONT_LARGE_BROWN);
-    int width = lang_text_draw(64, f->type, c->x_offset + 92, c->y_offset + 139, FONT_NORMAL_BROWN);
-
+    int width = 0;
+    if (building_get(f->building_id)->type == BUILDING_ARMOURY) {
+        width = text_draw(translation_for(TR_FIGURE_TYPE_ARMORY_CARTPUSHER), c->x_offset + 92, c->y_offset + 139, FONT_NORMAL_BROWN, 0);
+    } else {
+        width = lang_text_draw(64, f->type, c->x_offset + 92, c->y_offset + 139, FONT_NORMAL_BROWN);
+    }
     if (f->action_state != FIGURE_ACTION_132_DOCKER_IDLING && f->resource_id) {
         int resource = f->resource_id;
         image_draw(resource_get_data(resource)->image.icon,
@@ -613,7 +619,7 @@ int window_building_handle_mouse_figure_list(const mouse *m, building_info_conte
     figure *f = figure_get(c->figure.figure_ids[c->figure.selected_index]);
     if (f->type == FIGURE_DEPOT_CART_PUSHER && !is_depot_cartpusher_recalled(f)) {
         depot_figure_buttons[0].parameter1 = f->id;
-        int focus_id = data.depot_focus_button_id;
+        unsigned int focus_id = data.depot_focus_button_id;
         generic_buttons_handle_mouse(m, c->x_offset, c->y_offset, depot_figure_buttons, 1, &data.depot_focus_button_id);
         if (focus_id != data.depot_focus_button_id) {
             window_request_refresh();

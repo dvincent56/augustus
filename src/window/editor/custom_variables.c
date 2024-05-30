@@ -66,7 +66,7 @@ static generic_button buttons[] = {
 #define MAX_BUTTONS (sizeof(buttons) / sizeof(generic_button))
 
 static struct {
-    int focus_button_id;
+    unsigned int focus_button_id;
 
     int target_variable;
     custom_variable_t *list[MAX_VISIBLE_ROWS];
@@ -116,8 +116,8 @@ static void draw_foreground(void)
     text_draw_label_and_number(translation_for(TR_EDITOR_CUSTOM_VARIABLES_COUNT), MAX_CUSTOM_VARIABLES, "", 48, 106,
         FONT_NORMAL_PLAIN, COLOR_BLACK);
 
-    for (int i = 0; i < MAX_VISIBLE_ROWS; i++) {
-        int j = (i * 2);
+    for (unsigned int i = 0; i < MAX_VISIBLE_ROWS; i++) {
+        unsigned int j = (i * 2);
         if (data.list[i]) {
             large_label_draw(buttons[j].x, buttons[j].y, buttons[j].width / BLOCK_SIZE, data.focus_button_id == j + 1);
 
@@ -183,12 +183,6 @@ static void button_name_click(int button_index, int param2)
         return;
     };
 
-    scenario_event_t *event = scenario_events_get_using_custom_variable(data.list[button_index]->id);
-    if (event) {
-        show_used_event_popup_dialog(event);
-        return;
-    }
-
     int has_name = data.list[button_index]->linked_uid && data.list[button_index]->linked_uid->in_use;
     if (data.select_only) {
         if (!has_name) {
@@ -197,6 +191,11 @@ static void button_name_click(int button_index, int param2)
         data.callback(data.list[button_index]);
         window_go_back();
     } else {
+        scenario_event_t *event = scenario_events_get_using_custom_variable(data.list[button_index]->id);
+        if (event) {
+            show_used_event_popup_dialog(event);
+            return;
+        }
         data.target_variable = data.list[button_index]->id;
         static uint8_t text_input_title[100];
         uint8_t *cursor = string_copy(translation_for(TR_PARAMETER_TYPE_CUSTOM_VARIABLE), text_input_title, 100);
