@@ -206,6 +206,9 @@ int scenario_action_type_invasion_immediate_execute(scenario_action_t *action)
     int target_type = action->parameter4;
     int enemy_id = action->parameter5;
 
+    // Invasion points are internally 0-indexed, but the map editor displays them as 1-indexed, convert to adjust for this
+    invasion_point -= 1;
+
     if (invasion_point < 0 || invasion_point > MAX_INVASION_POINTS) {
         return 0;
     }
@@ -637,6 +640,15 @@ int scenario_action_type_major_curse_execute(scenario_action_t *action)
     int god = action->parameter1;
 
     city_god_curse(god, 1);
+
+    return 1;
+}
+
+int scenario_action_type_change_climate_execute(scenario_action_t *action)
+{
+    int climate = action->parameter1;
+
+    scenario_change_climate(climate);
 
     return 1;
 }

@@ -142,7 +142,7 @@ static void load_layer_from_another_image(layer *l, color_t **main_data, int *ma
             load_dummy_layer(l);
             return;
         }
-        if (l->x_offset != 0 || l->y_offset != 0 || l->width != width || l->height != height) {
+        /****if (l->x_offset != 0 || l->y_offset != 0 || l->width != width || l->height != height) {
             color_t *new_data = malloc(sizeof(color_t) * l->width * l->height);
             if (!new_data) {
                 free(data);
@@ -163,7 +163,7 @@ static void load_layer_from_another_image(layer *l, color_t **main_data, int *ma
             image_copy(&copy);
             free(data);
             data = new_data;
-        }
+        }****/
     } else if (type == ATLAS_MAIN) {
         int atlas_width = main_image_widths[img->atlas.id & IMAGE_ATLAS_BIT_MASK];
         const color_t *atlas_pixels = main_data[img->atlas.id & IMAGE_ATLAS_BIT_MASK];
@@ -335,12 +335,13 @@ static char *copy_attribute(const char *attribute)
     if (!attribute) {
         return 0;
     }
-    char *dest = malloc((strlen(attribute) + 1) * sizeof(char));
+    size_t buf_size = (strlen(attribute) + 1) * sizeof(char);
+    char *dest = malloc(buf_size);
     if (!dest) {
         log_error("There was no memory to copy the attribute", attribute, 0);
         return 0;
     }
-    strcpy(dest, attribute);
+    memcpy(dest, attribute, buf_size);
     return dest;
 }
 #endif

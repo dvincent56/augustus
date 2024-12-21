@@ -17,13 +17,13 @@
 
 #include <math.h>
 #include <stdio.h>
-#include <string.h>
 
-#define XML_TOTAL_ELEMENTS 61
+#define XML_TOTAL_ELEMENTS 62
+#define ERROR_MESSAGE_LENGTH 200
 
 static struct {
     int success;
-    char error_message[200];
+    char error_message[ERROR_MESSAGE_LENGTH];
     int error_line_number;
     uint8_t error_line_number_text[50];
     int version;
@@ -117,6 +117,7 @@ static const xml_parser_element xml_elements[XML_TOTAL_ELEMENTS] = {
     { "cause_blessing", xml_import_create_action, 0, "actions" },
     { "cause_minor_curse", xml_import_create_action, 0, "actions" }, // 60
     { "cause_major_curse", xml_import_create_action, 0, "actions" },
+    { "change_climate", xml_import_create_action, 0, "actions"}
 };
 
 static int xml_import_start_scenario_events(void)
@@ -289,7 +290,7 @@ static void xml_import_log_error(const char *msg)
 {
     data.success = 0;
     data.error_line_number = xml_parser_get_current_line_number();
-    strcpy(data.error_message, msg);
+    snprintf(data.error_message, ERROR_MESSAGE_LENGTH, "%s", msg);
     log_error("Error while import scenario events from XML. ", data.error_message, 0);
     log_error("Line:", 0, data.error_line_number);
 
@@ -345,6 +346,7 @@ static int xml_import_special_parse_attribute(xml_data_attribute_t *attr, int *t
         case PARAMETER_TYPE_STORAGE_TYPE:
         case PARAMETER_TYPE_TARGET_TYPE:
         case PARAMETER_TYPE_GOD:
+        case PARAMETER_TYPE_CLIMATE:
             return xml_import_special_parse_type(attr, attr->type, target);
         case PARAMETER_TYPE_BUILDING_COUNTING:
             return xml_import_special_parse_building_counting(attr, target);
@@ -640,6 +642,7 @@ int scenario_events_xml_parse_file(const char *filename)
     free(xml_contents);
     if (!success) {
         log_error("Error parsing file", filename, 0);
+        scenario_events_clear();
     }
     return success;
 }

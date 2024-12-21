@@ -51,16 +51,16 @@ static generic_button preview_button[] = {
 };
 
 static struct {
-    int selected_button;
+    unsigned int selected_button;
     int selected_city;
     int x_min, x_max, y_min, y_max;
     int x_draw_offset, y_draw_offset;
-    int focus_button_id;
+    unsigned int focus_button_id;
     int is_scrolling;
     int finished_scroll;
     int show_battle_objects;
     int preview_image_group;
-    int preview_button_focused;
+    unsigned int preview_button_focused;
     struct {
         int x;
         int y;
@@ -508,7 +508,11 @@ static void refresh_empire(void)
     if (scenario.empire.id != SCENARIO_CUSTOM_EMPIRE) {
         return;
     }
-    empire_xml_parse_file(scenario.empire.custom_name);
+    const char *filename = dir_get_file_at_location(scenario.empire.custom_name, PATH_LOCATION_EDITOR_CUSTOM_EMPIRES);
+    if (!filename) {
+        return;
+    }
+    empire_xml_parse_file(filename);
     window_invalidate();
 }
 

@@ -1,27 +1,27 @@
 #include "custom_messages.h"
 
-#include "campaign/campaign.h"
 #include "core/array.h"
 #include "core/encoding.h"
 #include "core/file.h"
 #include "core/log.h"
 #include "core/string.h"
+#include "game/campaign.h"
 
 #define CUSTOM_MESSAGES_ARRAY_SIZE_STEP 100
 
 static const char *AUDIO_FILE_PATHS[] = {
-    CAMPAIGNS_DIRECTORY "/audio/",
-    "community/audio/",
-    "mp3/",
-    "wavs/",
+    CAMPAIGNS_DIRECTORY "/audio",
+    "community/audio",
+    "mp3",
+    "wavs",
     0
 };
 
 static const char *VIDEO_FILE_PATHS[] = {
-    CAMPAIGNS_DIRECTORY "/video/",
-    "community/video/",
-    "smk/",
-    "mpg/",
+    CAMPAIGNS_DIRECTORY "/video",
+    "community/video",
+    "smk",
+    "mpg",
     0
 };
 
@@ -233,11 +233,18 @@ uint8_t *custom_messages_get_text(custom_message_t *message)
 static const char *check_for_file_in_dir(const char *filename, const char *directory)
 {
     static char filepath[FILE_NAME_MAX];
-    strncpy(filepath, directory, FILE_NAME_MAX);
-    size_t directory_length = strlen(directory);
-    strncpy(&filepath[directory_length], filename, FILE_NAME_MAX - directory_length);
-    filepath[FILE_NAME_MAX - 1] = 0;
-    return campaign_has_file(filepath) || file_exists(filepath, MAY_BE_LOCALIZED) ? filepath : 0;
+    int location = PATH_LOCATION_ROOT;
+    if (strncmp(directory, "community/", 10) == 0) {
+        directory += 10;
+        location = PATH_LOCATION_COMMUNITY;
+    }
+    if (snprintf(filepath, FILE_NAME_MAX, "%s/%s", directory, filename) > FILE_NAME_MAX) {
+        log_error("Filename too long. The file will not be loaded.", filename, 0);
+    }
+    if (game_campaign_has_file(filepath)) {
+        return filepath;
+    }
+    return dir_get_file_at_location(filepath, location);
 }
 
 static const char *search_for_file(const uint8_t *filename, const char *paths[])

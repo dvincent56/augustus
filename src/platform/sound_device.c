@@ -1,10 +1,10 @@
 #include "sound/device.h"
 
-#include "campaign/campaign.h"
 #include "core/calc.h"
 #include "core/config.h"
 #include "core/file.h"
 #include "core/log.h"
+#include "game/campaign.h"
 #include "game/settings.h"
 #include "platform/platform.h"
 #include "platform/vita/vita.h"
@@ -133,7 +133,7 @@ static Mix_Chunk *load_chunk(const char *filename)
 {
     if (filename[0]) {
         size_t size;
-        uint8_t *audio_data = campaign_load_file(filename, &size);
+        uint8_t *audio_data = game_campaign_load_file(filename, &size);
         if (audio_data) {
             SDL_RWops *sdl_memory = SDL_RWFromMem(audio_data, (int) size);
             return Mix_LoadWAV_RW(sdl_memory, SDL_TRUE);
@@ -203,7 +203,7 @@ static void load_music_for_vita(const char *filename)
         free(vita_music_data.buffer);
         vita_music_data.buffer = 0;
     }
-    strncpy(vita_music_data.filename, filename, FILE_NAME_MAX - 1);
+    snprintf(vita_music_data.filename, FILE_NAME_MAX, "%s", filename);
     FILE *fp = file_open(filename, "rb");
     if (!fp) {
         return;
@@ -229,7 +229,7 @@ int sound_device_play_music(const char *filename, int volume_pct, int loop)
             return 0;
         }
         size_t size;
-        data.custom_music = campaign_load_file(filename, &size);
+        data.custom_music = game_campaign_load_file(filename, &size);
         if (data.custom_music) {
             SDL_RWops *sdl_music = SDL_RWFromMem(data.custom_music, (int) size);
             data.music = Mix_LoadMUSType_RW(sdl_music,

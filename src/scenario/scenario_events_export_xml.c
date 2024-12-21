@@ -12,19 +12,20 @@
 #include "scenario/scenario_events_parameter_data.h"
 #include "window/plain_message_dialog.h"
 
-#include <string.h>
+#include <stdio.h>
 
 #define XML_EXPORT_MAX_SIZE 5000000
+#define ERROR_MESSAGE_LENGTH 200
 
 static struct {
     int success;
-    char error_message[200];
+    char error_message[ERROR_MESSAGE_LENGTH];
 } data;
 
 static void log_exporting_error(const char *msg)
 {
     data.success = 0;
-    strcpy(data.error_message, msg);
+    snprintf(data.error_message, ERROR_MESSAGE_LENGTH, "%s", msg);
     log_error("Error while exporting scenario events to XML. ", data.error_message, 0);
 
     window_plain_message_dialog_show_with_extra(
@@ -37,7 +38,7 @@ static int export_attribute_by_type(xml_data_attribute_t *attr, parameter_type t
 {
     special_attribute_mapping_t *found = scenario_events_parameter_data_get_attribute_mapping_by_value(type, target);
     if (found != 0) {
-        xml_exporter_add_attribute_text(attr->name, string_from_ascii(found->text));
+        xml_exporter_add_attribute_text(attr->name, found->text);
         return 1;
     }
     return 0;
@@ -48,7 +49,7 @@ static int export_attribute_future_city(xml_data_attribute_t *attr, int target)
     empire_city *city = empire_city_get(target);
     if (city) {
         const uint8_t *city_name = empire_city_get_name(city);
-        xml_exporter_add_attribute_text(attr->name, city_name);
+        xml_exporter_add_attribute_encoded_text(attr->name, city_name);
         return 1;
     }
     return 0;
@@ -66,7 +67,7 @@ static int export_attribute_route(xml_data_attribute_t *attr, int target)
     if (city_id) {
         empire_city *city = empire_city_get(city_id);
         const uint8_t *city_name = empire_city_get_name(city);
-        xml_exporter_add_attribute_text(attr->name, city_name);
+        xml_exporter_add_attribute_encoded_text(attr->name, city_name);
         return 1;
     }
     return 0;
@@ -80,16 +81,18 @@ static int export_attribute_resource(xml_data_attribute_t *attr, int target)
     }
 
     const char *resource_name = resource_get_data(target)->xml_attr_name;
-    char resource_name_to_use[50] = " ";
+    char resource_name_to_use[50];
 
     const char *next = strchr(resource_name, '|');
-    size_t length = next ? (size_t) (next - resource_name) : strlen(resource_name);
-    if (length > 48) {
-        length = 48;
+    if (next) {
+        size_t length = ((size_t) (next - resource_name) + 1) * sizeof(char);
+        if (length > sizeof(resource_name_to_use)) {
+            length = sizeof(resource_name_to_use);
+        }
+        snprintf(resource_name_to_use, length, "%s", resource_name);
+        resource_name = resource_name_to_use;
     }
-    strncpy(resource_name_to_use, resource_name, length);
-
-    xml_exporter_add_attribute_text(attr->name, string_from_ascii(resource_name_to_use));
+    xml_exporter_add_attribute_text(attr->name, resource_name);
     return 1;
 }
 
@@ -98,7 +101,7 @@ static int export_attribute_custom_message(xml_data_attribute_t *attr, int targe
     custom_message_t *message = custom_messages_get(target);
     if (message) {
         const uint8_t *message_uid = message->linked_uid->text;
-        xml_exporter_add_attribute_text(attr->name, message_uid);
+        xml_exporter_add_attribute_encoded_text(attr->name, message_uid);
         return 1;
     }
     return 0;
@@ -110,11 +113,11 @@ static int export_attribute_custom_variable(xml_data_attribute_t *attr, int targ
     if (variable) {
         if (!variable->linked_uid) {
             const uint8_t error_name[] = "ERROR_NO_VARIABLE_NAME_GIVEN";
-            xml_exporter_add_attribute_text(attr->name, error_name);
+            xml_exporter_add_attribute_encoded_text(attr->name, error_name);
             return 1;
         }
         const uint8_t *variable_uid = variable->linked_uid->text;
-        xml_exporter_add_attribute_text(attr->name, variable_uid);
+        xml_exporter_add_attribute_encoded_text(attr->name, variable_uid);
         return 1;
     }
     return 0;
@@ -136,6 +139,7 @@ static int export_parse_attribute(xml_data_attribute_t *attr, int target)
         case PARAMETER_TYPE_STORAGE_TYPE:
         case PARAMETER_TYPE_TARGET_TYPE:
         case PARAMETER_TYPE_GOD:
+        case PARAMETER_TYPE_CLIMATE:
             return export_attribute_by_type(attr, attr->type, target);
         case PARAMETER_TYPE_BUILDING_COUNTING:
             return export_attribute_by_type(attr, PARAMETER_TYPE_BUILDING, target);
@@ -173,7 +177,7 @@ static void export_event_condition(scenario_condition_t *condition)
     }
 
     if (condition_data->xml_attr.name) {
-        xml_exporter_new_element(condition_data->xml_attr.name, 1);
+        xml_exporter_new_element(condition_data->xml_attr.name);
     } else {
         log_exporting_error("Error while exporting condition.");
         return;
@@ -185,7 +189,7 @@ static void export_event_condition(scenario_condition_t *condition)
     export_parse_attribute(&condition_data->xml_parm4, condition->parameter4);
     export_parse_attribute(&condition_data->xml_parm5, condition->parameter5);
 
-    xml_exporter_close_element(0);
+    xml_exporter_close_element();
 }
 
 static void export_event_action(scenario_action_t *action)
@@ -200,7 +204,7 @@ static void export_event_action(scenario_action_t *action)
     }
 
     if (action_data->xml_attr.name) {
-        xml_exporter_new_element(action_data->xml_attr.name, 1);
+        xml_exporter_new_element(action_data->xml_attr.name);
     } else {
         log_exporting_error("Error while exporting action.");
         return;
@@ -212,7 +216,7 @@ static void export_event_action(scenario_action_t *action)
     export_parse_attribute(&action_data->xml_parm4, action->parameter4);
     export_parse_attribute(&action_data->xml_parm5, action->parameter5);
 
-    xml_exporter_close_element(0);
+    xml_exporter_close_element();
 }
 
 static int export_event(scenario_event_t *event)
@@ -221,7 +225,7 @@ static int export_event(scenario_event_t *event)
         return 1;
     }
 
-    xml_exporter_new_element("event", 1);
+    xml_exporter_new_element("event");
 
     xml_exporter_add_attribute_int("id", event->id);
     if (event->repeat_months_min > 0) {
@@ -234,21 +238,21 @@ static int export_event(scenario_event_t *event)
         xml_exporter_add_attribute_int("max_number_of_repeats", event->max_number_of_repeats);
     }
 
-    xml_exporter_new_element("conditions", 1);
+    xml_exporter_new_element("conditions");
     for (int i = 0; i < event->conditions.size; i++) {
         scenario_condition_t *condition = array_item(event->conditions, i);
         export_event_condition(condition);
     }
-    xml_exporter_close_element(0);
+    xml_exporter_close_element();
 
-    xml_exporter_new_element("actions", 1);
+    xml_exporter_new_element("actions");
     for (int i = 0; i < event->actions.size; i++) {
         scenario_action_t *action = array_item(event->actions, i);
         export_event_action(action);
     }
-    xml_exporter_close_element(0);
+    xml_exporter_close_element();
 
-    xml_exporter_close_element(0);
+    xml_exporter_close_element();
     
     return 1;
 }
@@ -259,31 +263,31 @@ static int export_custom_variable(custom_variable_t *variable)
         return 1;
     }
 
-    xml_exporter_new_element("variable", 1);
+    xml_exporter_new_element("variable");
 
-    xml_exporter_add_attribute_text("uid", variable->linked_uid->text);
+    xml_exporter_add_attribute_encoded_text("uid", variable->linked_uid->text);
     xml_exporter_add_attribute_int("initial_value", variable->value);
 
-    xml_exporter_close_element(0);
+    xml_exporter_close_element();
     
     return 1;
 }
 
 static void export_scenario_variables(buffer *buf)
 {
-    xml_exporter_new_element("variables", 1);
+    xml_exporter_new_element("variables");
 
     for (int i = 1; i < MAX_CUSTOM_VARIABLES; i++) {
         custom_variable_t *variable = scenario_get_custom_variable(i);
         export_custom_variable(variable);
     }
-    xml_exporter_close_element(0);
+    xml_exporter_close_element();
     xml_exporter_newline();
 }
 
 static void export_scenario_events(buffer *buf)
 {
-    xml_exporter_new_element("events", 0);
+    xml_exporter_new_element("events");
     xml_exporter_add_attribute_int("version", SCENARIO_EVENTS_XML_CURRENT_VERSION);
 
     export_scenario_variables(buf);
@@ -293,7 +297,7 @@ static void export_scenario_events(buffer *buf)
         scenario_event_t *event = scenario_event_get(i);
         export_event(event);
     }
-    xml_exporter_close_element(0);
+    xml_exporter_close_element();
     xml_exporter_newline();
 }
 

@@ -50,9 +50,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/cmake/")
 
 set(CMAKE_C_STANDARD 99)
 
-if(CMAKE_COMPILER_IS_GNUCC)
+if(CMAKE_COMPILER_IS_GNUCC OR MINGW)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-missing-field-initializers -Wno-sign-compare -Werror=implicit-function-declaration")
-    if(CMAKE_C_COMPILER_VERSION VERSION_GREATER 5.0)
+    if(CMAKE_COMPILER_IS_GNUCC AND CMAKE_C_COMPILER_VERSION VERSION_GREATER 5.0)
         set(CMAKE_C_FLAGS "-Werror=incompatible-pointer-types -Werror=int-conversion -Wstrict-prototypes ${CMAKE_C_FLAGS}")
     endif()
 
@@ -60,7 +60,7 @@ if(CMAKE_COMPILER_IS_GNUCC)
         set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Walloc-zero -Wdouble-promotion -Wduplicated-branches -Wduplicated-cond -Wformat=2 -Wformat-signedness -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-prototypes -Wshadow -Wundef -Wunused-macros -Wwrite-strings")
     endif()
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND "${CMAKE_BUILD_TYPE}" MATCHES "Debug" AND NOT ${TARGET_PLATFORM} STREQUAL "android")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined -Wall -Wextra -Wpedantic -Wdocumentation -Wno-unused-parameter -Wno-missing-field-initializers -Wno-sign-compare -Wno-unused-but-set-variable")
 endif()
 
 set(PROJECT_VERSION_MAJOR 4)
@@ -88,7 +88,7 @@ elseif (EXISTS "${CMAKE_SOURCE_DIR}/.git")
             OUTPUT_STRIP_TRAILING_WHITESPACE
         )
         execute_process(
-            COMMAND git diff-index --quiet HEAD --
+            COMMAND git diff --quiet HEAD --
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             RESULT_VARIABLE VERSION_COMMIT_DIRTY
         )
@@ -202,6 +202,7 @@ set(PLATFORM_FILES
     ${PROJECT_SOURCE_DIR}/src/platform/screen.c
     ${PROJECT_SOURCE_DIR}/src/platform/sound_device.c
     ${PROJECT_SOURCE_DIR}/src/platform/touch.c
+    ${PROJECT_SOURCE_DIR}/src/platform/user_path.c
     ${PROJECT_SOURCE_DIR}/src/platform/version.c
     ${PROJECT_SOURCE_DIR}/src/platform/virtual_keyboard.c
 )
@@ -305,12 +306,7 @@ set(BUILDING_FILES
     ${PROJECT_SOURCE_DIR}/src/building/variant.c
     ${PROJECT_SOURCE_DIR}/src/building/warehouse.c
 )
-set(CAMPAIGN_FILES
-    ${PROJECT_SOURCE_DIR}/src/campaign/campaign.c
-    ${PROJECT_SOURCE_DIR}/src/campaign/file.c
-    ${PROJECT_SOURCE_DIR}/src/campaign/mission.c
-    ${PROJECT_SOURCE_DIR}/src/campaign/xml.c
-)
+
 set(CITY_FILES
     ${PROJECT_SOURCE_DIR}/src/city/buildings.c
     ${PROJECT_SOURCE_DIR}/src/city/culture.c
@@ -396,6 +392,12 @@ set(FIGURETYPE_FILES
     ${PROJECT_SOURCE_DIR}/src/figuretype/workcamp.c
 )
 set(GAME_FILES
+    ${PROJECT_SOURCE_DIR}/src/game/campaign/campaign.c
+    ${PROJECT_SOURCE_DIR}/src/game/campaign/file.c
+    ${PROJECT_SOURCE_DIR}/src/game/campaign/mission.c
+    ${PROJECT_SOURCE_DIR}/src/game/campaign/original.c
+    ${PROJECT_SOURCE_DIR}/src/game/campaign/player_data.c
+    ${PROJECT_SOURCE_DIR}/src/game/campaign/xml.c
     ${PROJECT_SOURCE_DIR}/src/game/animation.c
     ${PROJECT_SOURCE_DIR}/src/game/cheats.c
     ${PROJECT_SOURCE_DIR}/src/game/difficulty.c
@@ -507,6 +509,7 @@ set(GRAPHICS_FILES
     ${PROJECT_SOURCE_DIR}/src/graphics/font.c
     ${PROJECT_SOURCE_DIR}/src/graphics/generic_button.c
     ${PROJECT_SOURCE_DIR}/src/graphics/graphics.c
+    ${PROJECT_SOURCE_DIR}/src/graphics/grid_box.c
     ${PROJECT_SOURCE_DIR}/src/graphics/image.c
     ${PROJECT_SOURCE_DIR}/src/graphics/image_button.c
     ${PROJECT_SOURCE_DIR}/src/graphics/lang_text.c
@@ -640,8 +643,8 @@ set(WINDOW_FILES
     ${PROJECT_SOURCE_DIR}/src/window/military_menu.c
     ${PROJECT_SOURCE_DIR}/src/window/mission_briefing.c
     ${PROJECT_SOURCE_DIR}/src/window/mission_end.c
+    ${PROJECT_SOURCE_DIR}/src/window/mission_list.c
     ${PROJECT_SOURCE_DIR}/src/window/mission_selection.c
-    ${PROJECT_SOURCE_DIR}/src/window/new_campaign.c
     ${PROJECT_SOURCE_DIR}/src/window/numeric_input.c
     ${PROJECT_SOURCE_DIR}/src/window/option_popup.c
     ${PROJECT_SOURCE_DIR}/src/window/overlay_menu.c
@@ -649,11 +652,13 @@ set(WINDOW_FILES
     ${PROJECT_SOURCE_DIR}/src/window/popup_dialog.c
     ${PROJECT_SOURCE_DIR}/src/window/race_bet.c
     ${PROJECT_SOURCE_DIR}/src/window/resource_settings.c
+    ${PROJECT_SOURCE_DIR}/src/window/select_campaign.c
     ${PROJECT_SOURCE_DIR}/src/window/select_list.c
     ${PROJECT_SOURCE_DIR}/src/window/set_salary.c
     ${PROJECT_SOURCE_DIR}/src/window/text_input.c
     ${PROJECT_SOURCE_DIR}/src/window/trade_opened.c
     ${PROJECT_SOURCE_DIR}/src/window/trade_prices.c
+    ${PROJECT_SOURCE_DIR}/src/window/user_path_setup.c
     ${PROJECT_SOURCE_DIR}/src/window/victory_dialog.c
     ${PROJECT_SOURCE_DIR}/src/window/video.c
 )
@@ -713,7 +718,6 @@ set(SOURCE_FILES
     ${PLATFORM_FILES}
     ${CORE_FILES}
     ${BUILDING_FILES}
-    ${CAMPAIGN_FILES}
     ${CITY_FILES}
     ${EMPIRE_FILES}
     ${FIGURE_FILES}
@@ -780,7 +784,7 @@ endif()
 
 if(${TARGET_PLATFORM} STREQUAL "emscripten")
     set(CMAKE_EXECUTABLE_SUFFIX .html)
-    set_target_properties(${SHORT_NAME} PROPERTIES LINK_FLAGS "-lidbfs.js -s SINGLE_FILE=1 -s DEMANGLE_SUPPORT=1 -s DYNCALLS=1 --shell-file ${PROJECT_SOURCE_DIR}/res/shell.html --embed-file ${ASSETS_DIR}@/assets -s INITIAL_MEMORY=268435456 -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0 -s SAFE_HEAP=1 -s INVOKE_RUN=0 -s EXPORTED_FUNCTIONS=[\"_main\"] -s EXPORTED_RUNTIME_METHODS=[\"callMain\",\"FS\"] -s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=[\"$autoResumeAudioContext\"] --bind")
+    set_target_properties(${SHORT_NAME} PROPERTIES LINK_FLAGS "-lidbfs.js -s SINGLE_FILE=1 -s DYNCALLS=1 --shell-file ${PROJECT_SOURCE_DIR}/res/shell.html --embed-file ${ASSETS_DIR}@/assets -s INITIAL_MEMORY=268435456 -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0 -s SAFE_HEAP=1 -s INVOKE_RUN=0 -s EXPORTED_FUNCTIONS=[\"_main\"] -s EXPORTED_RUNTIME_METHODS=[\"callMain\",\"FS\"] -s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=[\"$autoResumeAudioContext\"] --bind")
 endif()
 
 if(MSVC)
@@ -822,7 +826,7 @@ if(APPLE)
     # setting variables that will populate Info.plist
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "pl.Keriew.augustus")
     set(MACOSX_BUNDLE_BUNDLE_NAME ${USER_FRIENDLY_NAME})
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version" FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE)
     set(MACOSX_BUNDLE_ICON_FILE "augustus.icns")
     set(MACOSX_BUNDLE_BUNDLE_VERSION
         "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}${VERSION_REVISION}")

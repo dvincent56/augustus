@@ -25,7 +25,8 @@
 #define COVERAGE_OFFSET 470
 #define COVERAGE_WIDTH 130
 
-static int focus_button_id;
+static unsigned int focus_button_id;
+
 static void button_hold_games(int param1, int param2);
 
 static generic_button hold_games_button[] = {
@@ -63,18 +64,24 @@ void window_entertainment_draw_games_text(int x, int y)
     int cooldown = city_festival_games_cooldown();
 
     if (cooldown) {
-        text_draw_centered(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_COOLDOWN_TEXT), x, y + 15, 400, FONT_NORMAL_WHITE, 0);
-        int width = text_draw(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_COOLDOWN), x + 46, y + 50, FONT_NORMAL_WHITE, 0);
+        text_draw_centered(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_COOLDOWN_TEXT), x, y + 15,
+            400, FONT_NORMAL_WHITE, 0);
+        int width = text_draw(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_COOLDOWN), x + 46, y + 50,
+            FONT_NORMAL_WHITE, 0);
         text_draw_number(cooldown, '@', "", x + 46 + width, y + 50, FONT_NORMAL_WHITE, 0);
     } else if (city_festival_games_planning_time()) {
-        text_draw_centered(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_PREPARING), x, y + 15, 400, FONT_NORMAL_WHITE, 0);
-        int width = text_draw(translation_for(text_data[game->id].preparation_text), x + 56, y + 50, FONT_NORMAL_WHITE, 0);
+        text_draw_centered(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_PREPARING), x, y + 15, 400,
+            FONT_NORMAL_WHITE, 0);
+        int width = text_draw(translation_for(text_data[game->id].preparation_text), x + 56, y + 50,
+            FONT_NORMAL_WHITE, 0);
         text_draw_number(city_festival_games_planning_time(), '@', "", x + 56 + width, y + 50, FONT_NORMAL_WHITE, 0);
     } else if (city_festival_games_active()) {
-        text_draw_multiline(translation_for(text_data[game->id].ongoing_text), x + 4, y, 400, FONT_NORMAL_WHITE, 0);
+        text_draw_multiline(translation_for(text_data[game->id].ongoing_text), x + 4, y, 400, 0, FONT_NORMAL_WHITE, 0);
     } else {
-        text_draw_multiline(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_DESC), x + 4, y, 400, FONT_NORMAL_WHITE, 0);
-        text_draw_centered(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_BUTTON), x + 56, y + 60, 300, FONT_NORMAL_WHITE, 0);
+        text_draw_multiline(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_DESC), x + 4, y,
+            400, 0, FONT_NORMAL_WHITE, 0);
+        text_draw_centered(translation_for(TR_WINDOW_ADVISOR_ENTERTAINMENT_GAMES_BUTTON), x + 56, y + 60,
+            300, FONT_NORMAL_WHITE, 0);
     }
 }
 

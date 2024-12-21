@@ -1,13 +1,13 @@
 #include "rich_text.h"
 
 #include "assets/assets.h"
-#include "campaign/campaign.h"
 #include "core/calc.h"
 #include "core/file.h"
 #include "core/image.h"
 #include "core/image_group.h"
 #include "core/locale.h"
 #include "core/string.h"
+#include "game/campaign.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
 #include "graphics/image_button.h"
@@ -253,19 +253,20 @@ static int get_raw_text_width(const uint8_t *str)
 static int get_external_image_id(const char *filename)
 {
     char full_path[FILE_NAME_MAX];
-    char *paths[] = { CAMPAIGNS_DIRECTORY "/image", "community/image" };
-    int found_path = 0;
-    for (int i = 0; i < 2; i++) {
+    char *paths[] = { CAMPAIGNS_DIRECTORY "/image", "image" };
+    const char *found_path = 0;
+    for (int i = 0; i < 2 && !found_path; i++) {
         snprintf(full_path, FILE_NAME_MAX, "%s/%s", paths[i], filename);
-        if (campaign_has_file(full_path) || file_exists(full_path, NOT_LOCALIZED)) {
-            found_path = 1;
-            break;
+        if (game_campaign_has_file(full_path)) {
+            found_path = full_path;
+        } else {
+            found_path = dir_get_file_at_location(full_path, PATH_LOCATION_COMMUNITY);
         }
     }
     if (!found_path) {
         return 0;
     }
-    return assets_get_external_image(full_path, 0);
+    return assets_get_external_image(found_path, 0);
 }
 
 int rich_text_parse_image_id(const uint8_t **position, int default_image_group, int can_be_filepath)
@@ -297,8 +298,7 @@ int rich_text_parse_image_id(const uint8_t **position, int default_image_group, 
         cursor += length + 1;
         char *location = malloc((length + 1) * sizeof(char));
         if (location) {
-            strncpy(location, begin, length);
-            location[length] = 0;
+            snprintf(location, length + 1, "%s", begin);
             char *divider = strchr(location, ':');
             // "[<asset group name>:<asset image name>]"
             if (divider) {
@@ -341,7 +341,7 @@ int rich_text_parse_image_id(const uint8_t **position, int default_image_group, 
 }
 
 static int draw_text(const uint8_t *text, int x_offset, int y_offset,
-                     int box_width, int height_lines, color_t color, int measure_only)
+                     int box_width, unsigned int height_lines, color_t color, int measure_only)
 {
     if (!measure_only) {
         graphics_set_clip_rectangle(x_offset, y_offset, box_width, data.line_height * height_lines);
@@ -357,8 +357,8 @@ static int draw_text(const uint8_t *text, int x_offset, int y_offset,
     int has_more_characters = 1;
     int y = y_offset;
     int guard = 0;
-    int line = 0;
-    int num_lines = 0;
+    unsigned int line = 0;
+    unsigned int num_lines = 0;
     int heading = 0;
     while (has_more_characters || lines_to_skip) {
         if (++guard >= 1000) {
@@ -374,6 +374,7 @@ static int draw_text(const uint8_t *text, int x_offset, int y_offset,
         int current_width = x_line_offset;
         const font_definition *def = heading ? data.heading_font : data.normal_font;
         paragraph = 0;
+        int centered = heading;
         while (!line_break && (has_more_characters || lines_to_skip)) {
             if (lines_to_skip) {
                 lines_to_skip--;
@@ -415,6 +416,7 @@ static int draw_text(const uint8_t *text, int x_offset, int y_offset,
                                 lines_to_skip = 1;
                             } else {
                                 def = data.heading_font;
+                                centered = 1;
                             }
                             text++;
                             break;
@@ -483,7 +485,7 @@ static int draw_text(const uint8_t *text, int x_offset, int y_offset,
             }
         }
         if (!outside_viewport) {
-            if (def == data.heading_font) {
+            if (centered) {
                 x_line_offset = (box_width - current_width) / 2;
             }
             draw_line(tmp_line, def, x_line_offset + x_offset, y, color, measure_only);

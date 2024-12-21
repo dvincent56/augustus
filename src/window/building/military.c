@@ -55,20 +55,20 @@ static generic_button return_button[] = {
 };
 
 static struct {
-    int focus_button_id;
-    int focus_priority_button_id;
-    int focus_delivery_button_id;
-    int return_button_id;
+    unsigned int focus_button_id;
+    unsigned int focus_priority_button_id;
+    unsigned int focus_delivery_button_id;
+    unsigned int return_button_id;
     int building_id;
     building_info_context *context_for_callback;
 } data;
 
-static void draw_priority_buttons(int x, int y, int buttons, int building_id)
+static void draw_priority_buttons(int x, int y, unsigned int buttons, int building_id)
 {
     int base_priority_image_id = assets_get_image_id("UI", "Barracks_Priority_Legionaries_OFF");
     data.building_id = building_id;    
 
-    for (int i = 0; i < buttons; i++) {
+    for (unsigned int i = 0; i < buttons; i++) {
         int has_focus = 0;
         if (data.focus_priority_button_id) {
             if (data.focus_priority_button_id - 1 == i) {
@@ -79,7 +79,7 @@ static void draw_priority_buttons(int x, int y, int buttons, int building_id)
         int y_adj = y + priority_buttons[i].y;
 
         building *barracks = building_get(data.building_id);
-        int priority = building_barracks_get_priority(barracks);
+        unsigned int priority = building_barracks_get_priority(barracks);
 
         if (has_focus || priority == i) {
             button_border_draw(x_adj - 3, y_adj - 3, 46, 46, 1);
@@ -130,6 +130,7 @@ void window_building_draw_gatehouse(building_info_context *c)
 
 void window_building_draw_tower(building_info_context *c)
 {
+    c->advisor_button = ADVISOR_MILITARY;
     c->help_id = 85;
     window_building_play_sound(c, "wavs/tower.wav");
     outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
@@ -152,6 +153,7 @@ void window_building_draw_tower(building_info_context *c)
 
 void window_building_draw_barracks(building_info_context *c)
 {
+    c->advisor_button = ADVISOR_MILITARY;
     c->help_id = 37;
     data.building_id = c->building_id;
     window_building_play_sound(c, "wavs/barracks.wav");
@@ -180,10 +182,10 @@ void window_building_draw_barracks(building_info_context *c)
         }
         if (city_data.mess_hall.food_stress_cumulative > 50) {
             text_draw_multiline(translation_for(TR_BUILDING_BARRACKS_FOOD_WARNING_2),
-                c->x_offset + 32, c->y_offset + 106, 16 * c->width_blocks - 30, FONT_NORMAL_BLACK, 0);
+                c->x_offset + 32, c->y_offset + 106, 16 * c->width_blocks - 30, 0, FONT_NORMAL_BLACK, 0);
         } else if (city_data.mess_hall.food_stress_cumulative > 20) {
             text_draw_multiline(translation_for(TR_BUILDING_BARRACKS_FOOD_WARNING),
-                c->x_offset + 32, c->y_offset + 106, 16 * c->width_blocks - 30, FONT_NORMAL_BLACK, 0);
+                c->x_offset + 32, c->y_offset + 106, 16 * c->width_blocks - 30, 0, FONT_NORMAL_BLACK, 0);
         } else if (c->worker_percentage >= 100) {
             window_building_draw_description_at(c, 106, 136, 5 + offset);
         } else if (c->worker_percentage >= 66) {
@@ -240,21 +242,25 @@ int window_building_handle_mouse_barracks(const mouse *m, building_info_context 
 
 int window_building_handle_mouse_grand_temple_mars(const mouse *m, building_info_context *c)
 {
+    unsigned int focused_button = data.focus_priority_button_id;
     if (generic_buttons_handle_mouse(m, c->x_offset + 50, c->y_offset + 135,
         priority_buttons, 7, &data.focus_priority_button_id) ||
-        generic_buttons_handle_mouse(m, c->x_offset + 408, c->y_offset + 40,
-        delivery_buttons, 1, &data.focus_delivery_button_id)
+        generic_buttons_handle_mouse(m, c->x_offset + 392, c->y_offset + 40,
+            delivery_buttons, 1, &data.focus_delivery_button_id)
         ) {
         window_invalidate();
         return 1;
     }
-
+    if (focused_button != data.focus_priority_button_id) {
+        window_invalidate();
+    }
     window_building_handle_mouse_grand_temple(m, c);
     return 0;
 }
 
 void window_building_draw_military_academy(building_info_context *c)
 {
+    c->advisor_button = ADVISOR_MILITARY;
     c->help_id = 88;
     window_building_play_sound(c, "wavs/mil_acad.wav");
     outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
@@ -277,18 +283,24 @@ void window_building_draw_military_academy(building_info_context *c)
 
 void window_building_draw_fort(building_info_context *c)
 {
+    c->advisor_button = ADVISOR_MILITARY;
     c->help_id = 87;
     window_building_play_sound(c, "wavs/fort.wav");
     outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
     lang_text_draw_centered(89, 0, c->x_offset, c->y_offset + 10, BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK);
     int text_id = formation_get(c->formation_id)->cursed_by_mars ? 1 : 2;
-    window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 208, 89, text_id);
+    window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 388, 89, text_id);
 
     building *b = building_get(c->building_id);
-    inner_panel_draw(c->x_offset + 16, c->y_offset + 136, c->width_blocks - 2, 4);
+    inner_panel_draw(c->x_offset + 16, c->y_offset + 116, c->width_blocks - 2, 4);
+    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, c->y_offset + 122);
     if (building_get_levy(b)) {
-        window_building_draw_levy(building_get_levy(b), c->x_offset + 300, c->y_offset + 150);
+        window_building_draw_levy(building_get_levy(b), c->x_offset + 56, c->y_offset + 130);
     }
+    image_draw(assets_get_image_id("UI", "Fort_Banner_01"),
+        c->x_offset + 37, c->y_offset + 195, COLOR_MASK_NONE, SCALE_NONE);
+    image_draw_border(assets_get_image_id("UI", "Large_Banner_Border"),
+        c->x_offset + 32, c->y_offset + 190 , COLOR_MASK_NONE);
 }
 
 void window_building_draw_legion_info(building_info_context *c)
@@ -458,7 +470,7 @@ void window_building_draw_legion_info_foreground(building_info_context *c)
     if (!m->num_figures) {
         return;
     }
-    for (int i = 5 - c->formation_types; i < 5; i++) {
+    for (unsigned int i = 5 - c->formation_types; i < 5; i++) {
         int has_focus = 0;
         if (data.focus_button_id) {
             if (data.focus_button_id - 1 == i) {
@@ -699,6 +711,7 @@ static void button_delivery(int index, int param2)
 
 void window_building_draw_watchtower(building_info_context *c)
 {
+    c->advisor_button = ADVISOR_MILITARY;
     c->help_id = 85;
     window_building_play_sound(c, "wavs/tower2.wav");
     outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
@@ -710,10 +723,10 @@ void window_building_draw_watchtower(building_info_context *c)
         building *b = building_get(c->building_id);
         if (!b->figure_id4) {
             text_draw_multiline(translation_for(TR_BUILDING_WATCHTOWER_DESC_NO_SOLDIERS),
-                c->x_offset + 32, c->y_offset + 76, 16 * (c->width_blocks - 4), FONT_NORMAL_BLACK, 0);
+                c->x_offset + 32, c->y_offset + 76, 16 * (c->width_blocks - 4), 0, FONT_NORMAL_BLACK, 0);
         } else {
             text_draw_multiline(translation_for(TR_BUILDING_WATCHTOWER_DESC),
-                c->x_offset + 32, c->y_offset + 76, 16 * (c->width_blocks - 4), FONT_NORMAL_BLACK, 0);
+                c->x_offset + 32, c->y_offset + 76, 16 * (c->width_blocks - 4), 0, FONT_NORMAL_BLACK, 0);
         }
     }
     inner_panel_draw(c->x_offset + 16, c->y_offset + 136, c->width_blocks - 2, 4);
@@ -733,6 +746,7 @@ void window_building_draw_palisade(building_info_context *c)
 
 void window_building_draw_armoury(building_info_context *c)
 {
+    c->advisor_button = ADVISOR_MILITARY;
     c->help_id = 85;
     building *b = building_get(c->building_id);
 

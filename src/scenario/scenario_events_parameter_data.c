@@ -258,7 +258,7 @@ static scenario_action_data_t scenario_action_data[ACTION_TYPE_MAX] = {
                                         .xml_attr =     { .name = "invasion_start_immediate",    .type = PARAMETER_TYPE_TEXT,             .key = TR_ACTION_TYPE_INVASION_IMMEDIATE },
                                         .xml_parm1 =    { .name = "attack_type",                 .type = PARAMETER_TYPE_INVASION_TYPE,    .key = TR_PARAMETER_TYPE_INVASION_TYPE },
                                         .xml_parm2 =    { .name = "size",                        .type = PARAMETER_TYPE_NUMBER,           .min_limit = 0,           .max_limit = 150,     .key = TR_PARAMETER_TYPE_INVASION_SIZE },
-                                        .xml_parm3 =    { .name = "invasion_point",              .type = PARAMETER_TYPE_NUMBER,           .min_limit = 0,           .max_limit = 8,       .key = TR_PARAMETER_TYPE_INVASION_POINT },
+                                        .xml_parm3 =    { .name = "invasion_point",              .type = PARAMETER_TYPE_NUMBER,           .min_limit = 1,           .max_limit = 9,       .key = TR_PARAMETER_TYPE_INVASION_POINT },
                                         .xml_parm4 =    { .name = "target_type",                 .type = PARAMETER_TYPE_TARGET_TYPE,      .key = TR_PARAMETER_TYPE_TARGET_TYPE },
                                         .xml_parm5 =    { .name = "enemy_type",                  .type = PARAMETER_TYPE_ENEMY_TYPE,       .key = TR_PARAMETER_TYPE_ENEMY_TYPE }, },
     [ACTION_TYPE_CAUSE_BLESSING]         = { .type = ACTION_TYPE_CAUSE_BLESSING,
@@ -270,6 +270,10 @@ static scenario_action_data_t scenario_action_data[ACTION_TYPE_MAX] = {
     [ACTION_TYPE_CAUSE_MAJOR_CURSE]      = {.type = ACTION_TYPE_CAUSE_MAJOR_CURSE,
                                         .xml_attr = {.name = "cause_major_curse",    .type = PARAMETER_TYPE_TEXT,      .key = TR_ACTION_TYPE_CAUSE_MAJOR_CURSE },
                                         .xml_parm1 = {.name = "god",                 .type = PARAMETER_TYPE_GOD,       .key = TR_PARAMETER_TYPE_GOD }, },
+    [ACTION_TYPE_CHANGE_CLIMATE]         = { .type = ACTION_TYPE_CHANGE_CLIMATE,
+                                        .xml_attr = {.name = "change_climate",      .type = PARAMETER_TYPE_TEXT,      .key = TR_ACTION_TYPE_CHANGE_CLIMATE },
+                                        .xml_parm1 = {.name = "climate",            .type = PARAMETER_TYPE_CLIMATE,   .key = TR_PARAMETER_TYPE_CLIMATE }, },
+
 };
 
 scenario_action_data_t *scenario_events_parameter_data_get_actions_xml_attributes(action_types type)
@@ -758,6 +762,16 @@ special_attribute_mapping_t special_attribute_mappings_god[] =
 
 #define SPECIAL_ATTRIBUTE_MAPPINGS_GOD_SIZE (sizeof(special_attribute_mappings_god) / sizeof(special_attribute_mapping_t))
 
+special_attribute_mapping_t special_attribute_mappings_climate[] =
+{
+    {.type = PARAMETER_TYPE_CLIMATE,            .text = "Central",        .value = CLIMATE_CENTRAL,   .key = TR_PARAMETER_VALUE_CLIMATE_CENTRAL },
+    {.type = PARAMETER_TYPE_CLIMATE,            .text = "Northern",       .value = CLIMATE_NORTHERN,  .key = TR_PARAMETER_VALUE_CLIMATE_NORTHERN },
+    {.type = PARAMETER_TYPE_CLIMATE,            .text = "Desert",         .value = CLIMATE_DESERT,    .key = TR_PARAMETER_VALUE_CLIMATE_DESERT },
+};
+
+#define SPECIAL_ATTRIBUTE_MAPPINGS_CLIMATE_SIZE (sizeof(special_attribute_mappings_climate) / sizeof(special_attribute_mapping_t))
+
+
 special_attribute_mapping_t *scenario_events_parameter_data_get_attribute_mapping(parameter_type type, int index)
 {
     switch (type) {
@@ -790,6 +804,8 @@ special_attribute_mapping_t *scenario_events_parameter_data_get_attribute_mappin
             return &special_attribute_mappings_target_type[index];
         case PARAMETER_TYPE_GOD:
             return &special_attribute_mappings_god[index];
+        case PARAMETER_TYPE_CLIMATE:
+            return &special_attribute_mappings_climate[index];
         default:
             return 0;
     }
@@ -827,6 +843,8 @@ int scenario_events_parameter_data_get_mappings_size(parameter_type type)
             return SPECIAL_ATTRIBUTE_MAPPINGS_TARGET_TYPE_SIZE;
         case PARAMETER_TYPE_GOD:
             return SPECIAL_ATTRIBUTE_MAPPINGS_GOD_SIZE;
+        case PARAMETER_TYPE_CLIMATE:
+            return SPECIAL_ATTRIBUTE_MAPPINGS_CLIMATE_SIZE;
         default:
             return 0;
     }
@@ -900,6 +918,8 @@ int scenario_events_parameter_data_get_default_value_for_parameter(xml_data_attr
             return FORMATION_ATTACK_BEST_BUILDINGS;
         case PARAMETER_TYPE_GOD:
             return GOD_CERES;
+        case PARAMETER_TYPE_CLIMATE:
+            return CLIMATE_CENTRAL;
         default:
             return 0;
     }
@@ -1261,6 +1281,11 @@ void scenario_events_parameter_data_get_display_string_for_action(scenario_actio
         case ACTION_TYPE_CAUSE_MAJOR_CURSE:
             {
                 result_text = translation_for_type_lookup_by_value(PARAMETER_TYPE_GOD, action->parameter1, result_text, &maxlength);
+                return;
+            }
+        case ACTION_TYPE_CHANGE_CLIMATE:
+            {
+                result_text = translation_for_type_lookup_by_value(PARAMETER_TYPE_CLIMATE, action->parameter1, result_text, &maxlength);
                 return;
             }
         default:

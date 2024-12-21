@@ -1,10 +1,10 @@
 #include "message_list.h"
 
-#include "campaign/campaign.h"
 #include "city/message.h"
 #include "core/calc.h"
 #include "core/image_group.h"
 #include "core/lang.h"
+#include "game/campaign.h"
 #include "game/time.h"
 #include "graphics/generic_button.h"
 #include "graphics/graphics.h"
@@ -30,6 +30,7 @@ static void button_close(int param1, int param2);
 static void button_message(int param1, int param2);
 static void button_delete(int param1, int param2);
 static void button_delete_all_read(int param1, int param2);
+static void button_delete_all_common(int param1, int param2);
 static void button_mission_briefing(int param1, int param2);
 static void on_scroll(void);
 
@@ -59,6 +60,11 @@ static generic_button generic_button_delete_read[] = {
     { 0, 0, 20, 20, button_delete_all_read, button_none, 0, 0 }
 };
 
+static generic_button generic_button_delete_common[] = {
+    { 0, 0, 20, 20, button_delete_all_common, button_none, 0, 0 }
+};
+
+
 static scrollbar_type scrollbar = {432, 112, 208, 416, MAX_MESSAGES, on_scroll, 1};
 
 static void draw_delete_read_button(int x, int y, int focused)
@@ -68,6 +74,14 @@ static void draw_delete_read_button(int x, int y, int focused)
     text_draw_centered(delete_read_text, x + 1, y + 4, 20, FONT_NORMAL_BLACK, 0);
 }
 
+static void draw_delete_common_button(int x, int y, int focused)
+{
+    uint8_t delete_common_text[] = { 'x', 0 };
+    button_border_draw(x, y, 20, 20, focused ? 1 : 0);
+    text_draw_centered(delete_common_text, x + 1, y + 4, 20, FONT_NORMAL_BLACK, 0);
+}
+
+
 static struct {
     int width_blocks;
     int height_blocks;
@@ -75,12 +89,12 @@ static struct {
     int y_text;
     int text_width_blocks;
     int text_height_blocks;
-    int focus_button_id;
+    unsigned int focus_button_id;
 } data;
 
 static int review_briefing_button_should_be_active(void)
 {
-    if (!scenario_is_custom()) {
+    if (game_campaign_is_original()) {
         return 1;
     }
     if (!scenario_intro_message()) {
@@ -134,11 +148,11 @@ static void draw_background(void)
     graphics_reset_dialog();
 }
 
-static void draw_messages(int total_messages)
+static void draw_messages(unsigned int total_messages)
 {
-    int max = total_messages < MAX_MESSAGES ? total_messages : MAX_MESSAGES;
-    int index = scrollbar.scroll_position;
-    for (int i = 0; i < max; i++, index++) {
+    unsigned int max = total_messages < MAX_MESSAGES ? total_messages : MAX_MESSAGES;
+    unsigned int index = scrollbar.scroll_position;
+    for (unsigned int i = 0; i < max; i++, index++) {
         const city_message *msg = city_message_get(index);
         int image_offset = 0;
         const lang_message *lang_msg = 0;
@@ -190,6 +204,8 @@ static void draw_foreground(void)
     }
     draw_delete_read_button(BLOCK_SIZE * data.width_blocks - 58, 32 + BLOCK_SIZE * data.height_blocks - 36,
         data.focus_button_id == 14);
+    draw_delete_common_button(45, 32 + BLOCK_SIZE * data.height_blocks - 36,
+        data.focus_button_id == 16);
 
     int total_messages = city_message_count();
     if (total_messages > 0) {
@@ -202,7 +218,7 @@ static void draw_foreground(void)
 static void handle_input(const mouse *m, const hotkeys *h)
 {
     const mouse *m_dialog = mouse_in_dialog(m);
-    int old_button_id = data.focus_button_id;
+    unsigned int old_button_id = data.focus_button_id;
     data.focus_button_id = 0;
 
     if (scrollbar_handle_mouse(&scrollbar, m_dialog, 1)) {
@@ -210,7 +226,7 @@ static void handle_input(const mouse *m, const hotkeys *h)
         return;
     }
 
-    int button_id;
+    unsigned int button_id;
     int handled = image_buttons_handle_mouse(m_dialog, 16, 32 + BLOCK_SIZE * data.height_blocks - 42,
         &image_button_help, 1, &button_id);
     if (button_id) {
@@ -234,6 +250,12 @@ static void handle_input(const mouse *m, const hotkeys *h)
             data.focus_button_id = 15;
         }
     }
+    handled |= generic_buttons_handle_mouse(m_dialog, 45,
+    32 + BLOCK_SIZE * data.height_blocks - 36, generic_button_delete_common, 1, &button_id);
+    if (button_id) {
+        data.focus_button_id = 16;
+    }
+
     handled |= generic_buttons_handle_mouse(m_dialog, data.x_text, data.y_text + 4,
         generic_buttons_messages, MAX_MESSAGES, &button_id);
     if (!data.focus_button_id) {
@@ -291,6 +313,20 @@ static void button_delete(int id_to_delete, int param2)
     }
 }
 
+static void button_delete_all_common(int param1, int param2)
+{
+    for (int id = 0; id < city_message_count();) {
+        const city_message *msg = city_message_get(id);
+        if (msg->message_type != MESSAGE_CUSTOM_MESSAGE) {
+            city_message_delete(id);
+        } else {
+            id++;
+        }
+    }
+    scrollbar_update_total_elements(&scrollbar, city_message_count());
+    window_invalidate();
+}
+
 static void button_delete_all_read(int param1, int param2)
 {
     for (int id = 0; id < city_message_count();) {
@@ -307,7 +343,7 @@ static void button_delete_all_read(int param1, int param2)
 
 static void button_mission_briefing(int param1, int param2)
 {
-    if (!scenario_is_custom() || scenario_intro_message()) {
+    if (game_campaign_is_original() || scenario_intro_message()) {
         window_mission_briefing_show_review();
     }
 }
@@ -323,6 +359,8 @@ static void get_tooltip(tooltip_context *c)
     } else if (data.focus_button_id == 15) {
         c->text_group = 68;
         c->text_id = 42;
+    } else if (data.focus_button_id == 16) {
+        c->translation_key = TR_TOOLTIP_BUTTON_DELETE_COMMON_MESSAGES;
     } else {
         return;
     }
