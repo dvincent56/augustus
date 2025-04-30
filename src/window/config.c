@@ -20,6 +20,7 @@
 #include "graphics/text.h"
 #include "graphics/window.h"
 #include "sound/city.h"
+#include "sound/device.h"
 #include "sound/effect.h"
 #include "sound/music.h"
 #include "sound/speech.h"
@@ -57,13 +58,13 @@
 static void on_scroll(void);
 
 static void toggle_switch(int key);
-static void button_language_select(int height, int param2);
-static void button_edit_player_name(int param1, int param2);
-static void button_change_user_directory(int param1, int param2);
-static void button_reset_defaults(int param1, int param2);
-static void button_hotkeys(int param1, int param2);
-static void button_close(int save, int param2);
-static void button_page(int page, int param2);
+static void button_language_select(const generic_button *button);
+static void button_edit_player_name(const generic_button *button);
+static void button_change_user_directory(const generic_button *button);
+static void button_reset_defaults(const generic_button *button);
+static void button_hotkeys(const generic_button *button);
+static void button_close(const generic_button *button);
+static void button_page(const generic_button *button);
 
 static const uint8_t *display_text_language(void);
 static const uint8_t *display_text_user_directory(void);
@@ -272,9 +273,9 @@ static const int game_speeds[] = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200,
 static resolution available_resolutions[sizeof(resolutions) / sizeof(resolution) + 2];
 
 static generic_button select_buttons[] = {
-    {225, 0, 200, 24, button_language_select, button_none},
-    {225, 0, 200, 24, button_edit_player_name, button_none},
-    {225, 0, 200, 24, button_change_user_directory, button_none},
+    {225, 0, 200, 24, button_language_select},
+    {225, 0, 200, 24, button_edit_player_name},
+    {225, 0, 200, 24, button_change_user_directory},
 };
 
 static numerical_range_widget ranges[] = {
@@ -294,18 +295,18 @@ static numerical_range_widget ranges[] = {
 };
 
 static generic_button bottom_buttons[NUM_BOTTOM_BUTTONS] = {
-    {  20, 436,  120, 30, button_hotkeys, button_none, 0, TR_BUTTON_CONFIGURE_HOTKEYS },
-    { 170, 436, 150, 30, button_reset_defaults, button_none, 0, TR_BUTTON_RESET_DEFAULTS },
-    { 330, 436,  90, 30, button_close, button_none, 0, TR_BUTTON_CANCEL },
-    { 430, 436,  90, 30, button_close, button_none, 1, TR_BUTTON_OK },
-    { 530, 436,  90, 30, button_close, button_none, 2, TR_OPTION_MENU_APPLY }
+    {  20, 436,  120, 30, button_hotkeys, 0, 0, TR_BUTTON_CONFIGURE_HOTKEYS },
+    { 170, 436, 150, 30, button_reset_defaults, 0, 0, TR_BUTTON_RESET_DEFAULTS },
+    { 330, 436,  90, 30, button_close, 0, 0, TR_BUTTON_CANCEL },
+    { 430, 436,  90, 30, button_close, 0, 1, TR_BUTTON_OK },
+    { 530, 436,  90, 30, button_close, 0, 2, TR_OPTION_MENU_APPLY }
 };
 
 static generic_button page_buttons[] = {
-    { 0, 48, 0, 30, button_page, button_none, 0 },
-    { 0, 48, 0, 30, button_page, button_none, 1 },
-    { 0, 48, 0, 30, button_page, button_none, 2 },
-    { 0, 48, 0, 30, button_page, button_none, 3 },
+    { 0, 48, 0, 30, button_page, 0, 0 },
+    { 0, 48, 0, 30, button_page, 0, 1 },
+    { 0, 48, 0, 30, button_page, 0, 2 },
+    { 0, 48, 0, 30, button_page, 0, 3 },
 };
 
 static translation_key page_names[CONFIG_PAGES] = {
@@ -453,25 +454,25 @@ static void fetch_original_config_values(void)
     data.config_values[CONFIG_ORIGINAL_GAME_SPEED].original_value = (int) game_speed_index;
     data.config_values[CONFIG_ORIGINAL_GAME_SPEED].new_value = (int) game_speed_index;
 
-    data.config_values[CONFIG_ORIGINAL_ENABLE_MUSIC].original_value = setting_sound(SOUND_MUSIC)->enabled;
-    data.config_values[CONFIG_ORIGINAL_ENABLE_MUSIC].new_value = setting_sound(SOUND_MUSIC)->enabled;
-    data.config_values[CONFIG_ORIGINAL_MUSIC_VOLUME].original_value = setting_sound(SOUND_MUSIC)->volume;
-    data.config_values[CONFIG_ORIGINAL_MUSIC_VOLUME].new_value = setting_sound(SOUND_MUSIC)->volume;
+    data.config_values[CONFIG_ORIGINAL_ENABLE_MUSIC].original_value = setting_sound(SOUND_TYPE_MUSIC)->enabled;
+    data.config_values[CONFIG_ORIGINAL_ENABLE_MUSIC].new_value = setting_sound(SOUND_TYPE_MUSIC)->enabled;
+    data.config_values[CONFIG_ORIGINAL_MUSIC_VOLUME].original_value = setting_sound(SOUND_TYPE_MUSIC)->volume;
+    data.config_values[CONFIG_ORIGINAL_MUSIC_VOLUME].new_value = setting_sound(SOUND_TYPE_MUSIC)->volume;
 
-    data.config_values[CONFIG_ORIGINAL_ENABLE_SPEECH].original_value = setting_sound(SOUND_SPEECH)->enabled;
-    data.config_values[CONFIG_ORIGINAL_ENABLE_SPEECH].new_value = setting_sound(SOUND_SPEECH)->enabled;
-    data.config_values[CONFIG_ORIGINAL_SPEECH_VOLUME].original_value = setting_sound(SOUND_SPEECH)->volume;
-    data.config_values[CONFIG_ORIGINAL_SPEECH_VOLUME].new_value = setting_sound(SOUND_SPEECH)->volume;
+    data.config_values[CONFIG_ORIGINAL_ENABLE_SPEECH].original_value = setting_sound(SOUND_TYPE_SPEECH)->enabled;
+    data.config_values[CONFIG_ORIGINAL_ENABLE_SPEECH].new_value = setting_sound(SOUND_TYPE_SPEECH)->enabled;
+    data.config_values[CONFIG_ORIGINAL_SPEECH_VOLUME].original_value = setting_sound(SOUND_TYPE_SPEECH)->volume;
+    data.config_values[CONFIG_ORIGINAL_SPEECH_VOLUME].new_value = setting_sound(SOUND_TYPE_SPEECH)->volume;
 
-    data.config_values[CONFIG_ORIGINAL_ENABLE_SOUND_EFFECTS].original_value = setting_sound(SOUND_EFFECTS)->enabled;
-    data.config_values[CONFIG_ORIGINAL_ENABLE_SOUND_EFFECTS].new_value = setting_sound(SOUND_EFFECTS)->enabled;
-    data.config_values[CONFIG_ORIGINAL_SOUND_EFFECTS_VOLUME].original_value = setting_sound(SOUND_EFFECTS)->volume;
-    data.config_values[CONFIG_ORIGINAL_SOUND_EFFECTS_VOLUME].new_value = setting_sound(SOUND_EFFECTS)->volume;
+    data.config_values[CONFIG_ORIGINAL_ENABLE_SOUND_EFFECTS].original_value = setting_sound(SOUND_TYPE_EFFECTS)->enabled;
+    data.config_values[CONFIG_ORIGINAL_ENABLE_SOUND_EFFECTS].new_value = setting_sound(SOUND_TYPE_EFFECTS)->enabled;
+    data.config_values[CONFIG_ORIGINAL_SOUND_EFFECTS_VOLUME].original_value = setting_sound(SOUND_TYPE_EFFECTS)->volume;
+    data.config_values[CONFIG_ORIGINAL_SOUND_EFFECTS_VOLUME].new_value = setting_sound(SOUND_TYPE_EFFECTS)->volume;
 
-    data.config_values[CONFIG_ORIGINAL_ENABLE_CITY_SOUNDS].original_value = setting_sound(SOUND_CITY)->enabled;
-    data.config_values[CONFIG_ORIGINAL_ENABLE_CITY_SOUNDS].new_value = setting_sound(SOUND_CITY)->enabled;
-    data.config_values[CONFIG_ORIGINAL_CITY_SOUNDS_VOLUME].original_value = setting_sound(SOUND_CITY)->volume;
-    data.config_values[CONFIG_ORIGINAL_CITY_SOUNDS_VOLUME].new_value = setting_sound(SOUND_CITY)->volume;
+    data.config_values[CONFIG_ORIGINAL_ENABLE_CITY_SOUNDS].original_value = setting_sound(SOUND_TYPE_CITY)->enabled;
+    data.config_values[CONFIG_ORIGINAL_ENABLE_CITY_SOUNDS].new_value = setting_sound(SOUND_TYPE_CITY)->enabled;
+    data.config_values[CONFIG_ORIGINAL_CITY_SOUNDS_VOLUME].original_value = setting_sound(SOUND_TYPE_CITY)->volume;
+    data.config_values[CONFIG_ORIGINAL_CITY_SOUNDS_VOLUME].new_value = setting_sound(SOUND_TYPE_CITY)->volume;
 
     data.config_values[CONFIG_ORIGINAL_SCROLL_SPEED].original_value = setting_scroll_speed();
     data.config_values[CONFIG_ORIGINAL_SCROLL_SPEED].new_value = setting_scroll_speed();
@@ -1086,17 +1087,16 @@ static void set_language(int index)
     data.language_options.selected = index;
 }
 
-static void button_hotkeys(int param1, int param2)
+static void button_hotkeys(const generic_button *button)
 {
     window_hotkey_config_show();
 }
 
-static void button_language_select(int height, int param2)
+static void button_language_select(const generic_button *button)
 {
-    const generic_button *btn = &select_buttons[SELECT_LANGUAGE];
-    window_select_list_show_text(
-        screen_dialog_offset_x() + btn->x,
-        screen_dialog_offset_y() + height + btn->height,
+    int height = button->parameter1;
+
+    window_select_list_show_text(screen_dialog_offset_x(), screen_dialog_offset_y() + height, button,
         data.language_options.options, data.language_options.total, set_language
     );
 }
@@ -1113,7 +1113,7 @@ static void set_player_name(const uint8_t *name)
     window_invalidate();
 }
 
-static void button_edit_player_name(int param1, int param2)
+static void button_edit_player_name(const generic_button *button)
 {
     uint8_t player_name[PLAYER_NAME_LENGTH];
     encoding_from_utf8(data.config_string_values[CONFIG_STRING_ORIGINAL_PLAYER_NAME].new_value,
@@ -1122,12 +1122,12 @@ static void button_edit_player_name(int param1, int param2)
         PLAYER_NAME_LENGTH, set_player_name);
 }
 
-static void button_change_user_directory(int param1, int param2)
+static void button_change_user_directory(const generic_button *button)
 {
     window_user_path_setup_show(0);
 }
 
-static void button_reset_defaults(int param1, int param2)
+static void button_reset_defaults(const generic_button *button)
 {
     for (int i = 0; i < CONFIG_MAX_ENTRIES; ++i) {
         data.config_values[i].new_value = config_get_default_value(i);
@@ -1249,10 +1249,10 @@ static int config_enable_audio(int key)
 static int config_set_master_volume(int key)
 {
     config_change_basic(key);
-    sound_music_set_volume(setting_sound(SOUND_MUSIC)->volume);
-    sound_speech_set_volume(setting_sound(SOUND_SPEECH)->volume);
-    sound_effect_set_volume(setting_sound(SOUND_EFFECTS)->volume);
-    sound_city_set_volume(setting_sound(SOUND_CITY)->volume);
+    sound_music_set_volume(setting_sound(SOUND_TYPE_MUSIC)->volume);
+    sound_speech_set_volume(setting_sound(SOUND_TYPE_SPEECH)->volume);
+    sound_effect_set_volume(setting_sound(SOUND_TYPE_EFFECTS)->volume);
+    sound_city_set_volume(setting_sound(SOUND_TYPE_CITY)->volume);
     return 1;
 }
 
@@ -1260,8 +1260,8 @@ static int config_enable_music(int key)
 {
     config_change_basic(key);
 
-    if (setting_sound_is_enabled(SOUND_MUSIC) != data.config_values[key].new_value) {
-        setting_toggle_sound_enabled(SOUND_MUSIC);
+    if (setting_sound_is_enabled(SOUND_TYPE_MUSIC) != data.config_values[key].new_value) {
+        setting_toggle_sound_enabled(SOUND_TYPE_MUSIC);
     }
     if (data.config_values[key].new_value) {
         if (data.show_background_image) {
@@ -1279,8 +1279,8 @@ static int config_enable_music(int key)
 static int config_set_music_volume(int key)
 {
     config_change_basic(key);
-    setting_set_sound_volume(SOUND_MUSIC, data.config_values[key].new_value);
-    sound_music_set_volume(setting_sound(SOUND_MUSIC)->volume);
+    setting_set_sound_volume(SOUND_TYPE_MUSIC, data.config_values[key].new_value);
+    sound_music_set_volume(setting_sound(SOUND_TYPE_MUSIC)->volume);
     return 1;
 }
 
@@ -1288,8 +1288,8 @@ static int config_enable_speech(int key)
 {
     config_change_basic(key);
 
-    if (setting_sound_is_enabled(SOUND_SPEECH) != data.config_values[key].new_value) {
-        setting_toggle_sound_enabled(SOUND_SPEECH);
+    if (setting_sound_is_enabled(SOUND_TYPE_SPEECH) != data.config_values[key].new_value) {
+        setting_toggle_sound_enabled(SOUND_TYPE_SPEECH);
     }
     if (!data.config_values[key].new_value) {
         sound_speech_stop();
@@ -1300,8 +1300,8 @@ static int config_enable_speech(int key)
 static int config_set_speech_volume(int key)
 {
     config_change_basic(key);
-    setting_set_sound_volume(SOUND_SPEECH, data.config_values[key].new_value);
-    sound_speech_set_volume(setting_sound(SOUND_SPEECH)->volume);
+    setting_set_sound_volume(SOUND_TYPE_SPEECH, data.config_values[key].new_value);
+    sound_speech_set_volume(setting_sound(SOUND_TYPE_SPEECH)->volume);
     return 1;
 }
 
@@ -1309,8 +1309,8 @@ static int config_enable_effects(int key)
 {
     config_change_basic(key);
 
-    if (setting_sound_is_enabled(SOUND_EFFECTS) != data.config_values[key].new_value) {
-        setting_toggle_sound_enabled(SOUND_EFFECTS);
+    if (setting_sound_is_enabled(SOUND_TYPE_EFFECTS) != data.config_values[key].new_value) {
+        setting_toggle_sound_enabled(SOUND_TYPE_EFFECTS);
     }
     return 1;
 }
@@ -1318,8 +1318,8 @@ static int config_enable_effects(int key)
 static int config_set_effects_volume(int key)
 {
     config_change_basic(key);
-    setting_set_sound_volume(SOUND_EFFECTS, data.config_values[key].new_value);
-    sound_effect_set_volume(setting_sound(SOUND_EFFECTS)->volume);
+    setting_set_sound_volume(SOUND_TYPE_EFFECTS, data.config_values[key].new_value);
+    sound_effect_set_volume(setting_sound(SOUND_TYPE_EFFECTS)->volume);
     return 1;
 }
 
@@ -1327,8 +1327,8 @@ static int config_enable_city_sounds(int key)
 {
     config_change_basic(key);
 
-    if (setting_sound_is_enabled(SOUND_CITY) != data.config_values[key].new_value) {
-        setting_toggle_sound_enabled(SOUND_CITY);
+    if (setting_sound_is_enabled(SOUND_TYPE_CITY) != data.config_values[key].new_value) {
+        setting_toggle_sound_enabled(SOUND_TYPE_CITY);
     }
     return 1;
 }
@@ -1336,8 +1336,8 @@ static int config_enable_city_sounds(int key)
 static int config_set_city_sounds_volume(int key)
 {
     config_change_basic(key);
-    setting_set_sound_volume(SOUND_CITY, data.config_values[key].new_value);
-    sound_city_set_volume(setting_sound(SOUND_CITY)->volume);
+    setting_set_sound_volume(SOUND_TYPE_CITY, data.config_values[key].new_value);
+    sound_city_set_volume(setting_sound(SOUND_TYPE_CITY)->volume);
     return 1;
 }
 
@@ -1443,8 +1443,10 @@ static int apply_changed_configs(void)
     return 1;
 }
 
-static void button_close(int save, int param2)
+static void button_close(const generic_button *button)
 {
+    int save = button->parameter1;
+
     if (!save) {
         cancel_values();
         window_go_back();
@@ -1458,8 +1460,9 @@ static void button_close(int save, int param2)
     window_request_refresh();
 }
 
-static void button_page(int page, int param2)
+static void button_page(const generic_button *button)
 {
+    int page = button->parameter1;
     set_page(page);
     window_invalidate();
 }

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.1...3.27.0)
 include(CMakeDependentOption)
 
-set(TARGET_PLATFORM "default" CACHE STRING "Platform to cross-compile for. Options: vita switch android emscripten. Leave blank for no cross compilation")
-set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS default vita switch android emscripten)
+set(TARGET_PLATFORM "default" CACHE STRING "Platform to cross-compile for. Options: vita switch android ios emscripten. Leave blank for no cross compilation")
+set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS default vita switch android ios emscripten)
 
 string(TOLOWER ${TARGET_PLATFORM} TARGET_PLATFORM)
 
@@ -31,6 +31,40 @@ if(${TARGET_PLATFORM} STREQUAL "emscripten" AND NOT DEFINED CMAKE_TOOLCHAIN_FILE
     else()
         message(FATAL_ERROR "Please define EMSDK to point to your Emscripten SDK path!")
     endif()
+endif()
+    
+if(${TARGET_PLATFORM} STREQUAL "ios")
+
+    set(CMAKE_SYSTEM_NAME "iOS")
+
+    set(SYSTEM_LIBS OFF)
+
+    # Build SDL2 as static library
+    set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
+    set(SDL_SHARED OFF)
+    set(SDL_STATIC ON)
+
+    # Build SDL2_mixer as static library
+    set(BUILD_SHARED_LIBS OFF)
+
+    # Disable stuff that breaks the build and we don't need.
+    set(SDL2MIXER_WAVPACK OFF) 
+    set(SDL2MIXER_OPUS OFF) 
+    set(SDL2MIXER_MIDI OFF) 
+    set(SDL2MIXER_MOD OFF) 
+
+    # Explicitly set SDKROOT (called Base SDK in Xcode), otherwise it is set incorrectly.
+    set(CMAKE_XCODE_ATTRIBUTE_SDKROOT iphoneos)
+
+    # Support iPhone (1) and iPad (2) Destinations
+    set(CMAKE_XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
+endif()
+
+
+# Enable "Edit and Continue" for MSVC
+if (POLICY CMP0141)
+    cmake_policy(SET CMP0141 NEW)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>")
 endif()
 
 set(SHORT_NAME augustus)
@@ -226,6 +260,12 @@ elseif (${TARGET_PLATFORM} STREQUAL "android")
         ${PROJECT_SOURCE_DIR}/src/platform/android/android.c
         ${PROJECT_SOURCE_DIR}/src/platform/android/asset_handler.c
         ${PROJECT_SOURCE_DIR}/src/platform/android/jni.c
+    )
+elseif (${TARGET_PLATFORM} STREQUAL "ios")
+    set(PLATFORM_FILES
+        ${PLATFORM_FILES}
+        ${PROJECT_SOURCE_DIR}/src/platform/ios/ios.m
+        ${PROJECT_SOURCE_DIR}/src/platform/ios/GameDataPickerController.m
     )
 endif()
 
@@ -468,12 +508,13 @@ set(ASSETS_FILES
     ${PROJECT_SOURCE_DIR}/src/assets/xml.c
 )
 set(SCENARIO_FILES
-    ${PROJECT_SOURCE_DIR}/src/scenario/building.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/allowed_building.c
     ${PROJECT_SOURCE_DIR}/src/scenario/criteria.c
     ${PROJECT_SOURCE_DIR}/src/scenario/custom_media.c
     ${PROJECT_SOURCE_DIR}/src/scenario/custom_messages_export_xml.c
     ${PROJECT_SOURCE_DIR}/src/scenario/custom_messages_import_xml.c
     ${PROJECT_SOURCE_DIR}/src/scenario/custom_messages.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/custom_variable.c
     ${PROJECT_SOURCE_DIR}/src/scenario/demand_change.c
     ${PROJECT_SOURCE_DIR}/src/scenario/distant_battle.c
     ${PROJECT_SOURCE_DIR}/src/scenario/earthquake.c
@@ -491,16 +532,16 @@ set(SCENARIO_FILES
     ${PROJECT_SOURCE_DIR}/src/scenario/random_event.c
     ${PROJECT_SOURCE_DIR}/src/scenario/request.c
     ${PROJECT_SOURCE_DIR}/src/scenario/scenario.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/scenario_event.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/scenario_events_import_xml.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/scenario_events_export_xml.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/scenario_events_controller.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/scenario_events_parameter_data.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/action_types/action_handler.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/action_types/action_types.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/condition_types/comparison_helper.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/condition_types/condition_handler.c
-    ${PROJECT_SOURCE_DIR}/src/scenario/condition_types/condition_types.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/event.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/import_xml.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/export_xml.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/controller.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/parameter_data.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/action_handler.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/action_types.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/condition_comparison_helper.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/condition_handler.c
+    ${PROJECT_SOURCE_DIR}/src/scenario/event/condition_types.c
 )
 set(GRAPHICS_FILES
     ${PROJECT_SOURCE_DIR}/src/graphics/arrow_button.c
@@ -703,11 +744,25 @@ if(APPLE)
     set(${VAR} ${_LIST} PARENT_SCOPE)
     endfunction()
     resource(ASSET_SOURCES ${ASSETS_DIR} Resources/assets *)
+endif()
+
+if(APPLE AND NOT ${TARGET_PLATFORM} STREQUAL "ios")
     set(MACOSX_FILES
         ${PROJECT_SOURCE_DIR}/res/augustus.icns
         ${ASSET_SOURCES}
     )
 endif()
+
+
+set(IOS_FILES "")
+if(${TARGET_PLATFORM} STREQUAL "ios")
+    set(IOS_FILES 
+        ${PROJECT_SOURCE_DIR}/res/ios/Assets.xcassets
+        ${ASSET_SOURCES}
+    )
+
+endif()
+
 
 set(EMSCRIPTEN_FILES "")
 if(${TARGET_PLATFORM} STREQUAL "emscripten")
@@ -739,6 +794,8 @@ set(SOURCE_FILES
     ${ZIP_FILES}
     ${PROJECT_SOURCE_DIR}/res/augustus.rc
     ${MACOSX_FILES}
+    ${IOS_FILES}
+    ${EMSCRIPTEN_FILES}
 )
 
 function(GET_SDL_EXT_DIR result module)
@@ -771,6 +828,20 @@ elseif(${TARGET_PLATFORM} STREQUAL "android")
     string(TOLOWER ${CMAKE_BUILD_TYPE} ANDROID_BUILD_DIR)
     set(SDL2_LIBRARY SDL2::SDL2)
     set(SDL2_MIXER_LIBRARY SDL2::SDL2_mixer)
+elseif(${TARGET_PLATFORM} STREQUAL "ios")
+    GET_SDL_EXT_DIR(SDL_EXT_DIR "")
+    add_subdirectory(${SDL_EXT_DIR})
+    find_library(SDL2 NAMES SDL2-static SDL2main)
+    list(APPEND SDL2_LIBRARY
+        # We don't need to add SDL2-static here because SDL2_mixer will include it
+        SDL2main
+    )
+    GET_SDL_EXT_DIR(SDL_MIXER_EXT_DIR "mixer")
+    add_subdirectory(${SDL_MIXER_EXT_DIR})
+    find_library(SDL2_mixer NAMES SDL2_mixer-static)
+    list(APPEND SDL2_MIXER_LIBRARY
+        SDL2_mixer
+    )
 else()
     find_package(SDL2 REQUIRED)
     find_package(SDL2_mixer REQUIRED)
@@ -778,6 +849,8 @@ endif()
 
 if(${TARGET_PLATFORM} STREQUAL "android")
     add_library(${SHORT_NAME} SHARED ${SOURCE_FILES})
+elseif(${TARGET_PLATFORM} STREQUAL "ios")
+    add_executable(${SHORT_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
 else()
     add_executable(${SHORT_NAME} WIN32 ${SOURCE_FILES})
 endif()
@@ -793,7 +866,7 @@ if(MSVC)
     set_source_files_properties(${EXPAT_FILES} PROPERTIES COMPILE_FLAGS "/W3")
     set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/W4")
     set_source_files_properties(${PROJECT_SOURCE_DIR}/res/augustus.rc PROPERTIES COMPILE_FLAGS "")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /utf-8 /wd4100 /wd4244")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /utf-8 /wd4100 /wd4244 /we4013")
 endif()
 
 # Show debug info on crash on 32 bit builds compiled with MinGW
@@ -805,7 +878,7 @@ if(CMAKE_INSTALL_DATADIR)
     add_compile_definitions(CUSTOM_ASSETS_DIR="${CMAKE_INSTALL_DATADIR}")
 endif()
 
-if(APPLE)
+if(APPLE AND NOT ${TARGET_PLATFORM} STREQUAL "ios")
     # generating a macOS icns file (see https://stackoverflow.com/a/20703594)
     add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/res/augustus.icns
         COMMAND mkdir -p augustus.iconset
@@ -870,6 +943,26 @@ if(APPLE)
 			${codesignCommandWithEntitlements} \"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}\"
 		)
 	")
+endif()
+
+if(${TARGET_PLATFORM} STREQUAL "ios")
+    # setting variables that will populate Info.plist
+    set_target_properties(${SHORT_NAME} PROPERTIES
+
+        MACOSX_BUNDLE_BUNDLE_NAME  ${USER_FRIENDLY_NAME}
+        MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}${VERSION_REVISION}"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.github.keriew.augustus"
+        MACOSX_BUNDLE_INFO_PLIST "${PROJECT_SOURCE_DIR}/res/ios/Info.plist"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
+        MACOSX_BUNDLE_UI_LAUNCH_STORYBOARD_NAME "LaunchScreen"
+        OUTPUT_NAME "${PROJECT_NAME}"
+        XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY 1,2
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.github.keriew.augustus"
+    )
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0" CACHE STRING "Minimum OS X deployment version" FORCE)
+    set_source_files_properties(${PROJECT_SOURCE_DIR}/res/ios/Assets.xcassets PROPERTIES
+        MACOSX_PACKAGE_LOCATION Resources)
 endif()
 
 if(SDL2_INCLUDE_DIR)
@@ -966,7 +1059,23 @@ else()
         find_library(android-lib android)
         target_link_libraries(${SHORT_NAME} ${log-lib} ${android-lib})
     endif()
-    target_link_libraries(${SHORT_NAME} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY})
+
+    if(${TARGET_PLATFORM} STREQUAL "ios")
+        set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -DUSE_SDL_MAIN")
+        # Add SDL2 and SDL_Mixer headers, or they won't be found
+        target_include_directories(${SHORT_NAME} PRIVATE "${SDL_EXT_DIR}/include")
+        target_include_directories(${SHORT_NAME} PRIVATE "${SDL_MIXER_EXT_DIR}/include")
+
+        # Add UniformTypeIdentifiers to the list of linked frameworks
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-framework,UniformTypeIdentifiers")
+
+        set_target_properties(${SHORT_NAME}  PROPERTIES
+            XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)"
+            XCODE_ATTRIBUTE_SKIP_INSTALL "No"
+        )
+    endif()
+
+    target_link_libraries(${SHORT_NAME} ${SDL2MAIN_LIBRARY} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY})
     if(NOT APPLE AND NOT ${TARGET_PLATFORM} STREQUAL "android")
         install(TARGETS ${SHORT_NAME} RUNTIME DESTINATION bin)
     endif()

@@ -54,7 +54,7 @@
 
 static void button_game_speed(int is_down, int param2);
 static void button_toggle_play_paused(int param1, int param2);
-static void button_handle_request(int index, int param2);
+static void button_handle_request(const generic_button *button);
 
 static arrow_button arrow_buttons_speed[] = {
     {11, 30, 17, 24, button_game_speed, 1, 0},
@@ -66,11 +66,11 @@ static image_button play_paused_button = {
 };
 
 static generic_button buttons_emperor_requests[] = {
-    {2, 28, 158, 20, button_handle_request, button_none, 0, 0},
-    {2, 76, 158, 20, button_handle_request, button_none, 1, 0},
-    {2, 124, 158, 20, button_handle_request, button_none, 2, 0},
-    {2, 172, 158, 20, button_handle_request, button_none, 3, 0},
-    {2, 220, 158, 20, button_handle_request, button_none, 4, 0}
+    {2, 28, 158, 20, button_handle_request},
+    {2, 76, 158, 20, button_handle_request, 0, 1},
+    {2, 124, 158, 20, button_handle_request, 0, 2},
+    {2, 172, 158, 20, button_handle_request, 0, 3},
+    {2, 220, 158, 20, button_handle_request, 0, 4}
 };
 
 static const char *play_pause_button_image_names[] = { "Pause Button", "Play Button" };
@@ -115,6 +115,7 @@ static struct {
     int next_invasion;
     unsigned int visible_requests;
     unsigned int active_requests;
+    int troop_requests;
     int objectives_y_offset;
     int request_buttons_y_offset;
     unsigned int focused_request_button_id;
@@ -325,20 +326,20 @@ static int update_extra_info(int is_background)
         changed |= update_extra_info_value(city_population(), &data.objectives.population.value);
     }
     if (data.info_to_display & SIDEBAR_EXTRA_DISPLAY_REQUESTS) {
-        int new_requests = update_extra_info_value(count_active_requests(), (int *)&data.active_requests);
+        int new_requests = update_extra_info_value(count_active_requests(), (int *) &data.active_requests);
+        new_requests |= update_extra_info_value(city_request_has_troop_request(), &data.troop_requests);
 
-        int troop_requests = city_request_has_troop_request();
-        if (troop_requests) {
+        if (data.troop_requests) {
             changed |= update_extra_info_value(RESOURCE_TROOPS, &data.requests[0].resource);
             changed |= update_extra_info_value(city_military_months_until_distant_battle(), &data.requests[0].time);
             changed |= update_extra_info_value(city_military_distant_battle_enemy_strength(), &data.requests[0].amount);
             changed |= update_extra_info_value(city_military_empire_service_legions(), &data.requests[0].available);
             data.requests[0].index = 0;
         }
-        int other_requests = data.active_requests - troop_requests;
+        int other_requests = data.active_requests - data.troop_requests;
         int must_resort = 0;
         for (int i = 0; i < other_requests; i++) {
-            request *slot = &data.requests[i + troop_requests];
+            request *slot = &data.requests[i + data.troop_requests];
             if (new_requests) {
                 slot->index = i;
             }
@@ -348,18 +349,18 @@ static int update_extra_info(int is_background)
                 must_resort = 1;
             }
             changed |= update_extra_info_value(r->months_to_comply, &slot->time);
-            changed |= update_extra_info_value(r->amount, &slot->amount);
+            changed |= update_extra_info_value(r->amount.requested, &slot->amount);
             if (r->resource == RESOURCE_DENARII) {
                 changed |= update_extra_info_value(city_finance_treasury(), &slot->available);
             } else {
                 changed |= update_extra_info_value(city_resource_get_amount_including_granaries(r->resource,
-                    r->amount, 0), &slot->available);
+                    r->amount.requested, 0), &slot->available);
             }
 
             changed |= update_extra_info_value(is_stockpiled_changed(r->resource), &slot->stockpiled);
         }
         if (new_requests || must_resort) {
-            qsort(data.requests + troop_requests, other_requests, sizeof(request), sort_requests);
+            qsort(data.requests + data.troop_requests, other_requests, sizeof(request), sort_requests);
             changed = 1;
         }
     }
@@ -747,8 +748,9 @@ static void confirm_send_goods(int accepted, int checked)
     }
 }
 
-static void button_handle_request(int index, int param2)
+static void button_handle_request(const generic_button *button)
 {
+    int index = button->parameter1;
     if (data.active_requests > data.visible_requests && index == (int) data.visible_requests - 1) {
         window_advisors_show_advisor(ADVISOR_IMPERIAL);
         return;

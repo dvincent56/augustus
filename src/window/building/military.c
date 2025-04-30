@@ -9,9 +9,11 @@
 #include "city/military.h"
 #include "city/view.h"
 #include "core/calc.h"
+#include "core/dir.h"
 #include "core/log.h"
 #include "core/string.h"
 #include "figure/formation_legion.h"
+#include "graphics/button.h"
 #include "graphics/generic_button.h"
 #include "graphics/image.h"
 #include "graphics/lang_text.h"
@@ -23,35 +25,35 @@
 #include "window/city.h"
 #include "window/building/culture.h"
 
-static void button_return_to_fort(int param1, int param2);
-static void button_layout(int index, int param2);
-static void button_priority(int index, int param2);
-static void button_delivery(int index, int param2);
+static void button_return_to_fort(const generic_button *button);
+static void button_layout(const generic_button *button);
+static void button_priority(const generic_button *button);
+static void button_delivery(const generic_button *button);
 
 static generic_button layout_buttons[] = {
-    {19, 179, 84, 84, button_layout, button_none, 0, 0},
-    {104, 179, 84, 84, button_layout, button_none, 1, 0},
-    {189, 179, 84, 84, button_layout, button_none, 2, 0},
-    {274, 179, 84, 84, button_layout, button_none, 3, 0},
-    {359, 179, 84, 84, button_layout, button_none, 4, 0}
+    {19, 179, 84, 84, button_layout},
+    {104, 179, 84, 84, button_layout, 0, 1},
+    {189, 179, 84, 84, button_layout, 0, 2},
+    {274, 179, 84, 84, button_layout, 0, 3},
+    {359, 179, 84, 84, button_layout, 0, 4}
 };
 
 static generic_button priority_buttons[] = {
-    {0, 0, 40, 40, button_priority, button_none, 0, 0},
-    {56, 0, 40, 40, button_priority, button_none, 1, 0},
-    {112, 0, 40, 40, button_priority, button_none, 2, 0},
-    {168, 0, 40, 40, button_priority, button_none, 3, 0},
-    {224, 0, 40, 40, button_priority, button_none, 4, 0},
-    {280, 0, 40, 40, button_priority, button_none, 5, 0},
-    {336, 0, 40, 40, button_priority, button_none, 6, 0},
+    {0, 0, 40, 40, button_priority, 0, 0},
+    {56, 0, 40, 40, button_priority, 0, 1},
+    {112, 0, 40, 40, button_priority, 0, 2},
+    {168, 0, 40, 40, button_priority, 0, 3},
+    {224, 0, 40, 40, button_priority, 0, 4},
+    {280, 0, 40, 40, button_priority, 0, 5},
+    {336, 0, 40, 40, button_priority, 0, 6},
 };
 
 static generic_button delivery_buttons[] = {
-    {0, 0, 52, 52, button_delivery, button_none, 0, 0},
+    {0, 0, 52, 52, button_delivery},
 };
 
 static generic_button return_button[] = {
-    {0, 0, 288, 32, button_return_to_fort, button_none, 0, 0},
+    {0, 0, 288, 32, button_return_to_fort},
 };
 
 static struct {
@@ -66,7 +68,7 @@ static struct {
 static void draw_priority_buttons(int x, int y, unsigned int buttons, int building_id)
 {
     int base_priority_image_id = assets_get_image_id("UI", "Barracks_Priority_Legionaries_OFF");
-    data.building_id = building_id;    
+    data.building_id = building_id;
 
     for (unsigned int i = 0; i < buttons; i++) {
         int has_focus = 0;
@@ -89,13 +91,13 @@ static void draw_priority_buttons(int x, int y, unsigned int buttons, int buildi
 }
 
 static void draw_delivery_buttons(int x, int y, int building_id)
-{    
+{
     data.building_id = building_id;
 
     building *barracks = building_get(data.building_id);
 
     int accept_delivery = barracks->accepted_goods[RESOURCE_WEAPONS];
-    
+
     if (!accept_delivery) {
         inner_panel_draw(x + 2, y + 2, 3, 3);
     }
@@ -106,7 +108,7 @@ static void draw_delivery_buttons(int x, int y, int building_id)
         image_draw(assets_get_image_id("UI", "Large_Widget_Cross"), x + 15, y + 15,
         COLOR_MASK_NONE, SCALE_NONE);
     }
-    
+
     button_border_draw(x, y, 52, 52, data.focus_delivery_button_id || !accept_delivery ? 1 : 0);
 }
 
@@ -122,7 +124,8 @@ void window_building_draw_wall(building_info_context *c)
 void window_building_draw_gatehouse(building_info_context *c)
 {
     c->help_id = 85;
-    window_building_play_sound(c, "wavs/gatehouse.wav");
+    window_building_play_sound(c, ASSETS_DIRECTORY "/Sounds/Road.ogg");
+    //window_building_play_sound(c, "wavs/gatehouse.wav");
     outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
     lang_text_draw_centered(90, 0, c->x_offset, c->y_offset + 10, BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK);
     window_building_draw_description_at(c, BLOCK_SIZE * c->height_blocks - 158, 90, 1);
@@ -182,10 +185,10 @@ void window_building_draw_barracks(building_info_context *c)
         }
         if (city_data.mess_hall.food_stress_cumulative > 50) {
             text_draw_multiline(translation_for(TR_BUILDING_BARRACKS_FOOD_WARNING_2),
-                c->x_offset + 32, c->y_offset + 106, 16 * c->width_blocks - 30, 0, FONT_NORMAL_BLACK, 0);
+                c->x_offset + 32, c->y_offset + 106, 16 * c->width_blocks - 50, 0, FONT_NORMAL_BLACK, 0);
         } else if (city_data.mess_hall.food_stress_cumulative > 20) {
             text_draw_multiline(translation_for(TR_BUILDING_BARRACKS_FOOD_WARNING),
-                c->x_offset + 32, c->y_offset + 106, 16 * c->width_blocks - 30, 0, FONT_NORMAL_BLACK, 0);
+                c->x_offset + 32, c->y_offset + 106, 16 * c->width_blocks - 50, 0, FONT_NORMAL_BLACK, 0);
         } else if (c->worker_percentage >= 100) {
             window_building_draw_description_at(c, 106, 136, 5 + offset);
         } else if (c->worker_percentage >= 66) {
@@ -199,7 +202,7 @@ void window_building_draw_barracks(building_info_context *c)
 
     lang_text_draw(CUSTOM_TRANSLATION, TR_WINDOW_BARRACKS_PRIORITY,
         c->x_offset + 32, c->y_offset + 170, FONT_NORMAL_BLACK); // "Priority"
-    
+
     inner_panel_draw(c->x_offset + 16, c->y_offset + 290, c->width_blocks - 2, 4);
     window_building_draw_employment(c, 294);
     window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, c->y_offset + 298);
@@ -230,9 +233,9 @@ void window_building_draw_delivery_buttons(int x, int y, int building_id)
 int window_building_handle_mouse_barracks(const mouse *m, building_info_context *c)
 {
     if (generic_buttons_handle_mouse(m, c->x_offset + 46, c->y_offset + 222,
-        priority_buttons, 7, &data.focus_priority_button_id) || 
+        priority_buttons, 7, &data.focus_priority_button_id) ||
         generic_buttons_handle_mouse(m, c->x_offset + 392, c->y_offset + 40,
-        delivery_buttons, 1, &data.focus_delivery_button_id)) {
+            delivery_buttons, 1, &data.focus_delivery_button_id)) {
         window_invalidate();
         return 1;
     }
@@ -300,7 +303,7 @@ void window_building_draw_fort(building_info_context *c)
     image_draw(assets_get_image_id("UI", "Fort_Banner_01"),
         c->x_offset + 37, c->y_offset + 195, COLOR_MASK_NONE, SCALE_NONE);
     image_draw_border(assets_get_image_id("UI", "Large_Banner_Border"),
-        c->x_offset + 32, c->y_offset + 190 , COLOR_MASK_NONE);
+        c->x_offset + 32, c->y_offset + 190, COLOR_MASK_NONE);
 }
 
 void window_building_draw_legion_info(building_info_context *c)
@@ -361,12 +364,12 @@ void window_building_draw_legion_info(building_info_context *c)
 
     // number of soldiers
     lang_text_draw(138, 23, c->x_offset + 100, c->y_offset + 60, FONT_NORMAL_BLACK);
-    text_draw_number(m->num_figures, '@', " ", c->x_offset + 294, c->y_offset + 60, FONT_NORMAL_BLACK, 0);
+    text_draw_number(m->num_figures, '@', " ", c->x_offset + 283, c->y_offset + 60, FONT_NORMAL_BLACK, 0);
     // health
     lang_text_draw(138, 24, c->x_offset + 100, c->y_offset + 80, FONT_NORMAL_BLACK);
     if (m->mess_hall_max_morale_modifier < -20) {
         text_draw(translation_for(TR_BUILDING_LEGION_STARVING),
-            c->x_offset + 300, c->y_offset + 80, FONT_NORMAL_PLAIN, COLOR_FONT_RED);
+            c->x_offset + 290, c->y_offset + 80, FONT_NORMAL_PLAIN, COLOR_FONT_RED);
     } else {
         int health = calc_percentage(m->total_damage, m->max_total_damage);
         if (health <= 0) {
@@ -384,17 +387,17 @@ void window_building_draw_legion_info(building_info_context *c)
         } else {
             text_id = 32;
         }
-        lang_text_draw(138, text_id, c->x_offset + 300, c->y_offset + 80, FONT_NORMAL_BLACK);
+        lang_text_draw(138, text_id, c->x_offset + 290, c->y_offset + 80, FONT_NORMAL_BLACK);
     }
     // military training
     lang_text_draw(138, 25, c->x_offset + 100, c->y_offset + 100, FONT_NORMAL_BLACK);
-    lang_text_draw(18, m->has_military_training, c->x_offset + 300, c->y_offset + 100, FONT_NORMAL_BLACK);
+    lang_text_draw(18, m->has_military_training, c->x_offset + 290, c->y_offset + 100, FONT_NORMAL_BLACK);
     // morale
     if (m->cursed_by_mars) {
         lang_text_draw(138, 59, c->x_offset + 100, c->y_offset + 120, FONT_NORMAL_BLACK);
     } else {
         lang_text_draw(138, 36, c->x_offset + 100, c->y_offset + 120, FONT_NORMAL_BLACK);
-        lang_text_draw(138, 37 + morale_offset, c->x_offset + 300, c->y_offset + 120, FONT_NORMAL_BLACK);
+        lang_text_draw(138, 37 + morale_offset, c->x_offset + 290, c->y_offset + 120, FONT_NORMAL_BLACK);
     }
     // food
     text_draw(translation_for(TR_BUILDING_LEGION_FOOD_STATUS),
@@ -411,17 +414,17 @@ void window_building_draw_legion_info(building_info_context *c)
         hunger_text = TR_BUILDING_MESS_HALL_TROOP_HUNGER_2;
     }
 
-    text_draw(translation_for(hunger_text), c->x_offset + 300, c->y_offset + 140, FONT_NORMAL_BLACK, 0);
+    text_draw(translation_for(hunger_text), c->x_offset + 290, c->y_offset + 140, FONT_NORMAL_BLACK, 0);
     // food warnings
     if (m->mess_hall_max_morale_modifier < -20) {
         text_draw_centered(translation_for(TR_BUILDING_LEGION_FOOD_WARNING_2),
-            c->x_offset + 20, c->y_offset + 360, c->width_blocks * 16 - 40, FONT_NORMAL_PLAIN, COLOR_FONT_RED);
+            c->x_offset + 20, c->y_offset + 355, c->width_blocks * 16 - 40, FONT_NORMAL_PLAIN, COLOR_FONT_RED);
     } else if (m->mess_hall_max_morale_modifier < -5) {
         text_draw_centered(translation_for(TR_BUILDING_LEGION_FOOD_WARNING_1),
-            c->x_offset + 20, c->y_offset + 360, c->width_blocks * 16 - 40, FONT_NORMAL_BLACK, 0);
+            c->x_offset + 20, c->y_offset + 355, c->width_blocks * 16 - 40, FONT_NORMAL_BLACK, 0);
     } else if (m->mess_hall_max_morale_modifier > 0) {
         text_draw_centered(translation_for(TR_BUILDING_LEGION_FOOD_BONUS),
-            c->x_offset + 20, c->y_offset + 360, c->width_blocks * 16 - 40, FONT_NORMAL_BLACK, 0);
+            c->x_offset + 20, c->y_offset + 355, c->width_blocks * 16 - 40, FONT_NORMAL_BLACK, 0);
     }
 
     if (m->num_figures) {
@@ -576,9 +579,9 @@ void window_building_draw_legion_info_foreground(building_info_context *c)
 
     if (!m->is_at_fort && !m->in_distant_battle) {
         button_border_draw(c->x_offset + BLOCK_SIZE * (c->width_blocks - 18) / 2,
-            c->y_offset + BLOCK_SIZE * c->height_blocks - 48, 288, 32, data.return_button_id == 1);
+            c->y_offset + 2 + BLOCK_SIZE * c->height_blocks - 48, 288, 32, data.return_button_id == 1);
         lang_text_draw_centered(138, 58, c->x_offset + BLOCK_SIZE * (c->width_blocks - 18) / 2,
-            c->y_offset + BLOCK_SIZE * c->height_blocks - 39, 288, FONT_NORMAL_BLACK);
+            c->y_offset + 3 + BLOCK_SIZE * c->height_blocks - 39, 288, FONT_NORMAL_BLACK);
     }
 }
 
@@ -646,7 +649,7 @@ void window_building_barracks_get_tooltip_priority(int *translation)
     }
 }
 
-static void button_return_to_fort(int param1, int param2)
+static void button_return_to_fort(const generic_button *button)
 {
     formation *m = formation_get(data.context_for_callback->formation_id);
     if (!m->in_distant_battle && m->is_at_fort != 1) {
@@ -655,8 +658,9 @@ static void button_return_to_fort(int param1, int param2)
     }
 }
 
-static void button_layout(int index, int param2)
+static void button_layout(const generic_button *button)
 {
+    int index = button->parameter1;
     formation *m = formation_get(data.context_for_callback->formation_id);
     if (m->in_distant_battle) {
         return;
@@ -697,16 +701,17 @@ static void button_layout(int index, int param2)
     window_city_military_show(data.context_for_callback->formation_id);
 }
 
-static void button_priority(int index, int param2)
+static void button_priority(const generic_button *button)
 {
+    int index = button->parameter1;
     building *barracks = building_get(data.building_id);
-    building_barracks_set_priority(barracks, index);    
+    building_barracks_set_priority(barracks, index);
 }
 
-static void button_delivery(int index, int param2)
+static void button_delivery(const generic_button *button)
 {
     building *barracks = building_get(data.building_id);
-    building_barracks_toggle_delivery(barracks);    
+    building_barracks_toggle_delivery(barracks);
 }
 
 void window_building_draw_watchtower(building_info_context *c)

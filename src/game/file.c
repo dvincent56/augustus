@@ -66,6 +66,7 @@
 #include "scenario/earthquake.h"
 #include "scenario/emperor_change.h"
 #include "scenario/empire.h"
+#include "scenario/event/controller.h"
 #include "scenario/gladiator_revolt.h"
 #include "scenario/invasion.h"
 #include "scenario/map.h"
@@ -73,7 +74,6 @@
 #include "scenario/property.h"
 #include "scenario/request.h"
 #include "scenario/scenario.h"
-#include "scenario/scenario_events_controller.h"
 #include "sound/city.h"
 #include "sound/music.h"
 
@@ -257,6 +257,9 @@ static void check_backward_compatibility(void)
 static void initialize_saved_game(void)
 {
     load_empire_data(!game_campaign_is_original(), scenario_empire_id());
+    if (resource_mapping_get_version() < RESOURCE_SEPARATE_FISH_AND_MEAT_VERSION) {
+        empire_city_update_our_fish_and_meat_production();
+    }
     empire_city_update_trading_data(scenario_empire_id());
 
     map_image_context_init();
@@ -332,7 +335,6 @@ static int start_scenario(const uint8_t *scenario_name, const char *scenario_fil
 
     if (!is_save_game) {
         scenario_events_init();
-        scenario_events_process_all();
     }
     building_menu_update();
     city_message_init_scenario();
@@ -405,7 +407,6 @@ int game_file_start_scenario_from_buffer(uint8_t *data, int length, int is_save_
 
     if (!is_save_game) {
         scenario_events_init();
-        scenario_events_process_all();
     }
     building_menu_update();
     city_message_init_scenario();

@@ -9,7 +9,6 @@
 #include "empire/type.h"
 #include "game/animation.h"
 #include "game/save_version.h"
-#include "scenario/building.h"
 #include "scenario/data.h"
 #include "scenario/empire.h"
 
@@ -45,7 +44,7 @@ static void fix_image_ids(void)
     }
 }
 
-static void new_empire_object(full_empire_object *obj, int position)
+static void new_empire_object(full_empire_object *obj, unsigned int position)
 {
     obj->obj.id = position;
 }
@@ -75,6 +74,8 @@ void empire_object_load(buffer *buf, int version)
         empire_object_clear();
         return;
     }
+
+    resource_version_t resource_version = resource_mapping_get_version();
 
     if (version <= SCENARIO_LAST_UNVERSIONED) {
         resource_set_mapping(RESOURCE_ORIGINAL_VERSION);
@@ -202,6 +203,7 @@ void empire_object_load(buffer *buf, int version)
     }
     objects.size = highest_id_in_use + 1;
     fix_image_ids();
+    resource_set_mapping(resource_version);
 }
 
 void empire_object_save(buffer *buf)
@@ -349,6 +351,9 @@ void empire_object_init_cities(int empire_id)
         city->trader_figure_ids[2] = 0;
         city->empire_object_id = array_index;
     }
+    if (empire_id != SCENARIO_CUSTOM_EMPIRE) {
+        empire_city_update_our_fish_and_meat_production();
+    }
     empire_city_update_trading_data(empire_id);
 }
 
@@ -373,7 +378,7 @@ full_empire_object *empire_object_get_full(int object_id)
 full_empire_object *empire_object_get_new(void)
 {
     full_empire_object *obj;
-    array_new_item(objects, 1, obj);
+    array_new_item_after_index(objects, 1, obj);
     return obj;
 }
 
