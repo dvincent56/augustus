@@ -26,6 +26,7 @@
 #include "figure/formation_legion.h"
 #include "figure/roamer_preview.h"
 #include "game/resource.h"
+#include "game/state.h"
 #include "graphics/clouds.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
@@ -575,67 +576,31 @@ static void draw_dock_workers(const building *b, int x, int y, color_t color_mas
     }
 }
 
-static int get_warehouse_flag_image_id(const building *b)
+static void draw_permissions_flag(building *b, int x, int y, color_t color_mask)
 {
+    if (b->has_plague) {
+        return;
+    }
+    static int base_permission_image[8];
+    if (!base_permission_image[0]) {
+        base_permission_image[0] = 0xdeadbeef; // Invalid image ID, just to confirm the other values have been set
+        base_permission_image[1] = assets_get_image_id("UI", "Warehouse_Flag_Market");
+        base_permission_image[2] = assets_get_image_id("UI", "Warehouse_Flag_Land");
+        base_permission_image[3] = assets_get_image_id("UI", "Warehouse_Flag_Market_Land");
+        base_permission_image[4] = assets_get_image_id("UI", "Warehouse_Flag_Sea");
+        base_permission_image[5] = assets_get_image_id("UI", "Warehouse_Flag_Market_Sea");
+        base_permission_image[6] = assets_get_image_id("UI", "Warehouse_Flag_Land_Sea");
+        base_permission_image[7] = assets_get_image_id("UI", "Warehouse_Flag_All");
+    }
     const building_storage *storage = building_storage_get(b->storage_id);
-    int permission_mask = 0x7;
-    int permissions = (~storage->permissions) & permission_mask;
+    int flag_permission_mask = 0x7;
+    int permissions = (~storage->permissions) & flag_permission_mask;
     if (!permissions) {
-        return 0;
+        return;
     }
-    int image_offset = (permissions - 1) * WAREHOUSE_FLAG_FRAMES;
-    int image_id = assets_get_image_id("Flags", "Warehouse_Flag_Market") + image_offset;
-    return image_id;
-}
+    image_draw(base_permission_image[permissions] + b->data.warehouse.flag_frame, x, y, color_mask, draw_context.scale);
 
-static void draw_warehouse_flag(const building *b, int x, int y, color_t color_mask)
-{
-    if (!b->has_plague) {
-        int image_id = get_warehouse_flag_image_id(b);
-        if (!image_id) {
-            return;
-        }
-        image_id += b->data.warehouse.flag_frame;
-        image_draw(image_id, x + 19, y - 56, color_mask, draw_context.scale);
-    }
-}
-
-static int get_granary_flag_image_id(const building *b)
-{
-    const building_storage *storage = building_storage_get(b->storage_id);
-    int permission_mask = 0xf;
-    int warehouse_permission_mask = 0x7;
-    int permissions = (~storage->permissions) & permission_mask;
-    if (!permissions) {
-        return 0;
-    }
-
-    // Can mostly reuse the flags used for Warehouses, with two exceptions
-    // With all granary permissions, use reuse warehouse flag for all permissions
-    if (permissions == permission_mask) {
-        int image_id = assets_get_image_id("Flags", "Warehouse_Flag_All");
-        return image_id;
-    }
-    // Different flag for all permissions except mess hall
-    if (permissions == warehouse_permission_mask) {
-        int image_id = assets_get_image_id("Flags", "Granary_Flag_Market_Both_Traders");
-        return image_id;
-    }
-    int image_offset = (permissions - 1) * WAREHOUSE_FLAG_FRAMES;
-    int image_id = assets_get_image_id("Flags", "Warehouse_Flag_Market") + image_offset;
-    return image_id;
-}
-
-static void draw_granary_flag(const building *b, int x, int y, color_t color_mask)
-{
-    if (!b->has_plague) {
-        int image_id = get_granary_flag_image_id(b);
-        if (!image_id) {
-            return;
-        }
-        image_id += b->data.warehouse.flag_frame;
-        image_draw(image_id, x + 81, y - 101, color_mask, draw_context.scale);
-    }
+    building_animation_advance_storage_flag(b, base_permission_image[permissions]);
 }
 
 static void draw_warehouse_ornaments(int x, int y, color_t color_mask)
@@ -693,12 +658,10 @@ static void draw_animation(int x, int y, int grid_offset)
                 draw_dock_workers(b, x, y, color_mask);
             } else if (b->type == BUILDING_WAREHOUSE) {
                 draw_warehouse_ornaments(x, y, color_mask);
-                draw_warehouse_flag(b, x, y, color_mask);
-                building_animation_advance_storage_flag(b, get_warehouse_flag_image_id(b));
+                draw_permissions_flag(b, x + 19, y - 56, color_mask);
             } else if (b->type == BUILDING_GRANARY) {
                 draw_granary_stores(img, b, x, y, color_mask);
-                draw_granary_flag(b, x, y, color_mask);
-                building_animation_advance_storage_flag(b, get_granary_flag_image_id(b));
+                draw_permissions_flag(b, x + 81, y - 101, color_mask);
             } else if (b->type == BUILDING_BURNING_RUIN && b->has_plague) {
                 image_draw(image_group(GROUP_PLAGUE_SKULL), x + 18, y - 32, color_mask, draw_context.scale);
             }
@@ -758,6 +721,14 @@ static void draw_animation(int x, int y, int grid_offset)
             }
             if (fort->subtype.fort_figure_type == FIGURE_FORT_INFANTRY) {
                 image_id = assets_get_image_id("Military", "fort_aux_inf_flag_central");
+                switch (scenario_property_climate()) {
+                    case CLIMATE_DESERT: image_id += 2; break;
+                    case CLIMATE_NORTHERN: image_id += 1; break;
+                    default: break;
+                }
+            }
+            if (fort->subtype.fort_figure_type == FIGURE_FORT_ARCHER) {
+                image_id = assets_get_image_id("Military", "fort_aux_arch_flag_central");
                 switch (scenario_property_climate()) {
                     case CLIMATE_DESERT: image_id += 2; break;
                     case CLIMATE_NORTHERN: image_id += 1; break;
@@ -901,10 +872,10 @@ static int get_highlighted_formation_id(const map_tile *tile)
 
 static void update_clouds(void)
 {
-    if (!window_is(WINDOW_CITY) && !window_is(WINDOW_CITY_MILITARY)) {
+    int camera_x, camera_y;
+    if (game_state_is_paused() || (!window_is(WINDOW_CITY) && !window_is(WINDOW_CITY_MILITARY))) {
         clouds_pause();
     }
-    int camera_x, camera_y;
     city_view_get_camera_in_pixels(&camera_x, &camera_y);
     clouds_draw(camera_x, camera_y, GRID_SIZE * 60, GRID_SIZE * 30, draw_context.scale);
 }

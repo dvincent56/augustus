@@ -18,9 +18,8 @@
 #include "window/message_dialog.h"
 #include "window/option_popup.h"
 
-static void button_god(int god, int param2);
+static void button_god(const struct generic_button *button);
 static void button_close(int param1, int param2);
-
 
 static struct {
     option_menu_item option;
@@ -107,17 +106,17 @@ static image_button image_buttons_bottom[] = {
 };
 
 static generic_button buttons_gods_size[] = {
-    {30, 56, 80, 90, button_god, button_none, 0, 0},
-    {130, 56, 80, 90, button_god, button_none, 1, 0},
-    {230, 56, 80, 90, button_god, button_none, 2, 0},
-    {330, 56, 80, 90, button_god, button_none, 3, 0},
-    {430, 56, 80, 90, button_god, button_none, 4, 0},
-    {530, 56, 80, 90, button_god, button_none, 5, 0},
-    {630, 56, 80, 90, button_god, button_none, 6, 0}
+    {30, 56, 80, 90, button_god},
+    {130, 56, 80, 90, button_god},
+    {230, 56, 80, 90, button_god},
+    {330, 56, 80, 90, button_god},
+    {430, 56, 80, 90, button_god},
+    {530, 56, 80, 90, button_god},
+    {630, 56, 80, 90, button_god}
 };
 
-static int focus_button_id;
-static int focus_image_button_id;
+static unsigned int focus_button_id;
+static unsigned int focus_image_button_id;
 
 static void init(void)
 {
@@ -139,10 +138,9 @@ static void draw_background(void)
     color_t border_color =  COLOR_BORDER_ORANGE;
     color_t highlight_color = COLOR_MASK_NONE;
     
-    for (int god = 0; god < MAX_GODS + 1; god++) {
+    for (int god = 0; god <= MAX_GODS; god++) {
         if (god == selected_god_id) {
             button_border_draw(100 * god + 26, 52, 90, 100, 1);           
-
             if (god == MAX_GODS) {
                 image_draw_border(border_image_id, 100 * god + 30, 56, border_color);
                 image_draw(base_image_id, 100 * god + 35, 61, COLOR_MASK_NONE, SCALE_NONE);
@@ -173,17 +171,17 @@ static void draw_foreground(void)
 
     inner_panel_draw(33, 170, 36, 14);
 
-    int offet_y = 0;
+    int offset_y = 0;
 
     for (int i = 0; i < 3; i++) {
         int module_name = epithets_options[selected_god_id * 3 + i].option.header;
-        text_draw_centered(translation_for(module_name), 53, 184 + offet_y , 540, FONT_NORMAL_GREEN, 0);
+        text_draw_centered(translation_for(module_name), 53, 184 + offset_y , 540, FONT_NORMAL_GREEN, 0);
                 
         int module_desc = epithets_options[selected_god_id * 3 + i].option.desc;
          // Draw in black and then white to create shadow effect
-        text_draw_multiline(translation_for(module_desc), 53 + 1, 204 + offet_y + 1, 540, FONT_SMALL_PLAIN, COLOR_BLACK);
-        offet_y += text_draw_multiline(translation_for(module_desc), 53, 204 + offet_y, 540, FONT_SMALL_PLAIN, COLOR_WHITE);
-        offet_y += 34;
+        text_draw_multiline(translation_for(module_desc), 53 + 1, 204 + offset_y + 1, 540, 0, FONT_SMALL_PLAIN, COLOR_BLACK);
+        offset_y += text_draw_multiline(translation_for(module_desc), 53, 204 + offset_y, 540, 0, FONT_SMALL_PLAIN, COLOR_WHITE);
+        offset_y += 34;
     }
 
     image_buttons_draw(0, 0, image_buttons_bottom, 1);
@@ -191,9 +189,9 @@ static void draw_foreground(void)
     graphics_reset_dialog();
 }
 
-static void button_god(int god, int param2)
+static void button_god(const struct generic_button *button)
 {
-    selected_god_id = god;
+    selected_god_id = (button - buttons_gods_size); // Calculate index based on button pointer
     window_invalidate();
 }
 
@@ -229,7 +227,7 @@ static void handle_input(const mouse *m, const hotkeys *h)
 {
     const mouse *m_dialog = mouse_in_dialog(m);
     int handled = image_buttons_handle_mouse(m_dialog, 0, 0, image_buttons_bottom, 1, &focus_image_button_id) | 
-    generic_buttons_handle_mouse(m_dialog, 0, 0, buttons_gods_size, 6, &focus_button_id);
+    generic_buttons_handle_mouse(m_dialog, 0, 0, buttons_gods_size, 7, &focus_button_id);
 
     if (focus_image_button_id) {
         focus_button_id = 0;

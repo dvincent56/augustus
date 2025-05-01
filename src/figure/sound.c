@@ -42,6 +42,7 @@ void figure_play_die_sound(const figure *f)
         case FIGURE_PREFECT:
         case FIGURE_FORT_JAVELIN:
         case FIGURE_FORT_LEGIONARY:
+        case FIGURE_FORT_ARCHER:
         case FIGURE_GLADIATOR:
         case FIGURE_INDIGENOUS_NATIVE:
         case FIGURE_TOWER_SENTRY:
@@ -103,18 +104,20 @@ void figure_play_hit_sound(figure_type type)
         case FIGURE_ENEMY50_SWORD:
         case FIGURE_ENEMY52_MOUNTED_ARCHER:
         case FIGURE_ENEMY54_GLADIATOR:
+        case FIGURE_MESS_HALL_COLLECTOR:
             if (city_sound_update_hit_soldier()) {
                 sound_effect_play(SOUND_EFFECT_SWORD_SWING);
+            }
+            break;
+        case FIGURE_FORT_INFANTRY:
+        case FIGURE_FORT_ARCHER:
+            if (city_sound_update_hit_soldier()) {
+                sound_effect_play(SOUND_EFFECT_LIGHT_SWORD);
             }
             break;
         case FIGURE_FORT_JAVELIN:
         case FIGURE_TOWER_SENTRY:
         case FIGURE_WATCHMAN:
-        case FIGURE_FORT_INFANTRY:
-            if (city_sound_update_hit_soldier()) {
-                sound_effect_play(SOUND_EFFECT_LIGHT_SWORD);
-            }
-            break;
         case FIGURE_ENEMY43_SPEAR:
         case FIGURE_ENEMY51_SPEAR:
             if (city_sound_update_hit_spear()) {

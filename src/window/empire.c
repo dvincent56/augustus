@@ -55,8 +55,8 @@ static void button_help(int param1, int param2);
 static void button_return_to_city(int param1, int param2);
 static void button_advisor(int advisor, int param2);
 static void button_show_prices(int param1, int param2);
-static void button_open_trade(int param1, int param2);
-static void button_show_resource_window(int resource, int param2);
+static void button_open_trade(const generic_button *button);
+static void button_show_resource_window(const generic_button *button);
 
 static image_button image_button_help[] = {
     {0, 0, 27, 27, IB_NORMAL, GROUP_CONTEXT_ICONS, 0, button_help, button_none, 0, 0, 1}
@@ -72,19 +72,19 @@ static image_button image_button_show_prices[] = {
 };
 
 static generic_button generic_button_trade_resource[] = {
-    {0, 0, 101, 27, button_show_resource_window, button_none, 0, 0},
+    {0, 0, 101, 27, button_show_resource_window},
 };
 
 static generic_button generic_button_open_trade[] = {
-    {30, 56, 440, 26, button_open_trade, button_none, 0, 0}
+    {30, 56, 440, 26, button_open_trade}
 };
 
 static struct {
-    int selected_button;
+    unsigned int selected_button;
     int selected_city;
     int x_min, x_max, y_min, y_max;
     int x_draw_offset, y_draw_offset;
-    int focus_button_id;
+    unsigned int focus_button_id;
     int is_scrolling;
     int finished_scroll;
     resource_type focus_resource;
@@ -702,7 +702,7 @@ static void handle_input(const mouse *m, const hotkeys *h)
     }
     data.focus_button_id = 0;
     data.focus_resource = 0;
-    int button_id;
+    unsigned int button_id;
     image_buttons_handle_mouse(m, data.panel.x_min + 20, data.y_max - 44, image_button_help, 1, &button_id);
     if (button_id) {
         data.focus_button_id = 1;
@@ -914,7 +914,7 @@ static void button_show_prices(int param1, int param2)
     window_trade_prices_show(0, 0, screen_width(), screen_height());
 }
 
-static void button_show_resource_window(int param1, int param2)
+static void button_show_resource_window(const generic_button *button)
 {
     window_resource_settings_show(data.focus_resource);
 }
@@ -928,7 +928,7 @@ static void confirmed_open_trade(int accepted, int checked)
     }
 }
 
-static void button_open_trade(int param1, int param2)
+static void button_open_trade(const generic_button *button2)
 {
     window_popup_dialog_show(POPUP_DIALOG_OPEN_TRADE, confirmed_open_trade, 2);
 }

@@ -81,6 +81,16 @@ static struct {
             int x, y;
         } hotspot;
     } cursors[CURSOR_MAX];
+    struct {
+        SDL_Texture *texture;
+        int texture_width;
+        int texture_height;
+        int x;
+        int y;
+        int width;
+        int height;
+        int opacity;
+    } tooltip;
     SDL_Texture **texture_lists[ATLAS_MAX];
     image_atlas_data atlas_data[ATLAS_MAX];
     struct {
@@ -423,6 +433,11 @@ static void free_all_textures(void)
 
     free_silhouettes();
 
+    if (data.tooltip.texture) {
+        SDL_DestroyTexture(data.tooltip.texture);
+        data.tooltip.texture = 0;
+    }
+
     buffer_texture *texture_info = data.texture_buffers.first;
     while (texture_info) {
         buffer_texture *current = texture_info;
@@ -669,6 +684,68 @@ static void update_custom_texture_yuv(custom_image_type type, const uint8_t *y_d
     SDL_UpdateYUVTexture(data.custom_textures[type].texture, NULL,
         y_data, y_width, cb_data, cb_width, cr_data, cr_width);
 #endif
+}
+
+static int start_tooltip_creation(int width, int height)
+{
+    if (data.paused) {
+        return 0;
+    }
+    if (data.tooltip.texture) {
+        if (data.tooltip.texture_width < width || data.tooltip.texture_height < height) {
+            SDL_DestroyTexture(data.tooltip.texture);
+            data.tooltip.texture = 0;
+        }
+    }
+    if (!data.tooltip.texture) {
+        const char *scale_quality = "linear";
+#ifndef __APPLE__
+        // Scale using nearest neighbour when we scale a multiple of 100%: makes it look sharper.
+        // But not on MacOS: users are used to the linear interpolation since that's what Apple also does.
+        if (platform_screen_get_scale() % 100 == 0) {
+            scale_quality = "nearest";
+        }
+#endif
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale_quality);
+
+        data.tooltip.texture = SDL_CreateTexture(data.renderer, SDL_PIXELFORMAT_ARGB8888,
+            SDL_TEXTUREACCESS_TARGET, width, height);
+        if (!data.tooltip.texture) {
+            return 0;
+        }
+        SDL_SetTextureBlendMode(data.tooltip.texture, SDL_BLENDMODE_BLEND);
+        data.tooltip.texture_width = width;
+        data.tooltip.texture_height = height;
+    }
+    data.tooltip.width = width;
+    data.tooltip.height = height;
+
+    return SDL_SetRenderTarget(data.renderer, data.tooltip.texture) == 0;
+}
+
+static void finish_tooltip_creation(void)
+{
+    if (data.paused) {
+        return;
+    }
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+    SDL_SetRenderTarget(data.renderer, data.render_texture);
+}
+
+static int has_tooltip(void)
+{
+    return data.tooltip.texture != 0;
+}
+
+static void set_tooltip_position(int x, int y)
+{
+    data.tooltip.x = x;
+    data.tooltip.y = y;
+}
+
+static void set_tooltip_opacity(int opacity)
+{
+    data.tooltip.opacity = calc_adjust_with_percentage(255, opacity);
 }
 
 static buffer_texture *get_saved_texture_info(int texture_id)
@@ -1087,6 +1164,11 @@ static void create_renderer_interface(void)
     data.renderer_interface.update_custom_image_yuv = update_custom_texture_yuv;
     data.renderer_interface.draw_custom_image = draw_custom_texture;
     data.renderer_interface.supports_yuv_image_format = supports_yuv_texture;
+    data.renderer_interface.start_tooltip_creation = start_tooltip_creation;
+    data.renderer_interface.finish_tooltip_creation = finish_tooltip_creation;
+    data.renderer_interface.set_tooltip_position = set_tooltip_position;
+    data.renderer_interface.set_tooltip_opacity = set_tooltip_opacity;
+    data.renderer_interface.has_tooltip = has_tooltip;
     data.renderer_interface.save_image_from_screen = save_to_texture;
     data.renderer_interface.draw_image_to_screen = draw_saved_texture;
     data.renderer_interface.save_screen_buffer = save_screen_buffer;
@@ -1173,6 +1255,10 @@ static void destroy_render_texture(void)
         SDL_DestroyTexture(data.render_texture);
         data.render_texture = 0;
     }
+    if (data.tooltip.texture) {
+        SDL_DestroyTexture(data.tooltip.texture);
+        data.tooltip.texture = 0;
+    }
 }
 
 int platform_renderer_create_render_texture(int width, int height)
@@ -1247,11 +1333,38 @@ void platform_renderer_invalidate_target_textures(void)
         data.custom_textures[CUSTOM_IMAGE_GREEN_FOOTPRINT].texture = 0;
         create_blend_texture(CUSTOM_IMAGE_GREEN_FOOTPRINT);
     }
+    if (data.tooltip.texture) {
+        SDL_DestroyTexture(data.tooltip.texture);
+        data.tooltip.texture = 0;
+    }
 }
 
 void platform_renderer_clear(void)
 {
     clear_screen();
+}
+
+static void draw_tooltip(void)
+{
+    if (!data.tooltip.texture || !data.tooltip.opacity) {
+        return;
+    }
+    color_t opacity = calc_adjust_with_percentage(0x55, calc_percentage(data.tooltip.opacity, 0xff));
+    fill_rect(data.tooltip.x + 2, data.tooltip.width,
+        data.tooltip.y + 2, data.tooltip.height, opacity << COLOR_BITSHIFT_ALPHA);
+
+    SDL_Rect src;
+    src.x = 0;
+    src.y = 0;
+    src.w = data.tooltip.width;
+    src.h = data.tooltip.height;
+    SDL_Rect dst;
+    dst.x = data.tooltip.x;
+    dst.y = data.tooltip.y;
+    dst.w = data.tooltip.width;
+    dst.h = data.tooltip.height;
+    SDL_SetTextureAlphaMod(data.tooltip.texture, data.tooltip.opacity);
+    SDL_RenderCopy(data.renderer, data.tooltip.texture, &src, &dst);
 }
 
 static void draw_software_mouse_cursor(void)
@@ -1281,6 +1394,7 @@ void platform_renderer_render(void)
     }
     SDL_SetRenderTarget(data.renderer, NULL);
     SDL_RenderCopy(data.renderer, data.render_texture, NULL, NULL);
+    draw_tooltip();
     if (platform_cursor_is_software()) {
         draw_software_mouse_cursor();
     }

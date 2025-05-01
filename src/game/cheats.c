@@ -27,10 +27,13 @@
 #include "window/building_info.h"
 #include "window/city.h"
 #include "window/console.h"
+#include "window/editor/attributes.h"
 #include "window/editor/scenario_events.h"
+#include "window/plain_message_dialog.h"
 
 #include <string.h>
 
+static int map_editor_warning_shown;
 
 static void game_cheat_add_money(uint8_t *);
 static void game_cheat_start_invasion(uint8_t *);
@@ -43,10 +46,10 @@ static void game_cheat_set_monument_phase(uint8_t *);
 static void game_cheat_unlock_all_buildings(uint8_t *);
 static void game_cheat_incite_riot(uint8_t *);
 static void game_cheat_show_custom_events(uint8_t *);
+static void game_cheat_show_editor(uint8_t *);
 static void game_cheat_cast_curse(uint8_t *);
 static void game_cheat_make_buildings_invincible(uint8_t *);
 static void game_cheat_change_climate(uint8_t *);
-
 
 static void (*const execute_command[])(uint8_t *args) = {
     game_cheat_add_money,
@@ -60,6 +63,7 @@ static void (*const execute_command[])(uint8_t *args) = {
     game_cheat_unlock_all_buildings,
     game_cheat_incite_riot,
     game_cheat_show_custom_events,
+    game_cheat_show_editor,
     game_cheat_cast_curse,
     game_cheat_make_buildings_invincible,
     game_cheat_change_climate
@@ -77,6 +81,7 @@ static const char *commands[] = {
     "whathaveromansdoneforus",
     "nike",
     "debug.customevents",
+    "debug.showeditor",
     "curse",
     "romanconcrete",
     "globalwarming"
@@ -149,13 +154,13 @@ void game_cheat_victory(void)
     }
 }
 
-void game_cheat_breakpoint()
+void game_cheat_breakpoint(void)
 {
     if (data.is_cheating) {
     }
 }
 
-void game_cheat_console()
+void game_cheat_console(void)
 {
     if (data.is_cheating) {
         building_construction_clear_type();
@@ -200,7 +205,7 @@ static void game_cheat_cast_blessing(uint8_t *args)
 {
     int god_id = 0;
     parse_integer(args, &god_id);
-    city_god_blessing_cheat(god_id);
+    city_god_blessing(god_id);
     show_warning(TR_CHEAT_CASTED_BLESSING);
 }
 
@@ -210,7 +215,7 @@ static void game_cheat_cast_curse(uint8_t *args)
     int is_major = 0;
     int index = parse_integer(args, &god_id);
     parse_integer(args + index, &is_major);
-    city_god_curse_cheat(god_id, is_major);
+    city_god_curse(god_id, is_major);
     show_warning(TR_CHEAT_CASTED_CURSE);
 }
 
@@ -224,7 +229,7 @@ static void game_cheat_change_climate(uint8_t *args)
 {
     int climate = 0;
     parse_integer(args, &climate);
-    scenario_change_climate_cheat(climate);
+    scenario_change_climate(climate);
     show_warning(TR_CHEAT_CLIMATE_CHANGE);
 }
 
@@ -275,6 +280,15 @@ static void game_cheat_incite_riot(uint8_t *args)
 static void game_cheat_show_custom_events(uint8_t *args)
 {
     window_editor_scenario_events_show();
+}
+
+static void game_cheat_show_editor(uint8_t *args)
+{
+    window_editor_attributes_show();
+    if (!map_editor_warning_shown) {
+        window_plain_message_dialog_show(TR_CHEAT_EDITOR_WARNING_TITLE, TR_CHEAT_EDITOR_WARNING_TEXT, 1);
+        map_editor_warning_shown = 1;
+    }
 }
 
 void game_cheat_parse_command(uint8_t *command)

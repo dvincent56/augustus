@@ -31,11 +31,12 @@
 #define BACKGROUND_WIDTH 1024
 #define BACKGROUND_HEIGHT 768
 
-static void select_scenario(int index, int is_double_click);
+static void select_scenario(unsigned int index, int is_double_click);
 static void button_start_scenario(int param1, int param2);
 static void button_back(int param1, int param2);
-static void button_toggle_minimap(int param1, int param2);
+static void button_toggle_minimap(const generic_button *button);
 static void draw_scenario_item(const list_box_item *item);
+static void file_tooltip(const list_box_item *item, tooltip_context *c);
 
 static image_button start_button =
 { 600, 440, 27, 27, IB_NORMAL, GROUP_SIDEBAR_BUTTONS, 56, button_start_scenario, button_none, 1, 0, 1 };
@@ -43,7 +44,7 @@ static image_button start_button =
 static image_button back_button =
 { 330, 440, 39, 26, IB_NORMAL, GROUP_OK_CANCEL_SCROLL_BUTTONS, 4, button_back, button_none, 1, 0, 1 };
 static generic_button toggle_minimap_button =
-{ 570, 87, 39, 28, button_toggle_minimap, button_none, 0, 0 };
+{ 570, 87, 39, 28, button_toggle_minimap };
 
 static list_box_type list_box = {
     .x = 16,
@@ -55,11 +56,12 @@ static list_box_type list_box = {
     .extend_to_hidden_scrollbar = 1,
     .decorate_scrollbar = 1,
     .draw_item = draw_scenario_item,
-    .on_select = select_scenario
+    .on_select = select_scenario,
+    .handle_tooltip = file_tooltip
 };
 
 static struct {
-    int focus_toggle_button;
+    unsigned int focus_toggle_button;
     int show_minimap;
     char selected_scenario_filename[FILE_NAME_MAX];
     uint8_t selected_scenario_display[FILE_NAME_MAX];
@@ -70,7 +72,7 @@ static struct {
 
 static void init(void)
 {
-    data.scenarios = dir_find_files_with_extension(".", "map");
+    data.scenarios = dir_find_files_with_extension_at_location(PATH_LOCATION_SCENARIO, "map");
     data.scenarios = dir_append_files_with_extension("mapx");
     data.focus_toggle_button = 0;
     data.show_minimap = 0;
@@ -82,11 +84,9 @@ static void init(void)
 
 static void draw_scenario_item(const list_box_item *item)
 {
-    char file[FILE_NAME_MAX];
     uint8_t displayable_file[FILE_NAME_MAX];
     font_t font = item->is_selected ? FONT_NORMAL_WHITE : FONT_NORMAL_GREEN;
-    strcpy(file, data.scenarios->files[item->index].name);
-    encoding_from_utf8(file, displayable_file, FILE_NAME_MAX);
+    encoding_from_utf8(data.scenarios->files[item->index].name, displayable_file, FILE_NAME_MAX);
     file_remove_extension((char *) displayable_file);
     text_ellipsize(displayable_file, font, item->width);
     text_draw(displayable_file, item->x, item->y, font, 0);
@@ -250,16 +250,36 @@ static void handle_input(const mouse *m, const hotkeys *h)
     }
 }
 
+static void file_tooltip(const list_box_item *item, tooltip_context *c)
+{
+    static uint8_t displayable_file[FILE_NAME_MAX];
+    font_t font = item->is_selected ? FONT_NORMAL_WHITE : FONT_NORMAL_GREEN;
+    encoding_from_utf8(data.scenarios->files[item->index].name, displayable_file, FILE_NAME_MAX);
+    file_remove_extension((char *) displayable_file);
+    if (text_get_width(displayable_file, font) > item->width) {
+        c->precomposed_text = displayable_file;
+        c->type = TOOLTIP_BUTTON;
+    }
+}
+
+static void handle_tooltip(tooltip_context *c)
+{
+    list_box_handle_tooltip(&list_box, c);
+}
+
 static void button_back(int param1, int param2)
 {
     window_go_back();
 }
 
-static void select_scenario(int index, int is_double_click)
+static void select_scenario(unsigned int index, int is_double_click)
 {
     if (strcmp(data.selected_scenario_filename, data.scenarios->files[index].name) != 0) {
-        strcpy(data.selected_scenario_filename, data.scenarios->files[index].name);
-        game_file_io_read_scenario_info(data.selected_scenario_filename, &data.info);
+        snprintf(data.selected_scenario_filename, FILE_NAME_MAX, "%s", data.scenarios->files[index].name);
+        const char *filename = dir_get_file_at_location(data.selected_scenario_filename, PATH_LOCATION_SCENARIO);
+        if (filename) {
+            game_file_io_read_scenario_info(filename, &data.info);
+        }
         encoding_from_utf8(data.selected_scenario_filename, data.selected_scenario_display, FILE_NAME_MAX);
         file_remove_extension((char *) data.selected_scenario_display);
         window_invalidate();
@@ -274,10 +294,11 @@ static void button_start_scenario(int param1, int param2)
     encoding_from_utf8(data.selected_scenario_filename, data.selected_scenario_display, FILE_NAME_MAX);
     scenario_set_name(data.selected_scenario_display);
     scenario_set_custom(2);
+    scenario_set_player_name(lang_get_string(9, 5));
     window_mission_briefing_show();
 }
 
-static void button_toggle_minimap(int param1, int param2)
+static void button_toggle_minimap(const generic_button *button)
 {
     data.show_minimap = !data.show_minimap;
     window_invalidate();
@@ -289,7 +310,8 @@ void window_cck_selection_show(void)
         WINDOW_CCK_SELECTION,
         draw_background,
         draw_foreground,
-        handle_input
+        handle_input,
+        handle_tooltip
     };
     init();
     window_show(&window);

@@ -278,6 +278,8 @@ int building_image_get(const building *b)
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "City_Mint_Construction_01");
+                case 2:
+                    return assets_get_image_id("Monuments", "City_Mint_Construction_02");
                 default:
                     return building_variant_get_image_id_with_rotation(b->type, b->variant);
             }
@@ -321,7 +323,6 @@ int building_image_get(const building *b)
             } else {
                 return assets_get_image_id("Admin_Logistics", "Upgraded_Forum");
             }
-            return image_group(GROUP_BUILDING_FORUM);
         case BUILDING_FOUNTAIN:
             if (b->upgrade_level == 3) {
                 return scenario_property_climate() == CLIMATE_DESERT ?
@@ -354,6 +355,8 @@ int building_image_get(const building *b)
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "Ceres_LT_0");
+                case 2:
+                    return assets_get_image_id("Monuments", "Ceres_LT_50");
                 default:
                     return image_group(GROUP_BUILDING_TEMPLE_CERES) + 1;
             }
@@ -361,6 +364,8 @@ int building_image_get(const building *b)
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "Neptune_LT_0");
+                case 2:
+                    return assets_get_image_id("Monuments", "Neptune_LT_50");
                 default:
                     return image_group(GROUP_BUILDING_TEMPLE_NEPTUNE) + 1;
             }
@@ -368,6 +373,8 @@ int building_image_get(const building *b)
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "Mercury_LT_0");
+                case 2:
+                    return assets_get_image_id("Monuments", "Mercury_LT_50");
                 default:
                     return image_group(GROUP_BUILDING_TEMPLE_MERCURY) + 1;
             }
@@ -375,6 +382,8 @@ int building_image_get(const building *b)
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "Mars_LT_0");
+                case 2:
+                    return assets_get_image_id("Monuments", "Mars_LT_50");
                 default:
                     return image_group(GROUP_BUILDING_TEMPLE_MARS) + 1;
             }
@@ -382,6 +391,8 @@ int building_image_get(const building *b)
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "Venus_LT_0");
+                case 2:
+                    return assets_get_image_id("Monuments", "Venus_LT_50");
                 default:
                     return image_group(GROUP_BUILDING_TEMPLE_VENUS) + 1;
             }
@@ -389,6 +400,8 @@ int building_image_get(const building *b)
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "Oracle_Construction_01");
+                case 2:
+                    return assets_get_image_id("Monuments", "Oracle_Construction_02");
                 default:
                     return image_group(GROUP_BUILDING_ORACLE);
             }
@@ -537,6 +550,7 @@ int building_image_get(const building *b)
         case BUILDING_FORT_LEGIONARIES:
         case BUILDING_FORT_MOUNTED:
         case BUILDING_FORT_AUXILIA_INFANTRY:
+        case BUILDING_FORT_ARCHERS:
             switch (scenario_property_climate()) {
                 case CLIMATE_NORTHERN:
                     return assets_get_image_id("Military", "Fort_Main_North");
@@ -767,13 +781,14 @@ int building_image_get(const building *b)
             int offset = building_variant_get_offset_with_rotation(b->type, b->variant);
             return image_id + offset;
         }
-        case BUILDING_SMALL_MAUSOLEUM:
+        case BUILDING_SMALL_MAUSOLEUM: {
+            int orientation = building_rotation_get_building_orientation(b->subtype.orientation) / 2;
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "Mausoleum_Small_Construction_01");
+                case 2:
+                    return assets_get_image_id("Monuments", "Mausoleum_Small_Construction_02") + orientation % 2;
                 default:
-                {
-                    int orientation = building_rotation_get_building_orientation(b->subtype.orientation) / 2;
                     return assets_get_image_id("Monuments", "Mausoleum S") + orientation % 2;
                 }
             }
@@ -792,6 +807,8 @@ int building_image_get(const building *b)
             switch (b->monument.phase) {
                 case MONUMENT_START:
                     return assets_get_image_id("Monuments", "Pantheon_Const_00");
+                case 2:
+                    return assets_get_image_id("Monuments", "Nymphaeum_Construction_02");
                 default:
                     return assets_get_image_id("Monuments", "Nymphaeum ON");
             }
@@ -820,12 +837,12 @@ int building_image_get(const building *b)
         case BUILDING_PALM_TREE:
         case BUILDING_DATE_TREE:
             return assets_get_group_id("Aesthetics") + (b->type - BUILDING_PINE_TREE);
-        case BUILDING_SMALL_STATUE_ALT:
-        case BUILDING_SMALL_STATUE_ALT_B:
+        case BUILDING_GODDESS_STATUE:
+        case BUILDING_SENATOR_STATUE:
         {
             int orientation = building_rotation_get_building_orientation(b->subtype.orientation) / 2;
             return assets_get_image_id("Aesthetics", "sml statue 2") +
-                (b->type - BUILDING_SMALL_STATUE_ALT) + (orientation % 2) *
+                (b->type - BUILDING_GODDESS_STATUE) + (orientation % 2) *
                 building_properties_for_type(b->type)->rotation_offset;
         }
         case BUILDING_HEDGE_DARK:
