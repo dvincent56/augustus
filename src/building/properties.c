@@ -1294,7 +1294,7 @@ static building_properties properties[BUILDING_TYPE_MAX] = {
     [BUILDING_LATRINES] = {
         .size = 1,
         .fire_proof = 1,
-        .custom_asset.group = "Health_Education",
+        .custom_asset.group = "Health_Culture",
         .custom_asset.id = "Latrine_N",
         .event_data.attr = "latrines"
     }

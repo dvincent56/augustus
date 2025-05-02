@@ -998,11 +998,11 @@ int building_image_get(const building *b)
         case BUILDING_LATRINES:
             switch (scenario_property_climate()) {
                 case CLIMATE_NORTHERN:
-                    return assets_get_image_id("Health_Education", "Latrine_N");
+                    return assets_get_image_id("Health_Culture", "Latrine_N");
                 case CLIMATE_DESERT:
-                    return assets_get_image_id("Health_Education", "Latrine_S");
+                    return assets_get_image_id("Health_Culture", "Latrine_S");
                 default:
-                    return assets_get_image_id("Health_Education", "Latrine_C");
+                    return assets_get_image_id("Health_Culture", "Latrine_C");
             }
         default:
             return 0;

@@ -785,13 +785,13 @@ static void draw_latrines(const map_tile *tile, int x, int y)
     int image_id;
     switch (scenario_property_climate()) {
         case CLIMATE_NORTHERN:
-            image_id = assets_get_image_id("Health_Education", "Latrine_N");
+            image_id = assets_get_image_id("Health_Culture", "Latrine_N");
             break;
         case CLIMATE_DESERT:
-            image_id = assets_get_image_id("Health_Education", "Latrine_S");
+            image_id = assets_get_image_id("Health_Culture", "Latrine_S");
             break;
         default:
-            image_id = assets_get_image_id("Health_Education", "Latrine_C");
+            image_id = assets_get_image_id("Health_Culture", "Latrine_C");
             break;
     }
 
