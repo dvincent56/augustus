@@ -1,5 +1,6 @@
 #include "utility.h"
 
+#include <stdlib.h>
 #include "assets/assets.h"
 #include "building/building.h"
 #include "building/roadblock.h"
@@ -344,7 +345,11 @@ void window_building_draw_well(building_info_context *c)
 
 void window_building_draw_latrines(building_info_context *c)
 {
-    window_building_play_sound(c, "wavs/well.wav");
+    if (rand() % 10 == 0) {
+        window_building_play_sound(c, ASSETS_DIRECTORY "/Sounds/Latrine.mp3");
+    } else {
+        window_building_play_sound(c, "wavs/well.wav");
+    }
     outer_panel_draw(c->x_offset, c->y_offset, c->width_blocks, c->height_blocks);
     lang_text_draw_centered(CUSTOM_TRANSLATION, TR_BUILDING_LATRINES, c->x_offset, c->y_offset + 10,
         BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK);   
