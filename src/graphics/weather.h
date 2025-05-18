@@ -4,8 +4,9 @@
 typedef enum {
     WEATHER_NONE,
     WEATHER_RAIN,
-    WEATHER_SNOW
-} WeatherType;
+    WEATHER_SNOW,
+    WEATHER_SAND,
+} weather_type;
 
 void weather_stop(void);
 void weather_draw(void);

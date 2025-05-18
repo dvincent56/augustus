@@ -23,17 +23,23 @@ typedef struct {
     int x, y;
     float speed;
     float drift_offset;
-    int drift_direction; // +1 ou -1
+    int drift_direction; // +1 or -1
 } snowflake;
+
+typedef struct {
+    float x, y;
+    float speed;
+    float offset;
+} sand_particle;
 
 typedef struct {
     int active;        // 1 = enable, 0 = disable
     int intensity;     // number of drops/flakes
     int dx, dy;        // direction
-    WeatherType type;  // rain or snow
-} WeatherConfig;
+    weather_type type;  // rain or snow
+} weatherConfig;
 
-WeatherConfig weather_config = {
+weatherConfig weather_config = {
     .active = 0,
     .intensity = 200,
     .dx = 1,
@@ -43,6 +49,7 @@ WeatherConfig weather_config = {
 
 drop *drops = NULL;
 snowflake *flakes = NULL;
+sand_particle *sand_particles = NULL;
 
 int weather_initialized = 0;
 int lightning_timer = 0;
@@ -65,6 +72,13 @@ void init_snowflake(snowflake *flake) {
     flake->drift_direction = (rand() % 2 == 0) ? 1 : -1;
 }
 
+void init_sand_particle(sand_particle *sand) {
+    sand->x = rand() % screen_width();
+    sand->y = rand() % screen_height();
+    sand->speed = 1.5f + (rand() % 100) / 50.0f;
+    sand->offset = rand() % 1000;
+}
+
 void weather_stop(void) {
     weather_config.active = 0;
     if (drops) {
@@ -74,6 +88,10 @@ void weather_stop(void) {
     if (flakes) {
         free(flakes);
         flakes = NULL;
+    }
+    if (sand_particles) {
+        free(sand_particles);
+        sand_particles = NULL;
     }
     weather_initialized = 0;
 }
@@ -107,11 +125,7 @@ static void update_wind(void)
 }
 
 void weather_draw() {
-    if (!config_get(CONFIG_UI_DRAW_WEATHER)) {
-        weather_stop();
-        return;
-    }
-    if (!weather_config.active) {
+    if (!config_get(CONFIG_UI_DRAW_WEATHER) || !weather_config.active) {
         weather_stop();
         return;
     }
@@ -128,6 +142,10 @@ void weather_draw() {
             for (int i = 0; i < weather_config.intensity; ++i) {
                 init_snowflake(&flakes[i]);                
             }
+        } else if (weather_config.type == WEATHER_SAND) {
+            sand_particles = malloc(sizeof(sand_particle) * weather_config.intensity);
+            for (int i = 0; i < weather_config.intensity; ++i)
+                init_sand_particle(&sand_particles[i]);        
         }
         weather_initialized = 1;
     }
@@ -148,9 +166,33 @@ void weather_draw() {
             }
         }
 
-        graphics_shade_rect(0, 0, screen_width(), screen_height(), 2);
+        graphics_fill_rect(0, 0, screen_width(), screen_height(), 0x33DDEEFF);
+        
         return;
     }
+
+    if (weather_config.type == WEATHER_SAND) {
+        for (int i = 0; i < weather_config.intensity; ++i) {
+            float wave = sinf((sand_particles[i].y + sand_particles[i].offset) * 0.03f);
+            sand_particles[i].x += sand_particles[i].speed + wave;
+
+            graphics_draw_line(
+                (int)sand_particles[i].x,
+                (int)sand_particles[i].x + 1,
+                (int)sand_particles[i].y,
+                (int)sand_particles[i].y + 1,
+                0xAAE1C699);
+
+            if (sand_particles[i].x > screen_width()) {
+                init_sand_particle(&sand_particles[i]);
+                sand_particles[i].x = 0;
+            }
+        }
+        
+        graphics_fill_rect(0, 0, screen_width(), screen_height(), 0x44E1C699);
+
+        return;
+    }   
 
     // Rain
     if (weather_config.intensity < 500) {
@@ -187,32 +229,21 @@ void weather_draw() {
     }
 }
 
-void set_weather(int active, int intensity, WeatherType type) {
+void set_weather(int active, int intensity, weather_type type) {
     weather_stop();
     weather_config.active = active;
     weather_config.intensity = intensity;
     weather_config.type = type;
-
-    /*if (active) {
-        char weather_path[128];
-        int weather_number = 1;
-        if (intensity > 800) {
-            weather_number = 3;
-        } else if (intensity > 500) {
-            weather_number = 2;
-        }
-        snprintf(weather_path, sizeof(weather_path), ASSETS_DIRECTORY "/Sounds/Rain%d.mp3", weather_number);
-        sound_speech_play_file(weather_path);
-    }*/
 }
 
 void city_weather_update(int month) {
     if (scenario_property_climate() == CLIMATE_DESERT) {
-        set_weather(0, 0, WEATHER_NONE);
+        int active = (rand() % 8 == 0);
+        set_weather(active, 5000, WEATHER_SAND);
     } else {
         int active = (rand() % 4 == 0);
         int intensity = active ? rand() % 1001 : 0;
-         WeatherType type = WEATHER_RAIN;
+        weather_type type = WEATHER_RAIN;
 
         if (month == 10 || month == 11 || month == 0 || month == 1 || month == 2) {
             type = (rand() % 2 == 0) ? WEATHER_RAIN : WEATHER_SNOW;
