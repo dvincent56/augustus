@@ -30,6 +30,7 @@
 #include "graphics/clouds.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
+#include "graphics/rain.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
 #include "map/building.h"
@@ -880,6 +881,13 @@ static void update_clouds(void)
     clouds_draw(camera_x, camera_y, GRID_SIZE * 60, GRID_SIZE * 30, draw_context.scale);
 }
 
+static void update_rain(void)
+{
+    if (game_state_is_paused() || (!window_is(WINDOW_CITY) && !window_is(WINDOW_CITY_MILITARY))) {
+        rain_stop();
+    }
+    rain_draw();
+}
 /***
  * TODO:
  *
@@ -985,4 +993,5 @@ void city_without_overlay_draw(int selected_figure_id, pixel_coordinate *figure_
         city_view_foreach_valid_map_tile(deletion_draw_remaining);
     }
     update_clouds();
+    update_rain();
 }
