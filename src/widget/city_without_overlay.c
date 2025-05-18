@@ -881,9 +881,9 @@ static void update_clouds(void)
     clouds_draw(camera_x, camera_y, GRID_SIZE * 60, GRID_SIZE * 30, draw_context.scale);
 }
 
-static void update_rain(void)
+static void update_weather(void)
 {
-    rain_draw();
+    weather_draw();
 }
 /***
  * TODO:
@@ -990,5 +990,5 @@ void city_without_overlay_draw(int selected_figure_id, pixel_coordinate *figure_
         city_view_foreach_valid_map_tile(deletion_draw_remaining);
     }
     update_clouds();
-    update_rain();
+    update_weather();
 }

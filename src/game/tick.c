@@ -125,7 +125,7 @@ static void advance_month(void)
         game_file_write_saved_game(dir_append_location("autosave-year.svx", PATH_LOCATION_SAVEGAME));
     }
 
-    city_weather_update();
+    city_weather_update(game_time_month());
 }
 
 static void advance_day(void)
