@@ -1,5 +1,6 @@
 #include "weather.h"
 
+#include "core/config.h"
 #include "core/dir.h"
 #include "graphics/color.h"
 #include "graphics/graphics.h"
@@ -106,6 +107,10 @@ static void update_wind(void)
 }
 
 void weather_draw() {
+    if (!config_get(CONFIG_UI_DRAW_WEATHER)) {
+        weather_stop();
+        return;
+    }
     if (!weather_config.active) {
         weather_stop();
         return;
