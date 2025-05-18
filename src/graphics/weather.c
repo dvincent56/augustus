@@ -56,6 +56,12 @@ int lightning_timer = 0;
 int lightning_cooldown = 0;
 float wind_angle = 0.0f;
 float wind_speed = 0.05f;
+float overlay_alpha = 0.0f;
+float overlay_target = 1.0f;
+int weather_fading_out = 0;
+int sand_color = 0xE1C699;
+int snow_color = 0xDDEEFF;
+int rain_color = 0x000000;
 
 void init_drop(drop *drop) {
     drop->x = rand() % screen_width();
@@ -96,6 +102,20 @@ void weather_stop(void) {
     weather_initialized = 0;
 }
 
+static void update_overlay_transition(void) {
+    float speed = 0.01f;
+
+    if (overlay_alpha < overlay_target) {
+        overlay_alpha += speed;
+        if (overlay_alpha > overlay_target)
+            overlay_alpha = overlay_target;
+    } else if (overlay_alpha > overlay_target) {
+        overlay_alpha -= speed;
+        if (overlay_alpha < overlay_target)
+            overlay_alpha = overlay_target;
+    }
+}
+
 static void update_lightning(void) 
 {
     if (lightning_cooldown <= 0 && (rand() % 500) == 0) {
@@ -124,11 +144,15 @@ static void update_wind(void)
     weather_config.dx = (int)(2 * sinf(wind_angle)); // between -2 et 2
 }
 
-void weather_draw() {
-    if (!config_get(CONFIG_UI_DRAW_WEATHER) || !weather_config.active) {
+void update_weather() {
+    if (!config_get(CONFIG_UI_DRAW_WEATHER)) {
         weather_stop();
         return;
     }
+
+    if (!weather_config.active && !weather_fading_out) {
+        weather_fading_out = 1;
+    }    
     
     if (!weather_initialized) {
         srand(time(NULL));
@@ -150,7 +174,32 @@ void weather_draw() {
         weather_initialized = 1;
     }
 
-    // snowflakes
+    update_overlay_transition();
+    int max_alpha = 0x33;
+    int alpha = (int)(overlay_alpha * max_alpha);
+
+    if (weather_fading_out) {
+        overlay_target = 0.0f;
+
+        if (overlay_alpha <= 0.0f) {
+            weather_stop();
+            weather_fading_out = 0;
+        } else {            
+            if (alpha > 0) {
+                int baseColor = rain_color;
+                if (weather_config.type == WEATHER_SAND) {
+                    baseColor = sand_color;
+                } else if (weather_config.type == WEATHER_SNOW) {
+                    baseColor = snow_color;
+                }
+                int color = (alpha << 24) | baseColor;
+                graphics_fill_rect(0, 0, screen_width(), screen_height(), color);
+            }
+        }
+        return;
+    }
+
+    // SNOW
     if (weather_config.type == WEATHER_SNOW) {
         for (int i = 0; i < weather_config.intensity; ++i) {
             float drift = sinf((flakes[i].y + flakes[i].drift_offset) * 0.02f);
@@ -165,12 +214,15 @@ void weather_draw() {
                 flakes[i].y = 0;
             }
         }
-
-        graphics_fill_rect(0, 0, screen_width(), screen_height(), 0x33DDEEFF);
+        if (alpha > 0) {
+            int color = (alpha << 24) | snow_color;
+            graphics_fill_rect(0, 0, screen_width(), screen_height(), color);
+        }
         
         return;
     }
 
+    // SANDSTORM
     if (weather_config.type == WEATHER_SAND) {
         for (int i = 0; i < weather_config.intensity; ++i) {
             float wave = sinf((sand_particles[i].y + sand_particles[i].offset) * 0.03f);
@@ -188,26 +240,28 @@ void weather_draw() {
                 sand_particles[i].x = 0;
             }
         }
+        if (alpha > 0) {
+            int color = (alpha << 24) | sand_color;
+            graphics_fill_rect(0, 0, screen_width(), screen_height(), color);
+        }
         
-        graphics_fill_rect(0, 0, screen_width(), screen_height(), 0x44E1C699);
-
         return;
     }   
 
-    // Rain
+    // RAIN
     if (weather_config.intensity < 500) {
         update_wind();
     }
-
     if (weather_config.intensity > 800) {
-        int raw_darkness = weather_config.intensity - 800;
-        if (raw_darkness > 200) raw_darkness = 200;
-        int darkness = (raw_darkness * raw_darkness) / 4000;  // max = 10
-        if (darkness > 10) darkness = 10;
-        graphics_shade_rect(0, 0, screen_width(), screen_height(), darkness);
+        if (alpha > 0) {
+            int color = (alpha << 24) | rain_color;
+            graphics_fill_rect(0, 0, screen_width(), screen_height(), color);
+        }
         update_lightning();
     }
-
+    
+        
+    
     int wind_strength = abs(weather_config.dx);
     int base_speed = 3 + wind_strength + (weather_config.intensity / 300);
 
@@ -234,11 +288,16 @@ void set_weather(int active, int intensity, weather_type type) {
     weather_config.active = active;
     weather_config.intensity = intensity;
     weather_config.type = type;
+    if (active) {
+        overlay_target = 1.0f;
+    } else {
+        overlay_target = 0.0f;
+    }
 }
 
 void city_weather_update(int month) {
     if (scenario_property_climate() == CLIMATE_DESERT) {
-        int active = (rand() % 8 == 0);
+        int active = (rand() % 5 == 0);
         set_weather(active, 5000, WEATHER_SAND);
     } else {
         int active = (rand() % 4 == 0);

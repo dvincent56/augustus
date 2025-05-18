@@ -881,10 +881,6 @@ static void update_clouds(void)
     clouds_draw(camera_x, camera_y, GRID_SIZE * 60, GRID_SIZE * 30, draw_context.scale);
 }
 
-static void update_weather(void)
-{
-    weather_draw();
-}
 /***
  * TODO:
  *
