@@ -30,7 +30,7 @@
 #include "graphics/clouds.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
-#include "graphics/rain.h"
+#include "graphics/weather.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
 #include "map/building.h"
@@ -883,9 +883,6 @@ static void update_clouds(void)
 
 static void update_rain(void)
 {
-    if (game_state_is_paused() || (!window_is(WINDOW_CITY) && !window_is(WINDOW_CITY_MILITARY))) {
-        rain_stop();
-    }
     rain_draw();
 }
 /***
