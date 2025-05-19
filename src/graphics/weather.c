@@ -301,11 +301,16 @@ void city_weather_update(int month) {
         set_weather(active, 5000, WEATHER_SAND);
     } else {
         int active = (rand() % 4 == 0);
-        int intensity = active ? rand() % 1001 : 0;
+        int intensity;
         weather_type type = WEATHER_RAIN;
 
         if (month == 10 || month == 11 || month == 0 || month == 1 || month == 2) {
             type = (rand() % 2 == 0) ? WEATHER_RAIN : WEATHER_SNOW;
+        }
+        if (WEATHER_RAIN == type) {
+            intensity = (rand() % 1000);
+        } else {
+            intensity = (rand() % 5000);
         }
         
         set_weather(active, intensity, type);
