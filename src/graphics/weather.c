@@ -50,6 +50,10 @@ static struct {
     int lightning_cooldown;
     float wind_angle;
     float wind_speed;
+    float overlay_alpha;
+    float overlay_target;
+    int overlay_color;
+    int overlay_fadeout;
 
     struct {
         int active;
@@ -64,6 +68,9 @@ static struct {
     .lightning_cooldown = 0,
     .wind_angle = 0.0f,
     .wind_speed = 0.05f,
+    .overlay_alpha = 0.0f,
+    .overlay_target = 1.0f,
+    .overlay_fadeout = 0,
     .weather_config = {
         .active = 0,
         .intensity = 200,
@@ -113,13 +120,16 @@ void weather_stop(void) {
     data.weather_initialized = 0;
 }
 
-static uint32_t apply_alpha(uint32_t color, uint8_t alpha) {
+static uint32_t apply_alpha(uint32_t color, uint8_t alpha) 
+{
     return (color & 0x00FFFFFF) | (alpha << 24);
 }
 
-static int chance_percent(int percent) {
+static int chance_percent(int percent) 
+{
     return (random_between_from_stdlib(0, 99) < percent) ? 1 : 0;
 }
+
 static void update_lightning(void) 
 {
     if (data.lightning_cooldown <= 0 && (random_from_stdlib() % 500) == 0) {
@@ -149,25 +159,56 @@ static void update_wind(void)
     data.weather_config.dx = (int)(2 * sinf(data.wind_angle)); // between -2 & 2
 }
 
+static void update_overlay_alpha(void) 
+{
+    float speed = 0.01f;
+
+    if (data.overlay_alpha < data.overlay_target) { // fadein
+        data.overlay_alpha += speed;
+        if (data.overlay_alpha > data.overlay_target) {
+            data.overlay_alpha = data.overlay_target;
+        }            
+    } else if (data.overlay_alpha > data.overlay_target) { // fadeout
+        data.overlay_alpha -= speed;
+        if (data.overlay_alpha < data.overlay_target) {
+            data.overlay_alpha = data.overlay_target;
+            data.overlay_fadeout = 0;
+        }
+    }
+}
+
 static void render_weather_overlay(void) 
 {
+    update_overlay_alpha();
+
+    if (data.overlay_fadeout == 0 && data.weather_config.active == 0) {
+        return;
+    }
+
     float alpha_factor  = 0.4f;
     if (data.weather_config.type == WEATHER_SNOW ||
         (data.weather_config.type == WEATHER_RAIN && data.weather_config.intensity < 900)) {
         alpha_factor = 0.2f;
     }
 
-    const uint8_t alpha = (uint8_t)(alpha_factor * 255);
+    // no overlay for light rain
+    if (data.weather_config.type == WEATHER_RAIN && data.weather_config.intensity < 800) {
+        alpha_factor = 0.0f;
+    }
+
+    uint8_t alpha = (uint8_t)(fminf(alpha_factor * data.overlay_alpha, 1.0f) * 255);
     
-    int baseColor = COLOR_RAIN;
-    if (data.weather_config.type == WEATHER_SNOW) {
-        baseColor = COLOR_SNOW;
+    // update overlay color based on weather type
+    if (data.weather_config.type == WEATHER_RAIN) {
+        data.overlay_color = COLOR_RAIN;
+    } else if (data.weather_config.type == WEATHER_SNOW) {
+        data.overlay_color = COLOR_SNOW;
     } else if (data.weather_config.type == WEATHER_SAND) {
-        baseColor = COLOR_SAND;
+        data.overlay_color = COLOR_SAND;
     }
 
     graphics_fill_rect(0, 0, screen_width(), screen_height(),
-        apply_alpha(baseColor, alpha));
+        apply_alpha(data.overlay_color, alpha));
 }
 
 static void draw_snow(void)
@@ -185,7 +226,6 @@ static void draw_snow(void)
             flakes[i].y = 0;
         }
     }
-    render_weather_overlay();
 }
 
 static void draw_sandstorm(void) 
@@ -206,7 +246,6 @@ static void draw_sandstorm(void)
             sand_particles[i].x = 0;
         }
     }
-    render_weather_overlay();
 }
 
 static void draw_rain(void) 
@@ -239,13 +278,15 @@ static void draw_rain(void)
     }
 
     if (data.weather_config.intensity > 800) {
-        render_weather_overlay();
         update_lightning();
     }    
 }
 
-void update_weather() {
-    if (!config_get(CONFIG_UI_DRAW_WEATHER) || data.weather_config.type == WEATHER_NONE) {
+void update_weather() 
+{
+    render_weather_overlay();
+
+    if (!config_get(CONFIG_UI_DRAW_WEATHER) || data.weather_config.type == WEATHER_NONE || data.weather_config.active == 0) {
         weather_stop();
         return;
     }
@@ -270,10 +311,6 @@ void update_weather() {
         }
         data.weather_initialized = 1;
     }
-
-    if (data.weather_config.active == 0) {
-        return;
-    }
     
     // SNOW
     if (data.weather_config.type == WEATHER_SNOW) {
@@ -294,14 +331,26 @@ void update_weather() {
     
 }
 
-void set_weather(int active, int intensity, weather_type type) {
+void set_weather(int active, int intensity, weather_type type) 
+{
     weather_stop();
+    if (data.weather_config.active && active == 0) {
+        data.overlay_fadeout = 1;
+    }
+
     data.weather_config.active = active;
     data.weather_config.intensity = intensity;
     data.weather_config.type = type;
+
+    if (active == 0) {
+        data.overlay_target = 0.0f;
+    } else {
+         data.overlay_target = 1.0f;
+    }
 }
 
-void city_weather_update(int month) {
+void city_weather_update(int month) 
+{
     int active = chance_percent(20);
     int intensity;
     weather_type type = WEATHER_RAIN;
@@ -328,4 +377,3 @@ void city_weather_update(int month) {
     
     set_weather(active, intensity, type);
 }
-
