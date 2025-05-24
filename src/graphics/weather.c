@@ -2,6 +2,7 @@
 
 #include "core/config.h"
 #include "core/dir.h"
+#include "core/file.h"
 #include "core/random.h"
 #include "graphics/color.h"
 #include "graphics/graphics.h"
@@ -15,34 +16,28 @@
 #include <math.h>
 
 #define DRIFT_DIRECTION_RIGHT 1
-#define DRIFT_DIRECTION_LEFT -1 
+#define DRIFT_DIRECTION_LEFT -1
 
-typedef struct {
-    int x;
-    int y;
-    int length;
-    int speed;
-    float wind_variation; 
-} drop;
+#define MAX_WEATHER_SEGMENTS 10000
 
-typedef struct {
-    int x;
-    int y;
-    float speed;
-    float drift_offset;
-    int drift_direction;
-} snowflake;
+static line_segment line_buffer[MAX_WEATHER_SEGMENTS];
 
 typedef struct {
     float x;
     float y;
-    float speed;
-    float offset;
-} sand_particle;
 
-drop *drops = 0;
-snowflake *flakes = 0;
-sand_particle *sand_particles = 0;
+    // For rain
+    int length;
+    int speed;
+    float wind_variation;
+
+    // For snow
+    float drift_offset;
+    int drift_direction;
+
+    // For sand
+    float offset;
+} weather_element;
 
 static struct {
     int weather_initialized;
@@ -54,6 +49,8 @@ static struct {
     float overlay_target;
     int overlay_color;
     int overlay_fadeout;
+
+    weather_element* elements;
 
     struct {
         int active;
@@ -71,6 +68,7 @@ static struct {
     .overlay_alpha = 0.0f,
     .overlay_target = 1.0f,
     .overlay_fadeout = 0,
+    .elements = 0,
     .weather_config = {
         .active = 0,
         .intensity = 200,
@@ -80,43 +78,38 @@ static struct {
     }
 };
 
-void init_drop(drop *drop) {
-    drop->x = random_from_stdlib() % screen_width();
-    drop->y = random_from_stdlib() % screen_height();
-    drop->length = 10 + random_from_stdlib() % 10;
-    drop->speed = 4 + random_from_stdlib() % 5;
-    drop->wind_variation = ((random_from_stdlib() % 100) / 100.0f - 0.5f) * 1.5f;
+void init_weather_element(weather_element* e, int type) 
+{
+    e->x = random_from_stdlib() % screen_width();
+    e->y = random_from_stdlib() % screen_height();
+
+    switch (type) {
+        case WEATHER_RAIN:
+            e->length = 10 + random_from_stdlib() % 10;
+            e->speed = 4 + random_from_stdlib() % 5;
+            e->wind_variation = ((random_from_stdlib() % 100) / 100.0f - 0.5f) * 1.5f;
+            break;
+        case WEATHER_SNOW:
+            e->drift_offset = (float)(random_from_stdlib() % 100);
+            e->speed = 1 + random_from_stdlib() % 2;
+            e->drift_direction = (random_from_stdlib() % 2 == 0) ? DRIFT_DIRECTION_RIGHT : DRIFT_DIRECTION_LEFT;
+            break;
+        case WEATHER_SAND:
+            e->speed = 1.5f + (random_from_stdlib() % 100) / 50.0f;
+            e->offset = random_between_from_stdlib(0, 1000);
+            break;
+    }
 }
 
-void init_snowflake(snowflake *flake) {
-    flake->x = random_from_stdlib() % screen_width();
-    flake->y = random_from_stdlib() % screen_height();
-    flake->drift_offset = (float)(random_from_stdlib() % 100);
-    flake->speed = 1 + random_from_stdlib() % 2;
-    flake->drift_direction = (random_from_stdlib() % 2 == 0) ? DRIFT_DIRECTION_RIGHT : DRIFT_DIRECTION_LEFT;
-}
-
-void init_sand_particle(sand_particle *sand) {
-    sand->x = random_from_stdlib() % screen_width();
-    sand->y = random_from_stdlib() % screen_height();
-    sand->speed = 1.5f + (random_from_stdlib() % 100) / 50.0f;
-    sand->offset = random_between_from_stdlib(0, 1000);
-}
-
-void weather_stop(void) {
+void weather_stop(void)
+{
     data.weather_config.active = 0;
-    if (drops) {
-        free(drops);
-        drops = NULL;
+
+    if (data.elements) {
+        free(data.elements);
+        data.elements = 0;
     }
-    if (flakes) {
-        free(flakes);
-        flakes = NULL;
-    }
-    if (sand_particles) {
-        free(sand_particles);
-        sand_particles = NULL;
-    }
+
     data.weather_initialized = 0;
 }
 
@@ -140,13 +133,13 @@ static void update_lightning(void)
     }
     
     if (data.lightning_timer > 0) {
-        uint32_t white_flash = apply_alpha(COLOR_WHITE, 128);
+        color_t white_flash = apply_alpha(COLOR_WHITE, 128);
         graphics_fill_rect(0, 0, screen_width(), screen_height(), white_flash);
         data.lightning_timer--;
     }
 
     if (data.lightning_timer == 5) {        
-        char thunder_path[128];
+        char thunder_path[FILE_NAME_MAX];
         int thunder_num = random_between_from_stdlib(1, 2);
         snprintf(thunder_path, sizeof(thunder_path), ASSETS_DIRECTORY "/Sounds/Thunder%d.mp3", thunder_num);
         sound_speech_play_file(thunder_path);
@@ -213,39 +206,58 @@ static void render_weather_overlay(void)
 
 static void draw_snow(void)
 {
-    for (int i = 0; i < data.weather_config.intensity; ++i) {
-        float drift = sinf((flakes[i].y + flakes[i].drift_offset) * 0.02f);
-        flakes[i].x += drift * 0.5f * flakes[i].drift_direction;
-        flakes[i].y += (int)(flakes[i].speed);
+    int count = 0;
 
-        graphics_draw_line(flakes[i].x, flakes[i].x + 1, flakes[i].y, flakes[i].y, COLOR_SNOWFLAKE);
-        graphics_draw_line(flakes[i].x, flakes[i].x, flakes[i].y, flakes[i].y + 1, COLOR_SNOWFLAKE);
+    for (int i = 0; i < data.weather_config.intensity; ++i) {
+        float drift = sinf((data.elements[i].y + data.elements[i].drift_offset) * 0.02f);
+        data.elements[i].x += drift * 0.5f * data.elements[i].drift_direction;
+        data.elements[i].y += (int)(data.elements[i].speed);
+
+        line_buffer[count++] = (line_segment){
+            .x1 = data.elements[i].x,
+            .y1 = data.elements[i].y,
+            .x2 = data.elements[i].x + 1,
+            .y2 = data.elements[i].y
+        };
+
+        line_buffer[count++] = (line_segment){
+            .x1 = data.elements[i].x,
+            .y1 = data.elements[i].y,
+            .x2 = data.elements[i].x,
+            .y2 = data.elements[i].y + 1
+        };
         
-        if (flakes[i].y >= screen_height() || flakes[i].x <= 0 || flakes[i].x >= screen_width()) {
-            init_snowflake(&flakes[i]);
-            flakes[i].y = 0;
+        if (data.elements[i].y >= screen_height() || data.elements[i].x <= 0 || data.elements[i].x >= screen_width()) {
+            init_weather_element(&data.elements[i], data.weather_config.type);
+            data.elements[i].y = 0;
         }
     }
+
+    graphics_draw_lines(line_buffer, count, COLOR_SNOWFLAKE);
 }
 
 static void draw_sandstorm(void) 
 {
+
+    int count = 0;
+
     for (int i = 0; i < data.weather_config.intensity; ++i) {
-        float wave = sinf((sand_particles[i].y + sand_particles[i].offset) * 0.03f);
-        sand_particles[i].x += sand_particles[i].speed + wave;
+        float wave = sinf((data.elements[i].y + data.elements[i].offset) * 0.03f);
+        data.elements[i].x += data.elements[i].speed + wave;
 
-        graphics_draw_line(
-            (int)sand_particles[i].x,
-            (int)sand_particles[i].x + 1,
-            (int)sand_particles[i].y,
-            (int)sand_particles[i].y + 1,
-            COLOR_SAND_PARTICLE);
+        line_buffer[count++] = (line_segment){
+            .x1 = (int)data.elements[i].x,
+            .y1 = (int)data.elements[i].y,
+            .x2 = (int)data.elements[i].x + 1,
+            .y2 = (int)data.elements[i].y + 1
+        };
 
-        if (sand_particles[i].x > screen_width()) {
-            init_sand_particle(&sand_particles[i]);
-            sand_particles[i].x = 0;
+        if (data.elements[i].x > screen_width()) {
+            init_weather_element(&data.elements[i], data.weather_config.type);
+            data.elements[i].x = 0;
         }
     }
+    graphics_draw_lines(line_buffer, count, COLOR_SAND_PARTICLE);
 }
 
 static void draw_rain(void) 
@@ -257,25 +269,29 @@ static void draw_rain(void)
     int wind_strength = abs(data.weather_config.dx);
     int base_speed = 3 + wind_strength + (data.weather_config.intensity / 300);
 
+    int count = 0;
+
     for (int i = 0; i < data.weather_config.intensity; ++i) {
-        float dx = data.weather_config.dx + drops[i].wind_variation;
-        graphics_draw_line(
-            (int)(drops[i].x), 
-            (int)(drops[i].x + dx * 2),
-            (int)(drops[i].y),
-            (int)(drops[i].y + drops[i].length),
-            COLOR_DROPS);
+        float dx = data.weather_config.dx + data.elements[i].wind_variation;
 
-        drops[i].x += dx;
+        line_buffer[count].x1 = (int)(data.elements[i].x);
+        line_buffer[count].y1 = (int)(data.elements[i].y);
+        line_buffer[count].x2 = (int)(data.elements[i].x + dx * 2);
+        line_buffer[count].y2 = (int)(data.elements[i].y + data.elements[i].length);
+        count++;
 
-        float dy = base_speed + drops[i].speed + (sinf((drops[i].x + drops[i].y) * 0.05f) * 0.5f);
-        drops[i].y += dy;
+        data.elements[i].x += dx;
 
-        if (drops[i].y >= screen_height() || drops[i].x <= 0 || drops[i].x >= screen_width()) {
-            init_drop(&drops[i]);
-            drops[i].y = 0;
+        float dy = base_speed + data.elements[i].speed + (sinf((data.elements[i].x + data.elements[i].y) * 0.05f) * 0.5f);
+        data.elements[i].y += dy;
+
+        if (data.elements[i].y >= screen_height() || data.elements[i].x <= 0 || data.elements[i].x >= screen_width()) {
+            init_weather_element(&data.elements[i], data.weather_config.type);
+            data.elements[i].y = 0;
         }
     }
+
+    graphics_draw_lines(line_buffer, count, COLOR_DROPS);
 
     if (data.weather_config.intensity > 800) {
         update_lightning();
@@ -293,21 +309,9 @@ void update_weather()
 
     // init
     if (!data.weather_initialized && data.weather_config.active == 1) {
-        if (data.weather_config.type == WEATHER_RAIN) {
-            drops = malloc(sizeof(drop) * data.weather_config.intensity);
-            for (int i = 0; i < data.weather_config.intensity; ++i) {
-                init_drop(&drops[i]);
-            }
-        } else if (data.weather_config.type == WEATHER_SNOW) {
-            flakes = malloc(sizeof(snowflake) * data.weather_config.intensity);
-            for (int i = 0; i < data.weather_config.intensity; ++i) {
-                init_snowflake(&flakes[i]);                
-            }
-        } else if (data.weather_config.type == WEATHER_SAND) {
-            sand_particles = malloc(sizeof(sand_particle) * data.weather_config.intensity);
-            for (int i = 0; i < data.weather_config.intensity; ++i) {
-                init_sand_particle(&sand_particles[i]);     
-            }   
+        data.elements = malloc(sizeof(weather_element) * data.weather_config.intensity);
+        for (int i = 0; i < data.weather_config.intensity; ++i) {
+            init_weather_element(&data.elements[i], data.weather_config.type);
         }
         data.weather_initialized = 1;
     }
@@ -331,7 +335,7 @@ void update_weather()
     
 }
 
-void set_weather(int active, int intensity, weather_type type) 
+static void set_weather(int active, int intensity, weather_type type) 
 {
     weather_stop();
     if (data.weather_config.active && active == 0) {
