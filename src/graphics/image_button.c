@@ -45,9 +45,9 @@ void image_buttons_draw(int x, int y, image_button *buttons, unsigned int num_bu
         int image_id = 0;
 
         int is_health = (btn->parameter1 == BUILD_MENU_HEALTH);
-        int draw_caduceus = config_get(CONFIG_UI_DRAW_CADUCEUS);
+        int draw_asclepius = config_get(CONFIG_UI_DRAW_ASCLEPIUS);
 
-        if (btn->image_collection && (!is_health || (is_health && !draw_caduceus))) {
+        if (btn->image_collection && (!is_health || (is_health && !draw_asclepius))) {
             image_id = image_group(btn->image_collection) + btn->image_offset;
         } else if (btn->assetlist_name) {
             image_id = assets_get_image_id(btn->assetlist_name, btn->image_name);

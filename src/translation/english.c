@@ -1600,7 +1600,7 @@ static translation_string all_strings[] = {
     {TR_BUILDING_LATRINES_MISSING_EVOLVE, "This house cannot evolve, as it does not have access to a latrine or a clean water supply from a fountain."},
     {TR_BUILDING_LATRINES_MISSING_DEVOLVE, "This house will devolve soon, as it does not have access to a latrine or a clean water from a fountain."},
     {TR_BUILDING_LATRINES_NO_WORKERS, "Without employees to maintain the latrines, citizens avoid coming to relax there."},
-    {TR_CONFIG_DRAW_CADUCEUS, "Draw caduceus for health menu"},
+    {TR_CONFIG_DRAW_ASCLEPIUS, "Draw Rod of Asclepius for health menu"},
 };
 
 void translation_english(const translation_string **strings, int *num_strings)
