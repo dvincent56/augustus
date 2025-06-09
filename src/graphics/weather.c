@@ -18,10 +18,6 @@
 #define DRIFT_DIRECTION_RIGHT 1
 #define DRIFT_DIRECTION_LEFT -1
 
-#define MAX_WEATHER_SEGMENTS 10000
-
-static line_segment line_buffer[MAX_WEATHER_SEGMENTS];
-
 typedef struct {
     float x;
     float y;
@@ -206,58 +202,50 @@ static void render_weather_overlay(void)
 
 static void draw_snow(void)
 {
-    int count = 0;
-
     for (int i = 0; i < data.weather_config.intensity; ++i) {
         float drift = sinf((data.elements[i].y + data.elements[i].drift_offset) * 0.02f);
         data.elements[i].x += drift * 0.5f * data.elements[i].drift_direction;
         data.elements[i].y += (int)(data.elements[i].speed);
 
-        line_buffer[count++] = (line_segment){
-            .x1 = data.elements[i].x,
-            .y1 = data.elements[i].y,
-            .x2 = data.elements[i].x + 1,
-            .y2 = data.elements[i].y
-        };
+        graphics_draw_line(
+            (int)data.elements[i].x,
+            (int)data.elements[i].x + 1,
+            (int)data.elements[i].y,
+            (int)data.elements[i].y,
+            COLOR_SNOWFLAKE);
 
-        line_buffer[count++] = (line_segment){
-            .x1 = data.elements[i].x,
-            .y1 = data.elements[i].y,
-            .x2 = data.elements[i].x,
-            .y2 = data.elements[i].y + 1
-        };
+        graphics_draw_line(
+            (int)data.elements[i].x,
+            (int)data.elements[i].x,
+            (int)data.elements[i].y,
+            (int)data.elements[i].y + 1,
+            COLOR_SNOWFLAKE);
         
         if (data.elements[i].y >= screen_height() || data.elements[i].x <= 0 || data.elements[i].x >= screen_width()) {
             init_weather_element(&data.elements[i], data.weather_config.type);
             data.elements[i].y = 0;
         }
     }
-
-    graphics_draw_lines(line_buffer, count, COLOR_SNOWFLAKE);
 }
 
 static void draw_sandstorm(void) 
 {
-
-    int count = 0;
-
     for (int i = 0; i < data.weather_config.intensity; ++i) {
         float wave = sinf((data.elements[i].y + data.elements[i].offset) * 0.03f);
         data.elements[i].x += data.elements[i].speed + wave;
 
-        line_buffer[count++] = (line_segment){
-            .x1 = (int)data.elements[i].x,
-            .y1 = (int)data.elements[i].y,
-            .x2 = (int)data.elements[i].x + 1,
-            .y2 = (int)data.elements[i].y + 1
-        };
+        graphics_draw_line(
+            (int)data.elements[i].x,
+            (int)data.elements[i].x + 1,
+            (int)data.elements[i].y,
+            (int)data.elements[i].y + 1,
+            COLOR_SAND_PARTICLE);
 
         if (data.elements[i].x > screen_width()) {
             init_weather_element(&data.elements[i], data.weather_config.type);
             data.elements[i].x = 0;
         }
     }
-    graphics_draw_lines(line_buffer, count, COLOR_SAND_PARTICLE);
 }
 
 static void draw_rain(void) 
@@ -269,16 +257,15 @@ static void draw_rain(void)
     int wind_strength = abs(data.weather_config.dx);
     int base_speed = 3 + wind_strength + (data.weather_config.intensity / 300);
 
-    int count = 0;
-
     for (int i = 0; i < data.weather_config.intensity; ++i) {
         float dx = data.weather_config.dx + data.elements[i].wind_variation;
 
-        line_buffer[count].x1 = (int)(data.elements[i].x);
-        line_buffer[count].y1 = (int)(data.elements[i].y);
-        line_buffer[count].x2 = (int)(data.elements[i].x + dx * 2);
-        line_buffer[count].y2 = (int)(data.elements[i].y + data.elements[i].length);
-        count++;
+        graphics_draw_line(
+            (int)(data.elements[i].x), 
+            (int)(data.elements[i].x + dx * 2),
+            (int)(data.elements[i].y),
+            (int)(data.elements[i].y + data.elements[i].length),
+            COLOR_DROPS);
 
         data.elements[i].x += dx;
 
@@ -290,8 +277,6 @@ static void draw_rain(void)
             data.elements[i].y = 0;
         }
     }
-
-    graphics_draw_lines(line_buffer, count, COLOR_DROPS);
 
     if (data.weather_config.intensity > 800) {
         update_lightning();
