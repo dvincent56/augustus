@@ -478,7 +478,7 @@ static void draw_depot_resource(building *b, int x, int y, color_t color_mask)
     int img_id;
 
     if (b->num_workers > 0) {
-        switch(b->data.depot.current_order.resource_type) {
+        switch (b->data.depot.current_order.resource_type) {
             case RESOURCE_VEGETABLES:
                 img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Vegetables");
                 break;
@@ -540,7 +540,7 @@ static void draw_depot_resource(building *b, int x, int y, color_t color_mask)
             default:
                 img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Wheat");
                 break;
-        }        
+        }
     } else {
         img_id = assets_get_image_id("Admin_Logistics", "Cart_Depot_Cat");
     }
