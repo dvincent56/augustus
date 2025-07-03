@@ -3,6 +3,7 @@
 #include "assets/assets.h"
 #include "building/connectable.h"
 #include "building/construction.h"
+#include "building/construction_building.h"
 #include "building/count.h"
 #include "building/image.h"
 #include "building/industry.h"
@@ -65,6 +66,12 @@ enum farm_ghost_object {
     FARM_GHOST_NO_DRAW,
     FARM_GHOST_FARMHOUSE,
     FARM_GHOST_CROP
+};
+
+static enum {
+    TILE_FORBIDDEN = 1,
+    TILE_ALLOWED = 0,
+    TILE_DISCOURAGED = -1
 };
 
 static const int FORT_GROUND_GRID_OFFSETS[4][4] = {
@@ -164,7 +171,8 @@ static int is_blocked_for_building(int grid_offset, int building_size, int *bloc
 static int has_blocked_tiles(int num_tiles, int *blocked_tiles)
 {
     for (int i = 0; i < num_tiles; i++) {
-        if (blocked_tiles[i]) {
+        if (blocked_tiles[i] == TILE_FORBIDDEN) {
+            //TILE_DISCOURAGED shouldnt trigger this condition - these are discouraged, not blocked tiles.
             return 1;
         }
     }
@@ -176,7 +184,8 @@ static void draw_building_tiles(int x, int y, int num_tiles, int *blocked_tiles)
     for (int i = 0; i < num_tiles; i++) {
         int x_offset = x + view_offset_x(i);
         int y_offset = y + view_offset_y(i);
-        if (blocked_tiles[i]) {
+        if (blocked_tiles[i] == TILE_FORBIDDEN || blocked_tiles[i] == TILE_DISCOURAGED) {
+            //FORBIDDEN means real problem, DISCOURAGED means suggested problem, like a road that will disappear.
             image_blend_footprint_color(x_offset, y_offset, COLOR_MASK_RED, data.scale);
         } else {
             image_draw_isometric_footprint(image_group(GROUP_TERRAIN_FLAT_TILE),
@@ -193,12 +202,12 @@ static void draw_building(int image_id, int x, int y, color_t color)
 
 static void city_building_ghost_draw_malus_range(int x, int y, int grid_offset)
 {
-    image_draw(image_group(GROUP_TERRAIN_FLAT_TILE), x, y, COLOR_MASK_RED & ALPHA_FONT_SEMI_TRANSPARENT, data.scale);
+    image_draw(image_group(GROUP_TERRAIN_FLAT_TILE), x, y, COLOR_MASK_NEGATIVE_RANGE, data.scale);
 }
 
 static void city_building_ghost_draw_bonus_range(int x, int y, int grid_offset)
 {
-    image_draw(image_group(GROUP_TERRAIN_FLAT_TILE), x, y, COLOR_MASK_DARK_GREEN & ALPHA_FONT_SEMI_TRANSPARENT, data.scale);
+    image_draw(image_group(GROUP_TERRAIN_FLAT_TILE), x, y, COLOR_MASK_POSITIVE_RANGE, data.scale);
 }
 
 void city_building_ghost_draw_well_range(int x, int y, int grid_offset)
@@ -419,7 +428,7 @@ static void set_roamer_path(building_type type, int size, const map_tile *tile, 
     int grid_x = tile->x;
     int grid_y = tile->y;
     building_construction_offset_start_from_orientation(&grid_x, &grid_y, size);
-    
+
     if (!is_blocked) {
         figure_roamer_preview_create(type, grid_x, grid_y);
     } else {
@@ -434,23 +443,29 @@ static void set_roamer_path(building_type type, int size, const map_tile *tile, 
     }
 }
 
-static void draw_mausoleum_desirability_range(const map_tile *tile, building_type type, int building_size)
+static void draw_desirability_range(const map_tile *tile, building_type type, int building_size)
 {
     const model_building *model = model_get_building(type);
-    int positive_range = model->desirability_range;
-
     int desirability_value = model->desirability_value;
     int desirability_step_size = model->desirability_step_size;
+    int desirability_range = model->desirability_range;
     int negative_range = 0;
-
-    while (desirability_value < 0) {
+    if (desirability_value == 0 || desirability_range == 0) {
+        return;         // If there is no desirability - do not draw
+    }
+    // Calculating the Radius of Negative Desirability
+    while (desirability_value < 0 && negative_range < desirability_range) {
         desirability_value += desirability_step_size;
         negative_range++;
     }
-
-    city_view_foreach_tile_in_range(tile->grid_offset, building_size, positive_range, city_building_ghost_draw_bonus_range);
-
-    if (type != BUILDING_NYMPHAEUM) {
+    //Positive radius - the remainder of the max_range
+    int positive_range = desirability_range - negative_range;
+    //First draw the outer positive zone(if any)
+    if (positive_range > 0) {
+        city_view_foreach_tile_in_range(tile->grid_offset, building_size, desirability_range, city_building_ghost_draw_bonus_range);
+    }
+    //Then draw the inner negative zone
+    if (negative_range > 0) {
         city_view_foreach_tile_in_range(tile->grid_offset, building_size, negative_range, city_building_ghost_draw_malus_range);
     }
 }
@@ -458,7 +473,7 @@ static void draw_mausoleum_desirability_range(const map_tile *tile, building_typ
 static void draw_default(const map_tile *tile, int x_view, int y_view, building_type type)
 {
     const building_properties *props = building_properties_for_type(type);
-    int building_size = type == BUILDING_WAREHOUSE ? 3 : props->size;
+    int building_size = type == BUILDING_WAREHOUSE ? 3 : props->size; //BUILDING_WAREHOUSE is size 1, since it's only the corner tile. It's manually adjusted for sizing purposes that should affect entire 3x3 building.
     int image_id = 0;
 
     // check if we can place building
@@ -473,34 +488,53 @@ static void draw_default(const map_tile *tile, int x_view, int y_view, building_
         type = building_connectable_gate_type(type);
     }
 
-    if (config_get(CONFIG_UI_SHOW_DESIRABILITY_RANGE) && (type == BUILDING_NYMPHAEUM || type == BUILDING_SMALL_MAUSOLEUM || type == BUILDING_LARGE_MAUSOLEUM)) {
-        draw_mausoleum_desirability_range(tile, type, building_size);
-    }
-
     int check_figure = ((type != BUILDING_PLAZA && type != BUILDING_ROADBLOCK) || props->size != 1) ? 1 : 0;
 
     for (int i = 0; i < num_tiles; i++) {
         int tile_offset = grid_offset + tile_grid_offset(orientation_index, i);
         int forbidden_terrain = map_terrain_get(tile_offset) & TERRAIN_NOT_CLEAR;
+        int discouraged_terrain = map_terrain_get(tile_offset) & TERRAIN_NOT_CLEAR;
+        // forbidden terrain cannot be built on
+        // discouraged terrain can be built on, but is still highlighted red, to suggest e.g. that it will become unusable/be overwritten
         if (!fully_blocked) {
             if (type == BUILDING_PLAZA || building_type_is_roadblock(type)) {
                 forbidden_terrain &= ~TERRAIN_ROAD;
+                discouraged_terrain &= ~TERRAIN_ROAD;
             }
             if (type == BUILDING_GATEHOUSE) {
-                forbidden_terrain &= ~TERRAIN_HIGHWAY;
+                forbidden_terrain &= ~(TERRAIN_HIGHWAY | TERRAIN_WALL | TERRAIN_ROAD);
+                discouraged_terrain &= ~(TERRAIN_HIGHWAY | TERRAIN_WALL | TERRAIN_ROAD);
             }
             if (type == BUILDING_TOWER) {
                 forbidden_terrain &= ~TERRAIN_WALL;
             }
+            if (config_get(CONFIG_GP_CH_WAREHOUSES_GRANARIES_OVER_ROAD_PLACEMENT)) {
+                if (type == BUILDING_WAREHOUSE) {
+                    forbidden_terrain &= ~TERRAIN_ROAD; //every tile is allowed over roads
+                    if (building_construction_is_warehouse_corner(i)) {
+                        discouraged_terrain &= ~TERRAIN_ROAD; //corner tile isnt even discouraged over roads
+                    }
+                } else if (type == BUILDING_GRANARY) { // Allow roads under granary's cross shape
+                    forbidden_terrain &= ~TERRAIN_ROAD;
+                    if (building_construction_is_granary_cross_tile(i)) {
+                        discouraged_terrain &= ~TERRAIN_ROAD;
+                    }
+                }
+            }
         }
 
         if (fully_blocked || forbidden_terrain) {
-            blocked_tiles[i] = 1;
+            blocked_tiles[i] = TILE_FORBIDDEN;
         } else if (check_figure && map_has_figure_at(tile_offset)) {
-            blocked_tiles[i] = 1;
+            blocked_tiles[i] = TILE_FORBIDDEN;
             figure_animal_try_nudge_at(grid_offset, tile_offset, building_size);
         } else {
-            blocked_tiles[i] = 0;
+            if (discouraged_terrain) { //allow some leeway
+                blocked_tiles[i] = TILE_DISCOURAGED;
+            } else {
+                blocked_tiles[i] = TILE_ALLOWED;
+            }
+
         }
     }
     if (type >= BUILDING_ROADBLOCK || type == BUILDING_LIBRARY || type == BUILDING_SMALL_STATUE || type == BUILDING_MEDIUM_STATUE) {
@@ -532,8 +566,7 @@ static void draw_single_reservoir(int grid_offset, int x, int y, color_t color, 
             image_blend_footprint_color(x + view_offset_x(i), y + view_offset_y(i), COLOR_MASK_RED, data.scale);
         }
     }
-    if (grid_offset)
-    {
+    if (grid_offset) {
         int num_tiles = 9;
         int orientation_index = city_view_orientation() / 2;
 
@@ -544,7 +577,7 @@ static void draw_single_reservoir(int grid_offset, int x, int y, color_t color, 
 
             if (map_has_figure_at(tile_offset)) {
                 figure_animal_try_nudge_at(grid_offset, tile_offset, 3);
-            } 
+            }
         }
     }
 }
@@ -748,7 +781,7 @@ static void draw_fountain(const map_tile *tile, int x, int y)
             image_draw(image_id + 1, x + img->animation->sprite_offset_x, y + img->animation->sprite_offset_y,
                 color_mask, data.scale);
         }
-        }
+    }
     draw_building_tiles(x, y, 1, &blocked);
 }
 
@@ -1246,7 +1279,7 @@ static void draw_grand_temple_neptune(const map_tile *tile, int x, int y)
     int radius = map_water_supply_reservoir_radius();
     // need to add 2 for the bonus the Neptune GT will add
     if (!building_monument_working(BUILDING_GRAND_TEMPLE_NEPTUNE)) {
-         radius += 2;
+        radius += 2;
     }
     city_view_foreach_tile_in_range(tile->grid_offset, props->size, radius, draw_grand_temple_neptune_range);
     int image_id = get_new_building_image_id(tile->grid_offset, BUILDING_GRAND_TEMPLE_NEPTUNE);
@@ -1433,6 +1466,15 @@ void city_building_ghost_draw(const map_tile *tile)
     data.scale = city_view_get_scale() / 100.0f;
     int x, y;
     city_view_get_selected_tile_pixels(&x, &y);
+
+    const building_properties *props = building_properties_for_type(type);
+    if ((config_get(CONFIG_UI_SHOW_DESIRABILITY_RANGE_ALL) &&
+        type >= BUILDING_ANY && type <= BUILDING_TYPE_MAX) ||
+        (config_get(CONFIG_UI_SHOW_DESIRABILITY_RANGE) &&
+            building_properties_for_type(type)->draw_desirability_range)) {
+        int building_size = (type == BUILDING_WAREHOUSE) ? 3 : props->size;
+        draw_desirability_range(tile, type, building_size);
+    }
 
     if (!config_get(CONFIG_UI_SHOW_GRID) && config_get(CONFIG_UI_SHOW_PARTIAL_GRID_AROUND_CONSTRUCTION)) {
         draw_partial_grid(tile->grid_offset, x, y, type);
