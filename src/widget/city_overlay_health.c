@@ -8,7 +8,8 @@ static int show_building_health(const building *b)
 {
     return b->type == BUILDING_HOSPITAL || b->type == BUILDING_DOCTOR ||
            b->type == BUILDING_BARBER || b->type == BUILDING_BATHHOUSE ||
-           b->type == BUILDING_SMALL_MAUSOLEUM || b->type == BUILDING_LARGE_MAUSOLEUM;
+           b->type == BUILDING_SMALL_MAUSOLEUM || b->type == BUILDING_LARGE_MAUSOLEUM ||
+           b->type == BUILDING_LATRINES;
 }
 
 static int show_building_barber(const building *b)
@@ -35,7 +36,8 @@ static int show_building_sickness(const building *b)
 {
     return b->type == BUILDING_HOSPITAL || b->type == BUILDING_DOCTOR ||
            b->type == BUILDING_BARBER || b->type == BUILDING_BATHHOUSE ||
-           b->type == BUILDING_SMALL_MAUSOLEUM || b->type == BUILDING_LARGE_MAUSOLEUM;
+           b->type == BUILDING_SMALL_MAUSOLEUM || b->type == BUILDING_LARGE_MAUSOLEUM ||
+           b->type == BUILDING_LATRINES;
 }
 
 static int show_figure_health(const figure *f)
@@ -72,7 +74,8 @@ static int show_figure_sickness(const figure *f)
         f->type == FIGURE_BATHHOUSE_WORKER) {
         return 1;
     } else if (f->type == FIGURE_DOCKER || f->type == FIGURE_CART_PUSHER ||
-               f->type == FIGURE_WAREHOUSEMAN || f->type == FIGURE_DEPOT_CART_PUSHER) {
+               f->type == FIGURE_WAREHOUSEMAN || f->type == FIGURE_DEPOT_CART_PUSHER ||
+               f->type == FIGURE_LIGHTHOUSE_SUPPLIER || f->type == FIGURE_NATIVE_TRADER) {
                building *b = building_get(f->building_id);
                building *dest_b = building_get(f->destination_building_id);
                if (b->sickness_level > 0 || dest_b->sickness_level > 0) {

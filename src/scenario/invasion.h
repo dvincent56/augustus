@@ -5,6 +5,13 @@
 #include "figure/formation.h"
 #include "scenario/types.h"
 
+#define INVASION_DEFAULT_START_YEAR 1
+#define INVASION_DEFAULT_AMOUNT_MIN 1
+#define INVASION_DEFAULT_AMOUNT_MAX 1
+#define INVASION_DEFAULT_TYPE 2
+#define INVASION_DEFAULT_FROM 8
+#define INVASION_DEFAULT_ATTACK_TYPE FORMATION_ATTACK_RANDOM
+
 #define MAX_ORIGINAL_INVASIONS 20
 #define INVASIONS_REPEAT_INFINITE -1
 
@@ -71,5 +78,7 @@ void scenario_invasion_save_state(buffer *buf);
 
 void scenario_invasion_load_state(buffer *buf);
 void scenario_invasion_load_state_old_version(buffer *buf, invasion_old_state_sections section);
+
+void repeat_invasion_without_warnings(invasion_t *invasion);
 
 #endif // SCENARIO_INVASION_H

@@ -25,9 +25,12 @@ static array(scenario_request) requests;
 static void new_request(scenario_request *request, unsigned int index)
 {
     request->id = index;
+    request->resource = REQUESTS_DEFAULT_RESOURCE;
+    request->amount.min = REQUESTS_DEFAULT_AMOUNT_MIN;
+    request->amount.max = REQUESTS_DEFAULT_AMOUNT_MAX;
     request->deadline_years = REQUESTS_DEFAULT_DEADLINE_YEARS;
-    request->favor = REQUESTS_DEFAULT_FAVOUR;
     request->extension_months_to_comply = REQUESTS_DEFAULT_MONTHS_TO_COMPLY;
+    request->favor = REQUESTS_DEFAULT_FAVOUR;
     request->extension_disfavor = REQUESTS_DEFAULT_EXTENSION_DISFAVOUR;
     request->ignored_disfavor = REQUESTS_DEFAULT_IGNORED_DISFAVOUR;
 }
@@ -44,12 +47,13 @@ static void make_request_visible_and_send_message(scenario_request *request)
     if (city_resource_count(request->resource) >= request->amount.requested) {
         request->can_comply_dialog_shown = 1;
     }
+    int requested = request->amount.requested;
     if (request->resource == RESOURCE_DENARII) {
-        city_message_post(1, MESSAGE_CAESAR_REQUESTS_MONEY, request->id, 0);
+        city_message_post(1, MESSAGE_CAESAR_REQUESTS_MONEY, request->id, requested);
     } else if (request->resource == RESOURCE_TROOPS) {
-        city_message_post(1, MESSAGE_CAESAR_REQUESTS_ARMY, request->id, 0);
+        city_message_post(1, MESSAGE_CAESAR_REQUESTS_ARMY, request->id, requested);
     } else {
-        city_message_post(1, MESSAGE_CAESAR_REQUESTS_GOODS, request->id, 0);
+        city_message_post(1, MESSAGE_CAESAR_REQUESTS_GOODS, request->id, requested);
     }
 }
 
@@ -106,11 +110,12 @@ static void process_request(scenario_request *request)
     if (state == REQUEST_STATE_DISPATCHED || state == REQUEST_STATE_DISPATCHED_LATE) {
         --request->months_to_comply;
         if (request->months_to_comply <= 0) {
+            int requested_amount = request->amount.requested; // Save until reset
             if (state == REQUEST_STATE_DISPATCHED) {
-                city_message_post(1, MESSAGE_REQUEST_RECEIVED, request->id, 0);
+                city_message_post(1, MESSAGE_REQUEST_RECEIVED, request->id, requested_amount);
                 city_ratings_change_favor(request->favor);
             } else {
-                city_message_post(1, MESSAGE_REQUEST_RECEIVED_LATE, request->id, 0);
+                city_message_post(1, MESSAGE_REQUEST_RECEIVED_LATE, request->id, requested_amount);
                 city_ratings_change_favor(request->favor / 2);
             }
             request->state = REQUEST_STATE_RECEIVED;
@@ -290,7 +295,7 @@ int scenario_request_is_ongoing(int id)
     if (!request->resource) {
         return 0;
     }
-    
+
     if (request->visible
         && (request->state == REQUEST_STATE_NORMAL
             || request->state == REQUEST_STATE_OVERDUE)
@@ -313,7 +318,7 @@ int scenario_request_force_start(int id)
     if (id < 0 || id >= requests.size) {
         return 0;
     }
-    
+
     scenario_request *request = array_item(requests, id);
 
     if (!request->resource) {
@@ -329,7 +334,7 @@ int scenario_request_force_start(int id)
     request->year = game_time_year();
     request->month = game_time_month();
     request->can_comply_dialog_shown = 0;
-    
+
     make_request_visible_and_send_message(request);
 
     return 1;

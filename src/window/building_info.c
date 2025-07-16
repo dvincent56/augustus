@@ -29,6 +29,7 @@
 #include "graphics/window.h"
 #include "input/input.h"
 #include "map/aqueduct.h"
+#include "map/bridge.h"
 #include "map/building.h"
 #include "map/figure.h"
 #include "map/grid.h"
@@ -48,6 +49,22 @@
 #include "window/building/military.h"
 #include "window/building/terrain.h"
 #include "window/building/utility.h"
+
+enum {
+    HEIGHT_0_22_BLOCKS = 0,
+    HEIGHT_1_16_BLOCKS = 1,
+    HEIGHT_2_18_BLOCKS = 2,
+    HEIGHT_3_20_BLOCKS = 3,
+    HEIGHT_4_14_BLOCKS = 4,
+    HEIGHT_5_24_BLOCKS = 5,
+    HEIGHT_6_38_BLOCKS = 6,
+    HEIGHT_7_48_BLOCKS = 7,
+    HEIGHT_8_SCALING   = 8,
+    HEIGHT_10_46_BLOCKS = 10,
+    HEIGHT_11_28_BLOCKS = 11,
+    HEIGHT_12_21_BLOCKS = 12,
+    HEIGHT_13_15_BLOCKS = 13,
+};
 
 #define OFFSET(x,y) (x + GRID_SIZE * y)
 
@@ -83,61 +100,53 @@ static int get_height_id(void)
     if (context.type == BUILDING_INFO_TERRAIN) {
         switch (context.terrain_type) {
             case TERRAIN_INFO_AQUEDUCT:
-                return 4;
+                return HEIGHT_4_14_BLOCKS;
             case TERRAIN_INFO_RUBBLE:
             case TERRAIN_INFO_WALL:
             case TERRAIN_INFO_GARDEN:
-                return 1;
-            case TERRAIN_INFO_HIGHWAY:
-                return 7;
+                return HEIGHT_1_16_BLOCKS;
             default:
-                return 5;
+                return HEIGHT_5_24_BLOCKS;
         }
     } else if (context.type == BUILDING_INFO_LEGION) {
         return 7;
     } else if (context.type == BUILDING_INFO_BUILDING) {
         const building *b = building_get(context.building_id);
         if (building_is_house(b->type) && b->house_population <= 0) {
-            return 5;
+            return HEIGHT_5_24_BLOCKS;
         }
         if (building_is_house(b->type) && b->house_population > 0) {
-            return 7;
+            return HEIGHT_5_24_BLOCKS;
         }
 
         if (b->type >= BUILDING_SMALL_POND && b->type <= BUILDING_SENATOR_STATUE) {
-            return 1;
+            return HEIGHT_1_16_BLOCKS;
         }
 
         switch (b->type) {
+            //256px
             case BUILDING_SMALL_STATUE:
             case BUILDING_MEDIUM_STATUE:
             case BUILDING_LARGE_STATUE:
             case BUILDING_LEGION_STATUE:
             case BUILDING_DECORATIVE_COLUMN:
             case BUILDING_HORSE_STATUE:
-            case BUILDING_GLADIATOR_SCHOOL:
-            case BUILDING_LION_HOUSE:
-            case BUILDING_ACTOR_COLONY:
-            case BUILDING_CHARIOT_MAKER:
             case BUILDING_BURNING_RUIN:
             case BUILDING_RESERVOIR:
             case BUILDING_NATIVE_HUT:
+            case BUILDING_NATIVE_HUT_ALT:
             case BUILDING_NATIVE_MEETING:
             case BUILDING_NATIVE_CROPS:
+            case BUILDING_NATIVE_DECORATION:
+            case BUILDING_NATIVE_MONUMENT:
+            case BUILDING_NATIVE_WATCHTOWER:
             case BUILDING_MISSION_POST:
-            case BUILDING_PREFECTURE:
-            case BUILDING_ENGINEERS_POST:
             case BUILDING_GATEHOUSE:
             case BUILDING_TOWER:
             case BUILDING_MILITARY_ACADEMY:
-            case BUILDING_MARKET:
-            case BUILDING_SHIPYARD:
-            case BUILDING_WHARF:
             case BUILDING_GOVERNORS_HOUSE:
             case BUILDING_GOVERNORS_VILLA:
             case BUILDING_GOVERNORS_PALACE:
-            case BUILDING_FORUM:
-            case BUILDING_FORUM_2_UNUSED:
             case BUILDING_WORKCAMP:
             case BUILDING_ARCHITECT_GUILD:
             case BUILDING_OBELISK:
@@ -151,16 +160,29 @@ static int get_height_id(void)
             case BUILDING_PANELLED_GARDEN_WALL:
             case BUILDING_PALISADE:
             case BUILDING_GLADIATOR_STATUE:
-                return 1;
-
-            case BUILDING_SENATE_1_UNUSED:
-            case BUILDING_SENATE:
+                return HEIGHT_1_16_BLOCKS;
+                //288px
             case BUILDING_FOUNTAIN:
-                return 2;
+            case BUILDING_GLADIATOR_SCHOOL:
+            case BUILDING_LION_HOUSE:
+            case BUILDING_ACTOR_COLONY:
+            case BUILDING_CHARIOT_MAKER:
+                return HEIGHT_2_18_BLOCKS;
 
-            case BUILDING_ARMOURY:
-                return 3;
+                //(new 320px for description)
+            case BUILDING_PREFECTURE:
+            case BUILDING_ENGINEERS_POST:
+            case BUILDING_BARBER:
+            case BUILDING_BATHHOUSE:
+            case BUILDING_DOCTOR:
+            case BUILDING_HOSPITAL:
+            case BUILDING_MARKET:
+            case BUILDING_LATRINES:
+            case BUILDING_WHARF:
+            case BUILDING_SHIPYARD:
+                return HEIGHT_3_20_BLOCKS;
 
+                //224px
             case BUILDING_WELL:
             case BUILDING_ROADBLOCK:
             case BUILDING_HEDGE_GATE_DARK:
@@ -169,34 +191,28 @@ static int get_height_id(void)
             case BUILDING_LOOPED_GARDEN_GATE:
             case BUILDING_ROOFED_GARDEN_WALL_GATE:
             case BUILDING_PANELLED_GARDEN_GATE:
-                return 4;
+                return HEIGHT_4_14_BLOCKS;
 
+                //384px
             case BUILDING_TAVERN:
             case BUILDING_AMPHITHEATER:
             case BUILDING_ARENA:
-            case BUILDING_CONCRETE_MAKER:
             case BUILDING_ORACLE:
             case BUILDING_NYMPHAEUM:
-            case BUILDING_LARGE_TEMPLE_CERES:
-            case BUILDING_LARGE_TEMPLE_NEPTUNE:
-            case BUILDING_LARGE_TEMPLE_MERCURY:
-            case BUILDING_LARGE_TEMPLE_MARS:
-            case BUILDING_LARGE_TEMPLE_VENUS:
             case BUILDING_SMALL_MAUSOLEUM:
             case BUILDING_LARGE_MAUSOLEUM:
             case BUILDING_TRIUMPHAL_ARCH:
-                return 5;
+            case BUILDING_SHIP_BRIDGE:
+            case BUILDING_LOW_BRIDGE:
+                return HEIGHT_5_24_BLOCKS;
 
+                //608px
             case BUILDING_DOCK:
             case BUILDING_LIGHTHOUSE:
             case BUILDING_CARAVANSERAI:
-                return 6;
+                return HEIGHT_6_38_BLOCKS;
 
-            case BUILDING_MESS_HALL:
-            case BUILDING_CITY_MINT:
-            case BUILDING_BARRACKS:
-                return 7;
-
+                //640px
             case BUILDING_GRAND_TEMPLE_CERES:
             case BUILDING_GRAND_TEMPLE_NEPTUNE:
             case BUILDING_GRAND_TEMPLE_MERCURY:
@@ -204,14 +220,20 @@ static int get_height_id(void)
             case BUILDING_PANTHEON:
             case BUILDING_HIPPODROME:
             case BUILDING_COLOSSEUM:
-                return 8;
+                return HEIGHT_8_SCALING;
 
+                //736px
             case BUILDING_GRAND_TEMPLE_MARS:
-                return 10;
+                return HEIGHT_10_46_BLOCKS;
 
+                //448px
             case BUILDING_FORT:
-                return 11;
+            case BUILDING_MESS_HALL:
+            case BUILDING_CITY_MINT:
+            case BUILDING_BARRACKS:
+                return HEIGHT_11_28_BLOCKS;
 
+                //272px (new 336px for description)
             case BUILDING_SHRINE_CERES:
             case BUILDING_SHRINE_NEPTUNE:
             case BUILDING_SHRINE_MERCURY:
@@ -222,16 +244,24 @@ static int get_height_id(void)
             case BUILDING_SMALL_TEMPLE_MERCURY:
             case BUILDING_SMALL_TEMPLE_MARS:
             case BUILDING_SMALL_TEMPLE_VENUS:
-                return 12;
+            case BUILDING_LARGE_TEMPLE_CERES:
+            case BUILDING_LARGE_TEMPLE_NEPTUNE:
+            case BUILDING_LARGE_TEMPLE_MERCURY:
+            case BUILDING_LARGE_TEMPLE_MARS:
+            case BUILDING_LARGE_TEMPLE_VENUS:
+                return HEIGHT_12_21_BLOCKS;
 
+                //240px
             case BUILDING_LARARIUM:
-                return 13;
+            case BUILDING_ARMOURY:
+                return HEIGHT_13_15_BLOCKS;
 
+                //352px
             default:
-                return 0;
+                return HEIGHT_0_22_BLOCKS;
         }
     }
-    return 0;
+    return HEIGHT_0_22_BLOCKS;
 }
 
 static int has_mothball_button(void)
@@ -285,7 +315,7 @@ static void init(int grid_offset)
     city_resource_determine_available(1);
     context.type = BUILDING_INFO_TERRAIN;
     context.figure.drawn = 0;
-    if (!context.building_id && map_sprite_bridge_at(grid_offset) > 0) {
+    if (map_is_bridge(grid_offset)) {
         if (map_terrain_is(grid_offset, TERRAIN_WATER)) {
             context.terrain_type = TERRAIN_INFO_BRIDGE;
         } else {
@@ -418,7 +448,6 @@ static void init(int grid_offset)
                     case FIGURE_FRIENDLY_ARROW:
                     case FIGURE_WATCHTOWER_ARCHER:
                         break;
-                    // intentional fallthrough
                     default:
                         context.figure.figure_ids[context.figure.count++] = figure_id;
                         figure_phrase_determine(f);
@@ -455,15 +484,15 @@ static void init(int grid_offset)
     switch (get_height_id()) {
         case 1: context.height_blocks = 16; break;
         case 2: context.height_blocks = 18; break;
-        case 3: context.height_blocks = 19; break;
+        case 3: context.height_blocks = 20; break;
         case 4: context.height_blocks = 14; break;
         case 5: context.height_blocks = 24; break;
         case 6: context.height_blocks = 38; break;
-        case 7: context.height_blocks = 26; break;
+        case 7: context.height_blocks = 26; break; //416px
         case 8: context.height_blocks = 40; break;
-        case 10: context.height_blocks = 47; break;
+        case 10: context.height_blocks = 46; break;
         case 11: context.height_blocks = 28; break;
-        case 12: context.height_blocks = 17; break;
+        case 12: context.height_blocks = 21; break;
         case 13: context.height_blocks = 15; break;
         default: context.height_blocks = 22; break;
     }
@@ -707,7 +736,7 @@ static void draw_background(void)
         } else if (btype == BUILDING_OBELISK) {
             window_building_draw_obelisk(&context);
         } else if (building_type_is_roadblock(btype) && context.show_special_orders) {
-            window_building_draw_roadblock_orders(&context);            
+            window_building_draw_roadblock_orders(&context);
         } else if (btype == BUILDING_ROADBLOCK) {
             window_building_draw_roadblock(&context);
         } else if (btype == BUILDING_TRIUMPHAL_ARCH) {
@@ -724,12 +753,18 @@ static void draw_background(void)
             window_building_draw_fort(&context);
         } else if (btype == BUILDING_BURNING_RUIN) {
             window_building_draw_burning_ruin(&context);
-        } else if (btype == BUILDING_NATIVE_HUT) {
+        } else if (btype == BUILDING_NATIVE_HUT || btype == BUILDING_NATIVE_HUT_ALT) {
             window_building_draw_native_hut(&context);
         } else if (btype == BUILDING_NATIVE_MEETING) {
             window_building_draw_native_meeting(&context);
         } else if (btype == BUILDING_NATIVE_CROPS) {
             window_building_draw_native_crops(&context);
+        } else if (btype == BUILDING_NATIVE_DECORATION) {
+            window_building_draw_native_decoration(&context);
+        } else if (btype == BUILDING_NATIVE_MONUMENT) {
+            window_building_draw_native_monument(&context);
+        } else if (btype == BUILDING_NATIVE_WATCHTOWER) {
+            window_building_draw_native_watchtower(&context);
         } else if (btype == BUILDING_MISSION_POST) {
             window_building_draw_mission_post(&context);
         } else if (btype == BUILDING_WATCHTOWER) {
@@ -760,6 +795,8 @@ static void draw_background(void)
             window_building_draw_shrine_venus(&context);
         } else if (btype == BUILDING_ARMOURY) {
             window_building_draw_armoury(&context);
+        } else if (btype == BUILDING_LATRINES) {
+            window_building_draw_latrines(&context);
         }
     } else if (context.type == BUILDING_INFO_LEGION) {
         window_building_draw_legion_info(&context);
@@ -873,6 +910,12 @@ static void draw_foreground(void)
         }
     } else if (context.type == BUILDING_INFO_LEGION) {
         window_building_draw_legion_info_foreground(&context);
+    } else if (context.terrain_type == TERRAIN_INFO_BRIDGE) {
+        if (context.show_special_orders) {
+            window_building_draw_roadblock_orders_foreground(&context);
+        } else {
+            window_building_draw_roadblock_button(&context);
+        }
     }
 
     // general buttons
@@ -897,7 +940,7 @@ static void draw_foreground(void)
         !context.depot_selection.resource &&
         !building_monument_is_unfinished_monument(b) &&
         has_mothball_button()) {
-            draw_mothball_button(context.x_offset, context.y_offset + BLOCK_SIZE * context.height_blocks - 40);
+        draw_mothball_button(context.x_offset, context.y_offset + BLOCK_SIZE * context.height_blocks - 40);
     }
     if (!context.show_special_orders &&
         !context.depot_selection.source &&
@@ -1063,7 +1106,7 @@ static void get_tooltip(tooltip_context *c)
         window_building_primary_product_producer_stockpiling_tooltip(&translation);
     } else if (context.type == BUILDING_INFO_LEGION) {
         text_id = window_building_get_legion_info_tooltip_text(&context);
-    } else if (context.type == BUILDING_INFO_BUILDING && context.show_special_orders) {
+    } else if ((context.type == BUILDING_INFO_BUILDING && context.show_special_orders) || building_type_is_bridge(btype)) { //bridges are technically terrain, but they have special orders
         if (btype == BUILDING_GRANARY) {
             window_building_get_tooltip_granary_orders(&group_id, &text_id, &translation);
         } else if (btype == BUILDING_WAREHOUSE) {
@@ -1080,7 +1123,7 @@ static void get_tooltip(tooltip_context *c)
     } else if (btype == BUILDING_WAREHOUSE) {
         window_building_warehouse_get_tooltip_distribution_permissions(&translation);
     } else if (btype == BUILDING_DOCK) {
-        precomposed_text = window_building_dock_get_tooltip(&context);        
+        precomposed_text = window_building_dock_get_tooltip(&context);
     } else if (context.type == BUILDING_INFO_BUILDING && btype == BUILDING_DEPOT) {
         if (context.depot_selection.source || context.depot_selection.destination) {
             window_building_depot_get_tooltip_source_destination(&translation);
@@ -1209,7 +1252,7 @@ void window_building_info_depot_toggle_condition_type(void)
 
 void window_building_info_depot_toggle_condition_threshold(void)
 {
-    building* b = building_get(context.building_id);
+    building *b = building_get(context.building_id);
     b->data.depot.current_order.condition.threshold = (b->data.depot.current_order.condition.threshold + 4) % 36;
     window_invalidate();
 }
