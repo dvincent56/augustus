@@ -19,30 +19,30 @@
 #define DRIFT_DIRECTION_LEFT -1
 
 typedef struct {
-    float x;
-    float y;
+    int x;
+    int y;
 
     // For rain
     int length;
     int speed;
-    float wind_variation;
+    int wind_variation;
 
     // For snow
-    float drift_offset;
+    int drift_offset;
     int drift_direction;
 
     // For sand
-    float offset;
+    int offset;
 } weather_element;
 
 static struct {
     int weather_initialized;
     int lightning_timer;
     int lightning_cooldown;
-    float wind_angle;
-    float wind_speed;
-    float overlay_alpha;
-    float overlay_target;
+    int wind_angle;
+    int wind_speed;
+    int overlay_alpha;
+    int overlay_target;
     int overlay_color;
     int overlay_fadeout;
 
@@ -56,8 +56,8 @@ static struct {
         int type;
     } weather_config;
 } data = {
-    .wind_speed = 0.05f,
-    .overlay_target = 1.0f,
+    .wind_speed = 1,
+    .overlay_target = 100,
     .weather_config = {
         .intensity = 200,
         .dx = 1,
@@ -75,15 +75,19 @@ void init_weather_element(weather_element *e, int type)
         case WEATHER_RAIN:
             e->length = 10 + random_from_stdlib() % 10;
             e->speed = 4 + random_from_stdlib() % 5;
-            e->wind_variation = ((random_from_stdlib() % 100) / 100.0f - 0.5f) * 1.5f;
+            if (data.weather_config.intensity < 500) {
+                e->wind_variation = (random_from_stdlib() % 2) - 0; // 0 or 1
+            } else {
+                e->wind_variation = (random_from_stdlib() % 3) - 1; // -1, 0 or 1
+            }
             break;
         case WEATHER_SNOW:
-            e->drift_offset = (float) (random_from_stdlib() % 100);
+            e->drift_offset = random_from_stdlib() % 100;
             e->speed = 1 + random_from_stdlib() % 2;
             e->drift_direction = (random_from_stdlib() % 2 == 0) ? DRIFT_DIRECTION_RIGHT : DRIFT_DIRECTION_LEFT;
             break;
         case WEATHER_SAND:
-            e->speed = 1.5f + (random_from_stdlib() % 100) / 50.0f;
+            e->speed = 1 + (random_from_stdlib() % 2);
             e->offset = random_between_from_stdlib(0, 1000);
             break;
     }
@@ -137,12 +141,12 @@ static void update_lightning(void)
 static void update_wind(void)
 {
     data.wind_angle += data.wind_speed;
-    data.weather_config.dx = (int) (2 * sinf(data.wind_angle)); // between -2 & 2
+    data.weather_config.dx = ((data.wind_angle / 10) % 5) - 2;
 }
 
 static void update_overlay_alpha(void)
 {
-    float speed = 0.01f;
+    int speed = 1;
 
     if (data.overlay_alpha < data.overlay_target) { // fadein
         data.overlay_alpha += speed;
@@ -166,18 +170,18 @@ static void render_weather_overlay(void)
         return;
     }
 
-    float alpha_factor = 0.4f;
+    int alpha_factor = 40;
     if (data.weather_config.type == WEATHER_SNOW ||
         (data.weather_config.type == WEATHER_RAIN && data.weather_config.intensity < 900)) {
-        alpha_factor = 0.2f;
+        alpha_factor = 20;
     }
 
     // no overlay for light rain
     if (data.weather_config.type == WEATHER_RAIN && data.weather_config.intensity < 800) {
-        alpha_factor = 0.0f;
+        alpha_factor = 0;
     }
 
-    uint8_t alpha = (uint8_t) (fminf(alpha_factor * data.overlay_alpha, 1.0f) * 255);
+    uint8_t alpha = (uint8_t)(((alpha_factor * data.overlay_alpha) / 100) * 255 / 100);
 
     // update overlay color based on weather type
     if (data.weather_config.type == WEATHER_RAIN) {
@@ -195,22 +199,22 @@ static void render_weather_overlay(void)
 static void draw_snow(void)
 {
     for (int i = 0; i < data.weather_config.intensity; ++i) {
-        float drift = sinf((data.elements[i].y + data.elements[i].drift_offset) * 0.02f);
-        data.elements[i].x += drift * 0.5f * data.elements[i].drift_direction;
-        data.elements[i].y += (int) (data.elements[i].speed);
+        int drift = ((data.elements[i].y + data.elements[i].drift_offset) % 10) - 5;
+        data.elements[i].x += (drift / 10) * data.elements[i].drift_direction;
+        data.elements[i].y += data.elements[i].speed;
 
         graphics_draw_line(
-            (int) data.elements[i].x,
-            (int) data.elements[i].x + 1,
-            (int) data.elements[i].y,
-            (int) data.elements[i].y,
+            data.elements[i].x,
+            data.elements[i].x + 1,
+            data.elements[i].y,
+            data.elements[i].y,
             COLOR_WEATHER_SNOWFLAKE);
 
         graphics_draw_line(
-            (int) data.elements[i].x,
-            (int) data.elements[i].x,
-            (int) data.elements[i].y,
-            (int) data.elements[i].y + 1,
+            data.elements[i].x,
+            data.elements[i].x,
+            data.elements[i].y,
+            data.elements[i].y + 1,
             COLOR_WEATHER_SNOWFLAKE);
 
         if (data.elements[i].y >= screen_height() || data.elements[i].x <= 0 || data.elements[i].x >= screen_width()) {
@@ -223,14 +227,14 @@ static void draw_snow(void)
 static void draw_sandstorm(void)
 {
     for (int i = 0; i < data.weather_config.intensity; ++i) {
-        float wave = sinf((data.elements[i].y + data.elements[i].offset) * 0.03f);
-        data.elements[i].x += data.elements[i].speed + wave;
+        int wave = ((data.elements[i].y + data.elements[i].offset) % 10) - 5;
+        data.elements[i].x += data.elements[i].speed + (wave / 10);
 
         graphics_draw_line(
-            (int) data.elements[i].x,
-            (int) data.elements[i].x + 1,
-            (int) data.elements[i].y,
-            (int) data.elements[i].y + 1,
+            data.elements[i].x,
+            data.elements[i].x + 1,
+            data.elements[i].y,
+            data.elements[i].y + 1,
             COLOR_WEATHER_SAND_PARTICLE);
 
         if (data.elements[i].x > screen_width()) {
@@ -250,18 +254,18 @@ static void draw_rain(void)
     int base_speed = 3 + wind_strength + (data.weather_config.intensity / 300);
 
     for (int i = 0; i < data.weather_config.intensity; ++i) {
-        float dx = data.weather_config.dx + data.elements[i].wind_variation;
+        int dx = data.weather_config.dx + data.elements[i].wind_variation;
 
         graphics_draw_line(
-            (int) (data.elements[i].x),
-            (int) (data.elements[i].x + dx * 2),
-            (int) (data.elements[i].y),
-            (int) (data.elements[i].y + data.elements[i].length),
+            data.elements[i].x,
+            data.elements[i].x + dx * 2,
+            data.elements[i].y,
+            data.elements[i].y + data.elements[i].length,
             COLOR_WEATHER_DROPS);
 
         data.elements[i].x += dx;
 
-        float dy = base_speed + data.elements[i].speed + (sinf((data.elements[i].x + data.elements[i].y) * 0.05f) * 0.5f);
+        int dy = base_speed + data.elements[i].speed + (((data.elements[i].x + data.elements[i].y) % 10) / 10);
         data.elements[i].y += dy;
 
         if (data.elements[i].y >= screen_height() || data.elements[i].x <= 0 || data.elements[i].x >= screen_width()) {
@@ -324,36 +328,65 @@ static void set_weather(int active, int intensity, weather_type type)
     data.weather_config.type = type;
 
     if (active == 0) {
-        data.overlay_target = 0.0f;
+        data.overlay_target = 0;
     } else {
-        data.overlay_target = 1.0f;
+        data.overlay_target = 100;
     }
 }
 
 void city_weather_update(int month)
 {
-    int active = chance_percent(20);
+    static int weather_months_left = 0;
+    static int last_active = 0;
+    static int last_intensity = 0;
+    static weather_type last_type = WEATHER_NONE;
+
+    int active;
     int intensity;
-    weather_type type = WEATHER_RAIN;
+    weather_type type;
 
-    if (scenario_property_climate() == CLIMATE_DESERT) {
-        active = chance_percent(10);
-        intensity = 5000;
-        type = WEATHER_SAND;
+    if (weather_months_left > 0) {
+        // keep last month's weather but reduce intensity
+        active = last_active;
+        intensity = last_intensity / 2;
+        
+        if (last_type == WEATHER_RAIN && intensity < 250) {
+            intensity = 250;
+        } else if (intensity < 1000) {
+            intensity = 1000;
+        }
+        
+        type = last_type;
+        weather_months_left--;
     } else {
-        if (month == 10 || month == 11 || month == 0 || month == 1 || month == 2) {
-            type = (random_from_stdlib() % 2 == 0) ? WEATHER_RAIN : WEATHER_SNOW;
-        }
-        if (WEATHER_RAIN == type) {
-            intensity = random_between_from_stdlib(100, 1000);
-        } else {
-            intensity = random_between_from_stdlib(1000, 5000);
-        }
-    }
+        active = chance_percent(20);
+        type = WEATHER_RAIN;
 
-    if (active == 0) {
-        intensity = 0;
-        type = WEATHER_NONE;
+        if (scenario_property_climate() == CLIMATE_DESERT) {
+            active = chance_percent(10);
+            intensity = 5000;
+            type = WEATHER_SAND;
+        } else {
+            if (month == 10 || month == 11 || month == 0 || month == 1 || month == 2) {
+                type = (random_from_stdlib() % 2 == 0) ? WEATHER_RAIN : WEATHER_SNOW;
+            }
+            if (WEATHER_RAIN == type) {
+                intensity = random_between_from_stdlib(250, 1000);
+            } else {
+                intensity = random_between_from_stdlib(1000, 5000);
+            }
+        }
+
+        if (active == 0) {
+            intensity = 0;
+            type = WEATHER_NONE;
+        } else {
+            weather_months_left = 1;
+        }
+
+        last_active = active;
+        last_intensity = intensity;
+        last_type = type;
     }
 
     set_weather(active, intensity, type);
