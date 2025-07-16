@@ -111,8 +111,7 @@ static void add_warehouse(building *b)
     b->prev_part_building_id = 0;
     map_building_tiles_add(b->id, b->x + x_offset[corner], b->y + y_offset[corner], 1,
         image_group(GROUP_BUILDING_WAREHOUSE), TERRAIN_BUILDING);
-    map_terrain_add_warehouse_road(b->x, b->y);
-    map_tiles_set_road(b->x, b->y);
+    map_tiles_update_area_roads(b->x + x_offset[corner], b->y + y_offset[corner], 3);
     int id = b->id;
     int prev = id;
     for (int i = 0; i < 9; i++) {
@@ -347,10 +346,12 @@ int building_construction_place_building(building_type type, int x, int y)
 {
     int terrain_mask = TERRAIN_ALL;
     if (building_type_is_roadblock(type)) {
-        terrain_mask = type == BUILDING_GATEHOUSE ? ~TERRAIN_WALL & ~TERRAIN_ROAD : ~TERRAIN_ROAD & ~TERRAIN_HIGHWAY;
+        terrain_mask = type == BUILDING_GATEHOUSE ? ~TERRAIN_WALL & ~TERRAIN_ROAD & ~TERRAIN_HIGHWAY : ~TERRAIN_ROAD & ~TERRAIN_HIGHWAY;
         //allow building gatehouses over walls and roads, other non-bridge roadblocks over roads and highways
     } else if (type == BUILDING_TOWER) {
         terrain_mask = ~TERRAIN_WALL;
+    } else if (type == BUILDING_RESERVOIR || type == BUILDING_DRAGGABLE_RESERVOIR) {
+        terrain_mask = ~TERRAIN_AQUEDUCT;
     }
     if (config_get(CONFIG_GP_CH_WAREHOUSES_GRANARIES_OVER_ROAD_PLACEMENT)) {
         if (type == BUILDING_GRANARY || type == BUILDING_WAREHOUSE) {
