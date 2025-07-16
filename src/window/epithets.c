@@ -219,7 +219,7 @@ static void get_tooltip(tooltip_context *c)
         case 3: c->translation_key = TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_MERCURY; break;
         case 4: c->translation_key = TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_MARS; break;
         case 5: c->translation_key = TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_VENUS; break;
-        case 6: c->translation_key = TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_JUPITER; break;
+        case 6: c->translation_key = TR_WINDOW_ADVISOR_EPITHETS_TOOLTIP_PANTHEON; break;
     }
 }
 
