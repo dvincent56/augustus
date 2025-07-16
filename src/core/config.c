@@ -81,8 +81,8 @@ static const char *ini_keys[] = {
     "ui_draw_asclepius",
     "ui_show_desirability_range_all",
     "ui_highlight_selected_building",
-    "gameplay_change_caravans_move_off_road"
-    "ui_draw_weather",
+    "gameplay_change_caravans_move_off_road",
+    "ui_draw_weather"
 };
 
 static const char *ini_string_keys[] = {
