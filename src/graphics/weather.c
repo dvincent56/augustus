@@ -432,7 +432,7 @@ void city_weather_update(int month)
         type = data.last_type;
         weather_months_left--;
     } else {
-        active = chance_percent(12);
+        active = chance_percent(15);
         type = WEATHER_RAIN;
 
         if (scenario_property_climate() == CLIMATE_DESERT) {
