@@ -50,6 +50,7 @@ static struct {
     int last_elements_count;
     int last_intensity;
     int last_active;
+    int is_sound_playing;
     weather_type displayed_type;
     weather_type last_type;
 
@@ -68,6 +69,7 @@ static struct {
     .overlay_alpha = 0,
     .last_elements_count = 0,
     .last_active = 0,
+    .is_sound_playing = 0,
     .last_intensity = 0,
     .displayed_type = WEATHER_NONE,
     .last_type = WEATHER_NONE,
@@ -108,16 +110,21 @@ void init_weather_element(weather_element *e, int type)
 
 static void weather_stop(void)
 {
-    data.weather_config.active = 0;
-
     if (data.elements) {
         free(data.elements);
         data.elements = 0;
     }
 
+    data.weather_config.active = 0;
     data.weather_initialized = 0;
     data.last_elements_count = 0;
     data.displayed_intensity = 0;
+    data.last_active = 0;
+    data.last_type = WEATHER_NONE;
+    data.last_intensity = 0;
+    data.overlay_target = 0;
+    data.overlay_alpha = 0;
+    data.displayed_type = WEATHER_NONE;
 }
 
 static uint32_t apply_alpha(uint32_t color, uint8_t alpha)
@@ -347,8 +354,18 @@ static void draw_rain(void)
 
 void update_weather()
 {
+
     render_weather_overlay();
     update_displayed_intensity();
+
+    if (!config_get(CONFIG_UI_DRAW_WEATHER)) {
+        if (data.is_sound_playing) {
+            sound_device_stop_type(SOUND_TYPE_EFFECTS);
+            data.is_sound_playing = 0;
+        }
+        weather_stop();
+        return;
+    }
 
     int target_count = data.weather_config.intensity;
     if (target_count != data.last_elements_count && target_count > 0) {
@@ -369,15 +386,12 @@ void update_weather()
         data.last_elements_count = 0;
     }
 
-    if (!config_get(CONFIG_UI_DRAW_WEATHER)) {
-        weather_stop();
-        sound_device_stop_type(SOUND_TYPE_EFFECTS);
-        return;
-    }
-
     if ((data.weather_config.type == WEATHER_NONE || data.weather_config.active == 0) && data.displayed_intensity == 0) {
+        if (data.is_sound_playing) {
+            sound_device_stop_type(SOUND_TYPE_EFFECTS);
+            data.is_sound_playing = 0;
+        }
         weather_stop();
-        sound_device_stop_type(SOUND_TYPE_EFFECTS);
         return;
     }
 
@@ -425,8 +439,8 @@ static void set_weather(int active, int intensity, weather_type type)
 
 void weather_reset(void)
 {
-    sound_device_stop_type(SOUND_TYPE_EFFECTS);
     weather_stop();
+    sound_device_stop_type(SOUND_TYPE_EFFECTS);
 }
 
 void city_weather_update(int month)
@@ -477,6 +491,7 @@ void city_weather_update(int month)
             } else {
                 sound_device_play_file_on_channel_panned(ASSETS_DIRECTORY "/Sounds/Snow.ogg", SOUND_TYPE_EFFECTS, setting_sound(SOUND_TYPE_EFFECTS)->volume, 100, 100, 1);
             }
+            data.is_sound_playing = 1;
         }
 
         data.last_active = active;
