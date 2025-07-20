@@ -230,12 +230,15 @@ static void render_weather_overlay(void)
 
 static void draw_snow(void)
 {
-    if (!data.elements || data.displayed_intensity == 0) return;
+    if (!data.elements || data.displayed_intensity == 0) {
+        return;
+    }
 
     int max_particles = data.last_elements_count;
     int count = data.displayed_intensity;
-    if (count > max_particles) count = max_particles;
-
+    if (count > max_particles) {
+        count = max_particles;
+    }
     for (int i = 0; i < count; ++i) {
         int drift = ((data.elements[i].y + data.elements[i].drift_offset) % 10) - 5;
         data.elements[i].x += (drift / 10) * data.elements[i].drift_direction;
@@ -264,12 +267,16 @@ static void draw_snow(void)
 
 static void draw_sandstorm(void)
 {
-    if (!data.elements || data.displayed_intensity == 0) return;
+    if (!data.elements || data.displayed_intensity == 0) {
+        return;
+    }
 
     int max_particles = data.last_elements_count;
     int count = data.displayed_intensity;
-    if (count > max_particles) count = max_particles;
-
+    if (count > max_particles) {
+        count = max_particles;
+    }
+    
     for (int i = 0; i < count; ++i) {
         int wave = ((data.elements[i].y + data.elements[i].offset) % 10) - 5;
         data.elements[i].x += data.elements[i].speed + (wave / 10);
@@ -290,7 +297,9 @@ static void draw_sandstorm(void)
 
 static void draw_rain(void)
 {
-    if (!data.elements || data.displayed_intensity == 0) return;
+    if (!data.elements || data.displayed_intensity == 0) {
+        return;
+    }
 
     if (data.weather_config.intensity < 600) {
         update_wind();
@@ -301,7 +310,9 @@ static void draw_rain(void)
 
     int max_particles = data.last_elements_count;
     int count = data.displayed_intensity;
-    if (count > max_particles) count = max_particles;
+    if (count > max_particles) {
+        count = max_particles;
+    }
 
     for (int i = 0; i < count; ++i) {
         int dx;
