@@ -355,6 +355,7 @@ set(BUILDING_FILES
     ${PROJECT_SOURCE_DIR}/src/building/storage.c
     ${PROJECT_SOURCE_DIR}/src/building/tavern.c
     ${PROJECT_SOURCE_DIR}/src/building/temple.c
+    ${PROJECT_SOURCE_DIR}/src/building/tollhouse.c
     ${PROJECT_SOURCE_DIR}/src/building/variant.c
     ${PROJECT_SOURCE_DIR}/src/building/warehouse.c
 )

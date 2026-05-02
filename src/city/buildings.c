@@ -1,5 +1,6 @@
 #include "buildings.h"
 
+#include "building/tollhouse.h"
 #include "city/data_private.h"
 #include "core/calc.h"
 
@@ -89,8 +90,11 @@ int city_buildings_get_tollhouse(void)
 
 int city_buildings_has_working_tollhouse(void)
 {
-    // Real implementation provided after building/tollhouse.c exists (see Task 6).
-    return 0;
+    int id = city_buildings_get_tollhouse();
+    if (!id) {
+        return 0;
+    }
+    return building_tollhouse_is_functional(building_get(id));
 }
 
 int city_buildings_triumphal_arch_available(void)
