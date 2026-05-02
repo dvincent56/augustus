@@ -72,11 +72,18 @@ void building_tollhouse_consume_monthly(void)
     }
 }
 
+#define TOLLHOUSE_MAX_STOCK 500
+
 int building_tollhouse_get_storage_destination(building *tollhouse)
 {
+    if (tollhouse->resources[RESOURCE_STONE] >= TOLLHOUSE_MAX_STOCK &&
+        tollhouse->resources[RESOURCE_SAND] >= TOLLHOUSE_MAX_STOCK) {
+        return 0;
+    }
     resource_storage_info info[RESOURCE_MAX] = { 0 };
-    if (!building_distribution_get_handled_resources_for_building(tollhouse, info) ||
-        !building_distribution_get_resource_storages_for_building(info, tollhouse, MAX_DISTANCE)) {
+    info[RESOURCE_STONE].needed = 1;
+    info[RESOURCE_SAND].needed = 1;
+    if (!building_distribution_get_resource_storages_for_building(info, tollhouse, MAX_DISTANCE)) {
         return 0;
     }
     int fetch_inventory = building_distribution_fetch(tollhouse, info, 0, 1);
@@ -84,7 +91,7 @@ int building_tollhouse_get_storage_destination(building *tollhouse)
         tollhouse->data.market.fetch_inventory_id = fetch_inventory;
         return info[fetch_inventory].building_id;
     }
-    fetch_inventory = building_distribution_fetch(tollhouse, info, BASELINE_STOCK, 0);
+    fetch_inventory = building_distribution_fetch(tollhouse, info, TOLLHOUSE_MAX_STOCK, 0);
     if (fetch_inventory != RESOURCE_NONE) {
         tollhouse->data.market.fetch_inventory_id = fetch_inventory;
         return info[fetch_inventory].building_id;
