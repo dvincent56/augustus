@@ -911,4 +911,7 @@
 	<image id="Granary_32_food" width="19" height="21">
 		<layer group="99" image="5" x="-1" y="-1"/>
 	</image>
+	<!-- Tollhouse: 3x3 building. Halves highway construction cost and monthly levies when supplied with stone and sand. -->
+	<image id="Tollhouse OFF" src="Industry/tollhouse_off" width="238" height="143" isometric="true"/>
+	<image id="Tollhouse ON" src="Industry/tollhouse_on" width="238" height="143" isometric="true"/>
 </assetlist>
