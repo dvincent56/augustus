@@ -780,6 +780,8 @@ static int should_mark_for_construction(building_type type)
         return 0;
     } else if (type == BUILDING_CITY_MINT && (city_buildings_has_city_mint() || !city_buildings_has_senate())) {
         return 0;
+    } else if (type == BUILDING_TOLLHOUSE && (city_buildings_has_tollhouse() || !city_buildings_has_senate())) {
+        return 0;
     } else if (type == BUILDING_BARRACKS && city_buildings_has_barracks() &&
         !config_get(CONFIG_GP_CH_MULTIPLE_BARRACKS)) {
         return 0;
