@@ -2202,6 +2202,15 @@ static building_properties properties[BUILDING_TYPE_MAX] = {
         .building_model_data = {.cost = 0, .desirability_value = -10, .desirability_step = 1,
             .desirability_step_size = 2, .desirability_range = 4, .laborers = 0}
      },
+     [BUILDING_TOLLHOUSE] = {
+        .size = 3,
+        .fire_proof = 1,
+        .custom_asset.group = "Industry",
+        .custom_asset.id = "Tollhouse OFF",
+        .event_data.attr = "tollhouse",
+        .building_model_data = {.cost = 200, .desirability_value = -2, .desirability_step = 1,
+            .desirability_step_size = 1, .desirability_range = 3, .laborers = 12}
+     },
 };
 
 void building_properties_init(void)
