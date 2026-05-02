@@ -651,6 +651,7 @@ set(WINDOW_FILES
     ${PROJECT_SOURCE_DIR}/src/window/building/industry.c
     ${PROJECT_SOURCE_DIR}/src/window/building/military.c
     ${PROJECT_SOURCE_DIR}/src/window/building/terrain.c
+    ${PROJECT_SOURCE_DIR}/src/window/building/tollhouse.c
     ${PROJECT_SOURCE_DIR}/src/window/building/utility.c
     ${PROJECT_SOURCE_DIR}/src/window/editor/allowed_buildings.c
     ${PROJECT_SOURCE_DIR}/src/window/editor/attributes.c
