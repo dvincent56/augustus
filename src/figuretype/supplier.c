@@ -289,6 +289,10 @@ void figure_supplier_action(figure *f)
             if (f->direction == DIR_FIGURE_AT_DESTINATION || f->direction == DIR_FIGURE_LOST) {
                 if (f->direction == DIR_FIGURE_AT_DESTINATION && f->type == FIGURE_LIGHTHOUSE_SUPPLIER) {
                     building_get(f->building_id)->resources[RESOURCE_TIMBER] += 100;
+                } else if (f->direction == DIR_FIGURE_AT_DESTINATION && f->type == FIGURE_TOLLHOUSE_SUPPLIER) {
+                    if (f->collecting_item_id == RESOURCE_STONE || f->collecting_item_id == RESOURCE_SAND) {
+                        building_get(f->building_id)->resources[f->collecting_item_id] += 100;
+                    }
                 }
                 f->state = FIGURE_STATE_DEAD;
             } else if (f->direction == DIR_FIGURE_REROUTE) {
@@ -326,7 +330,7 @@ void figure_supplier_action(figure *f)
             f->image_id = assets_get_image_id("Walkers", "Barkeep NE 01") +
                 dir * 12 + f->image_offset;
         }
-    } else if (f->type == FIGURE_LIGHTHOUSE_SUPPLIER) {
+    } else if (f->type == FIGURE_LIGHTHOUSE_SUPPLIER || f->type == FIGURE_TOLLHOUSE_SUPPLIER) {
         if (f->action_state == FIGURE_ACTION_146_SUPPLIER_RETURNING) {
             f->cart_image_id = resource_get_data(f->collecting_item_id)->image.cart.single_load;
         } else {
