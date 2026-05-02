@@ -77,6 +77,22 @@ int city_buildings_get_caravanserai(void)
     return get_first_working_building(BUILDING_CARAVANSERAI)->id;
 }
 
+int city_buildings_has_tollhouse(void)
+{
+    return city_buildings_get_tollhouse() != 0;
+}
+
+int city_buildings_get_tollhouse(void)
+{
+    return get_first_working_building(BUILDING_TOLLHOUSE)->id;
+}
+
+int city_buildings_has_working_tollhouse(void)
+{
+    // Real implementation provided after building/tollhouse.c exists (see Task 6).
+    return 0;
+}
+
 int city_buildings_triumphal_arch_available(void)
 {
     return city_data.building.triumphal_arches_available > city_data.building.triumphal_arches_placed;
