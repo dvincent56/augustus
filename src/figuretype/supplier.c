@@ -141,7 +141,7 @@ static int take_resource_from_warehouse(figure *f, int warehouse_id, int max_amo
     building_warehouse_try_remove_resource(warehouse, f->collecting_item_id, num_loads);
 
     // create delivery boys
-    if (f->type != FIGURE_LIGHTHOUSE_SUPPLIER) {
+    if (f->type != FIGURE_LIGHTHOUSE_SUPPLIER && f->type != FIGURE_TOLLHOUSE_SUPPLIER) {
         int supplier_id = f->id;
         int boy1 = figure_supplier_create_delivery_boy(supplier_id, supplier_id, FIGURE_DELIVERY_BOY);
         if (num_loads > 1) {
@@ -255,7 +255,7 @@ void figure_supplier_action(figure *f)
                 f->previous_tile_y = f->y;
                 int id = f->id;
                 if (!resource_is_food(f->collecting_item_id)) {
-                    int max_amount = f->type == FIGURE_LIGHTHOUSE_SUPPLIER ? 1 : 2;
+                    int max_amount = (f->type == FIGURE_LIGHTHOUSE_SUPPLIER || f->type == FIGURE_TOLLHOUSE_SUPPLIER) ? 1 : 2;
                     if (!take_resource_from_warehouse(f, f->destination_building_id, max_amount)) {
                         f->state = FIGURE_STATE_DEAD;
                     }
