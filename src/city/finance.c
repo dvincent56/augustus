@@ -4,6 +4,8 @@
 #include "building/count.h"
 #include "building/monument.h"
 #include "building/properties.h"
+#include "building/tollhouse.h"
+#include "city/buildings.h"
 #include "city/data_private.h"
 #include "city/culture.h"
 #include "city/festival.h"
@@ -368,6 +370,9 @@ static void pay_monthly_building_levies(void)
         }
     }
     int highway_tax = num_highway_tiles / 4 * HIGHWAY_LEVY_MONTHLY;
+    if (city_buildings_has_working_tollhouse()) {
+        highway_tax /= 2;
+    }
     levies += highway_tax;
 
     city_data.finance.treasury -= levies;
@@ -407,6 +412,7 @@ void city_finance_handle_month_change(void)
     pay_monthly_interest();
     pay_monthly_salary();
     pay_monthly_building_levies();
+    building_tollhouse_consume_monthly();
 }
 
 static void reset_taxes(void)
