@@ -339,6 +339,11 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
             b->data.market.is_mess_hall = 1;
             add_building(b);
             break;
+        case BUILDING_TOLLHOUSE:
+            b->accepted_goods[RESOURCE_STONE] = 1;
+            b->accepted_goods[RESOURCE_SAND] = 1;
+            add_building(b);
+            break;
         case BUILDING_SMALL_STATUE:
         case BUILDING_MEDIUM_STATUE:
         case BUILDING_HORSE_STATUE:
