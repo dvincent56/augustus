@@ -25,11 +25,13 @@ static int count_highway_tiles(void)
 
 int building_tollhouse_monthly_need(void)
 {
-    int tiles = count_highway_tiles();
-    if (tiles <= 0) {
+    // count_highway_tiles() returns sub-tiles. A placed highway is a 2x2 block,
+    // so each block contributes 4 sub-tiles. Divide by 4 to get block count.
+    int blocks = count_highway_tiles() / 4;
+    if (blocks <= 0) {
         return 0;
     }
-    return (tiles + TOLLHOUSE_HIGHWAY_TILES_PER_UNIT - 1) / TOLLHOUSE_HIGHWAY_TILES_PER_UNIT;
+    return (blocks + TOLLHOUSE_HIGHWAY_TILES_PER_UNIT - 1) / TOLLHOUSE_HIGHWAY_TILES_PER_UNIT;
 }
 
 int building_tollhouse_is_functional(building *b)
