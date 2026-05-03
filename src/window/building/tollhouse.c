@@ -2,6 +2,7 @@
 
 #include "building/building.h"
 #include "building/tollhouse.h"
+#include "city/constants.h"
 #include "game/resource.h"
 #include "graphics/image.h"
 #include "graphics/lang_text.h"
@@ -10,8 +11,19 @@
 #include "translation/translation.h"
 #include "window/building/figures.h"
 
+#define ROW_HEIGHT 26
+
+static int draw_resource_row(int x, int y, int icon_id, const uint8_t *label, int amount)
+{
+    image_draw(icon_id, x, y - 6, COLOR_MASK_NONE, SCALE_NONE);
+    int width = text_draw(label, x + 30, y, FONT_NORMAL_BLACK, 0);
+    text_draw_number(amount, '@', " ", x + 30 + width, y, FONT_NORMAL_BLACK, 0);
+    return ROW_HEIGHT;
+}
+
 void window_building_draw_tollhouse(building_info_context *c)
 {
+    c->advisor_button = ADVISOR_FINANCIAL;
     c->help_id = 0;
     window_building_play_sound(c, "wavs/forum.wav");
 
@@ -20,42 +32,52 @@ void window_building_draw_tollhouse(building_info_context *c)
         c->x_offset, c->y_offset + 12, BLOCK_SIZE * c->width_blocks, FONT_LARGE_BLACK, 0);
 
     building *b = building_get(c->building_id);
-    int text_width = BLOCK_SIZE * (c->width_blocks - 4);
     int x_text = c->x_offset + 32;
+    int text_width = BLOCK_SIZE * (c->width_blocks - 4);
 
-    int y_status = c->y_offset + 56;
-
-    if (!c->has_road_access) {
-        window_building_draw_description_at(c, 56, 69, 25);
-    } else if (b->num_workers <= 0) {
-        text_draw_multiline(translation_for(TR_BUILDING_TOLLHOUSE_NO_EMPLOYEES),
-            x_text, y_status, text_width, 0, FONT_NORMAL_BLACK, 0);
-    } else if (!building_tollhouse_is_functional(b)) {
-        text_draw_multiline(translation_for(TR_BUILDING_TOLLHOUSE_NO_RESOURCES),
-            x_text, y_status, text_width, 0, FONT_NORMAL_BLACK, 0);
-    } else {
-        text_draw_multiline(translation_for(TR_BUILDING_TOLLHOUSE_FUNCTIONAL),
-            x_text, y_status, text_width, 0, FONT_NORMAL_BLACK, 0);
-    }
-
-    int y_stocks = y_status + 70;
     int need = building_tollhouse_monthly_need();
-
-    text_draw_label_and_number(translation_for(TR_BUILDING_TOLLHOUSE_MONTHLY_NEED),
-        need, " ", x_text, y_stocks, FONT_NORMAL_BLACK, 0);
-
     int stone_units = b->resources[RESOURCE_STONE] / 100;
     int sand_units = b->resources[RESOURCE_SAND] / 100;
 
-    text_draw_label_and_number(translation_for(TR_BUILDING_TOLLHOUSE_STONE_STOCK),
-        stone_units, " ", x_text, y_stocks + 24, FONT_NORMAL_BLACK, 0);
-    text_draw_label_and_number(translation_for(TR_BUILDING_TOLLHOUSE_SAND_STOCK),
-        sand_units, " ", x_text, y_stocks + 48, FONT_NORMAL_BLACK, 0);
+    int y = c->y_offset + 50;
 
+    // Resources block
+    y += draw_resource_row(x_text, y, resource_get_data(RESOURCE_STONE)->image.icon,
+        translation_for(TR_BUILDING_TOLLHOUSE_STONE_STOCK), stone_units);
+    y += draw_resource_row(x_text, y, resource_get_data(RESOURCE_SAND)->image.icon,
+        translation_for(TR_BUILDING_TOLLHOUSE_SAND_STOCK), sand_units);
+
+    // Monthly need
+    int width = text_draw(translation_for(TR_BUILDING_TOLLHOUSE_MONTHLY_NEED),
+        x_text, y, FONT_NORMAL_BLACK, 0);
+    text_draw_number(need, '@', " ", x_text + width, y, FONT_NORMAL_BLACK, 0);
+    y += ROW_HEIGHT + 8;
+
+    // Status line
+    int status_tr;
+    if (!c->has_road_access) {
+        status_tr = 0;
+        window_building_draw_description_at(c, y - c->y_offset, 69, 25);
+    } else if (b->num_workers <= 0) {
+        status_tr = TR_BUILDING_TOLLHOUSE_NO_EMPLOYEES;
+    } else if (!building_tollhouse_is_functional(b)) {
+        status_tr = TR_BUILDING_TOLLHOUSE_NO_RESOURCES;
+    } else {
+        status_tr = TR_BUILDING_TOLLHOUSE_FUNCTIONAL;
+    }
+    if (status_tr) {
+        text_draw_multiline(translation_for(status_tr),
+            x_text, y, text_width, 0, FONT_NORMAL_BLACK, 0);
+    }
+    y += 60;
+
+    // Description block
     text_draw_multiline(translation_for(TR_BUILDING_TOLLHOUSE_DESC),
-        x_text, y_stocks + 80, text_width, 0, FONT_NORMAL_BLACK, 0);
+        x_text, y, text_width, 0, FONT_NORMAL_BLACK, 0);
 
-    inner_panel_draw(c->x_offset + 16, c->y_offset + BLOCK_SIZE * c->height_blocks - 80,
-        c->width_blocks - 2, 4);
-    window_building_draw_employment(c, BLOCK_SIZE * c->height_blocks - 76);
+    // Employment panel + risks
+    int y_panel = c->y_offset + BLOCK_SIZE * c->height_blocks - 76;
+    inner_panel_draw(c->x_offset + 16, y_panel, c->width_blocks - 2, 4);
+    window_building_draw_employment(c, y_panel - c->y_offset + 8);
+    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, y_panel + 8);
 }
