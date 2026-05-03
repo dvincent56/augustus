@@ -1004,7 +1004,7 @@ static translation_string all_strings[] = {
     {TR_BUILDING_TOLLHOUSE_NO_RESOURCES, "This tollhouse needs more stone and sand to maintain the highway network."},
     {TR_BUILDING_TOLLHOUSE_FUNCTIONAL, "The tollhouse is operating. Highway costs and levies are halved."},
     {TR_BUILDING_TOLLHOUSE_NOT_FUNCTIONAL, "The tollhouse is idle. Highway costs and levies are at full price."},
-    {TR_BUILDING_TOLLHOUSE_MONTHLY_NEED, "Monthly need:"},
+    {TR_BUILDING_TOLLHOUSE_MONTHLY_NEED, "Monthly consumption (each):"},
     {TR_BUILDING_TOLLHOUSE_STONE_STOCK, "Stone stock:"},
     {TR_BUILDING_TOLLHOUSE_SAND_STOCK, "Sand stock:"},
     {TR_TOOLTIP_BUTTON_TOLLHOUSE, "Tollhouse"},

@@ -233,13 +233,13 @@ static int get_height_id(void)
             case BUILDING_SHIP_BRIDGE:
             case BUILDING_LOW_BRIDGE:
             case BUILDING_DEPOT:
+            case BUILDING_TOLLHOUSE:
                 return HEIGHT_5_24_BLOCKS;
 
                 //608px
             case BUILDING_DOCK:
             case BUILDING_LIGHTHOUSE:
             case BUILDING_CARAVANSERAI:
-            case BUILDING_TOLLHOUSE:
                 return HEIGHT_6_38_BLOCKS;
 
                 //640px

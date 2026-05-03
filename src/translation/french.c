@@ -1004,7 +1004,7 @@ static translation_string all_strings[] = {
     {TR_BUILDING_TOLLHOUSE_NO_RESOURCES, "Cette maison de péage a besoin de plus de pierre et de sable pour entretenir le réseau d'autoroutes."},
     {TR_BUILDING_TOLLHOUSE_FUNCTIONAL, "La maison de péage est en activité. Les coûts et redevances des autoroutes sont réduits de moitié."},
     {TR_BUILDING_TOLLHOUSE_NOT_FUNCTIONAL, "La maison de péage est inactive. Les coûts et redevances des autoroutes sont au prix plein."},
-    {TR_BUILDING_TOLLHOUSE_MONTHLY_NEED, "Besoin mensuel :"},
+    {TR_BUILDING_TOLLHOUSE_MONTHLY_NEED, "Consommation mensuelle (chaque) :"},
     {TR_BUILDING_TOLLHOUSE_STONE_STOCK, "Stock de pierre :"},
     {TR_BUILDING_TOLLHOUSE_SAND_STOCK, "Stock de sable :"},
     {TR_TOOLTIP_BUTTON_TOLLHOUSE, "Maison de péage"},

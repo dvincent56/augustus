@@ -11,7 +11,7 @@
 #include "translation/translation.h"
 #include "window/building/figures.h"
 
-#define ROW_HEIGHT 26
+#define ROW_HEIGHT 22
 
 static int draw_resource_row(int x, int y, int icon_id, const uint8_t *label, int amount)
 {
@@ -39,9 +39,9 @@ void window_building_draw_tollhouse(building_info_context *c)
     int stone_units = b->resources[RESOURCE_STONE] / 100;
     int sand_units = b->resources[RESOURCE_SAND] / 100;
 
-    int y = c->y_offset + 50;
+    int y = c->y_offset + 44;
 
-    // Resources block
+    // Stocks block
     y += draw_resource_row(x_text, y, resource_get_data(RESOURCE_STONE)->image.icon,
         translation_for(TR_BUILDING_TOLLHOUSE_STONE_STOCK), stone_units);
     y += draw_resource_row(x_text, y, resource_get_data(RESOURCE_SAND)->image.icon,
@@ -51,12 +51,11 @@ void window_building_draw_tollhouse(building_info_context *c)
     int width = text_draw(translation_for(TR_BUILDING_TOLLHOUSE_MONTHLY_NEED),
         x_text, y, FONT_NORMAL_BLACK, 0);
     text_draw_number(need, '@', " ", x_text + width, y, FONT_NORMAL_BLACK, 0);
-    y += ROW_HEIGHT + 8;
+    y += ROW_HEIGHT + 6;
 
     // Status line
-    int status_tr;
+    int status_tr = 0;
     if (!c->has_road_access) {
-        status_tr = 0;
         window_building_draw_description_at(c, y - c->y_offset, 69, 25);
     } else if (b->num_workers <= 0) {
         status_tr = TR_BUILDING_TOLLHOUSE_NO_EMPLOYEES;
@@ -69,15 +68,15 @@ void window_building_draw_tollhouse(building_info_context *c)
         text_draw_multiline(translation_for(status_tr),
             x_text, y, text_width, 0, FONT_NORMAL_BLACK, 0);
     }
-    y += 60;
+    y += 50;
 
-    // Description block
+    // Description
     text_draw_multiline(translation_for(TR_BUILDING_TOLLHOUSE_DESC),
         x_text, y, text_width, 0, FONT_NORMAL_BLACK, 0);
 
-    // Employment panel + risks
-    int y_panel = c->y_offset + BLOCK_SIZE * c->height_blocks - 76;
-    inner_panel_draw(c->x_offset + 16, y_panel, c->width_blocks - 2, 4);
-    window_building_draw_employment(c, y_panel - c->y_offset + 8);
-    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, y_panel + 8);
+    // Employment panel + risks anchored from top, leaving room for bottom buttons
+    int y_panel = c->y_offset + BLOCK_SIZE * c->height_blocks - 56;
+    inner_panel_draw(c->x_offset + 16, y_panel, c->width_blocks - 2, 3);
+    window_building_draw_employment(c, y_panel - c->y_offset + 4);
+    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, y_panel + 4);
 }
