@@ -39,7 +39,7 @@ void window_building_draw_tollhouse(building_info_context *c)
     int stone_units = b->resources[RESOURCE_STONE] / 100;
     int sand_units = b->resources[RESOURCE_SAND] / 100;
 
-    int y = c->y_offset + 44;
+    int y = c->y_offset + 64;
 
     // Stocks block
     y += draw_resource_row(x_text, y, resource_get_data(RESOURCE_STONE)->image.icon,
