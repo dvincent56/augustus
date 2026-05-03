@@ -288,6 +288,12 @@ int building_image_get(const building *b)
                 default:
                     return assets_get_image_id("Industry", "Brickworks_C_ON");
             }
+        case BUILDING_TOLLHOUSE:
+            if (b->resources[RESOURCE_STONE] > 0 && b->resources[RESOURCE_SAND] > 0 && b->num_workers > 0) {
+                return assets_get_image_id("Industry", "Tollhouse ON");
+            } else {
+                return assets_get_image_id("Industry", "Tollhouse OFF");
+            }
         case BUILDING_CONCRETE_MAKER:
             switch (scenario_property_climate()) {
                 case CLIMATE_NORTHERN:
