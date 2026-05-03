@@ -626,6 +626,17 @@ int building_construction_place_building(building_type type, int x, int y, int e
             return 0;
         }
     }
+    if (type == BUILDING_TOLLHOUSE) {
+        if (city_buildings_has_tollhouse()) {
+            city_warning_show(WARNING_ONE_BUILDING_OF_TYPE, NEW_WARNING_SLOT);
+            return 0;
+        }
+        if (!city_buildings_has_senate()) {
+            city_warning_show(WARNING_SENATE_NEEDED, NEW_WARNING_SLOT);
+            city_warning_show(WARNING_BUILD_SENATE, NEW_WARNING_SLOT);
+            return 0;
+        }
+    }
     if (type == BUILDING_LIGHTHOUSE && city_buildings_has_lighthouse()) {
         city_warning_show(WARNING_ONE_BUILDING_OF_TYPE, NEW_WARNING_SLOT);
         return 0;
