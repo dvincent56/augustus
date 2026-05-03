@@ -6,6 +6,7 @@
 #include "building/granary.h"
 #include "building/market.h"
 #include "building/storage.h"
+#include "building/tollhouse.h"
 #include "building/warehouse.h"
 #include "core/config.h"
 #include "core/image.h"
@@ -303,7 +304,9 @@ void figure_supplier_action(figure *f)
                 } else if (f->direction == DIR_FIGURE_AT_DESTINATION && f->type == FIGURE_TOLLHOUSE_SUPPLIER) {
                     if (f->collecting_item_id == RESOURCE_STONE || f->collecting_item_id == RESOURCE_SAND) {
                         int loads = f->loads_sold_or_carrying ? f->loads_sold_or_carrying : 1;
-                        building_get(f->building_id)->resources[f->collecting_item_id] += loads * 100;
+                        building *target = building_get(f->building_id);
+                        target->resources[f->collecting_item_id] += loads * 100;
+                        building_tollhouse_refresh_graphic(target);
                     }
                 }
                 f->state = FIGURE_STATE_DEAD;

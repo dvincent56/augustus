@@ -14,4 +14,6 @@ void building_tollhouse_consume_monthly(void);
 
 int building_tollhouse_get_storage_destination(building *tollhouse);
 
+void building_tollhouse_refresh_graphic(building *b);
+
 #endif // BUILDING_TOLLHOUSE_H

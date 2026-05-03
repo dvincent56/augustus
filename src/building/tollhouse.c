@@ -2,8 +2,10 @@
 
 #include "building/building.h"
 #include "building/distribution.h"
+#include "building/image.h"
 #include "city/buildings.h"
 #include "game/resource.h"
+#include "map/building_tiles.h"
 #include "map/data.h"
 #include "map/terrain.h"
 
@@ -53,6 +55,15 @@ int building_tollhouse_is_functional(building *b)
     return 1;
 }
 
+void building_tollhouse_refresh_graphic(building *b)
+{
+    if (!b || b->state != BUILDING_STATE_IN_USE) {
+        return;
+    }
+    map_building_tiles_add(b->id, b->x, b->y, b->size,
+        building_image_get(b), TERRAIN_BUILDING);
+}
+
 void building_tollhouse_consume_monthly(void)
 {
     int id = city_buildings_get_tollhouse();
@@ -72,6 +83,7 @@ void building_tollhouse_consume_monthly(void)
         b->resources[RESOURCE_STONE] -= need_internal;
         b->resources[RESOURCE_SAND] -= need_internal;
     }
+    building_tollhouse_refresh_graphic(b);
 }
 
 #define TOLLHOUSE_MAX_STOCK 500
