@@ -10,6 +10,7 @@
 #include "map/terrain.h"
 
 #define MAX_DISTANCE 40
+#define TOLLHOUSE_MAX_STOCK 500
 
 static int count_highway_tiles(void)
 {
@@ -86,7 +87,6 @@ void building_tollhouse_consume_monthly(void)
     building_tollhouse_refresh_graphic(b);
 }
 
-#define TOLLHOUSE_MAX_STOCK 500
 
 int building_tollhouse_get_storage_destination(building *tollhouse)
 {
