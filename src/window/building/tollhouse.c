@@ -51,7 +51,7 @@ void window_building_draw_tollhouse(building_info_context *c)
     int width = text_draw(translation_for(TR_BUILDING_TOLLHOUSE_MONTHLY_NEED),
         x_text, y, FONT_NORMAL_BLACK, 0);
     text_draw_number(need, '@', " ", x_text + width, y, FONT_NORMAL_BLACK, 0);
-    y += ROW_HEIGHT + 6;
+    y += ROW_HEIGHT + 4;
 
     // Status line
     int status_tr = 0;
@@ -68,15 +68,13 @@ void window_building_draw_tollhouse(building_info_context *c)
         text_draw_multiline(translation_for(status_tr),
             x_text, y, text_width, 0, FONT_NORMAL_BLACK, 0);
     }
-    y += 50;
 
-    // Description
+    // Employment panel + risks at the same Y position as Tavern (HEIGHT_5_24_BLOCKS layout)
+    inner_panel_draw(c->x_offset + 16, c->y_offset + 188, c->width_blocks - 2, 4);
+    window_building_draw_employment(c, 192);
+    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, c->y_offset + 196);
+
+    // Description below the panel
     text_draw_multiline(translation_for(TR_BUILDING_TOLLHOUSE_DESC),
-        x_text, y, text_width, 0, FONT_NORMAL_BLACK, 0);
-
-    // Employment panel + risks anchored from top, leaving room for bottom buttons
-    int y_panel = c->y_offset + BLOCK_SIZE * c->height_blocks - 56;
-    inner_panel_draw(c->x_offset + 16, y_panel, c->width_blocks - 2, 3);
-    window_building_draw_employment(c, y_panel - c->y_offset + 4);
-    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, y_panel + 4);
+        x_text, c->y_offset + 264, text_width, 0, FONT_NORMAL_BLACK, 0);
 }
