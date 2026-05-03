@@ -69,12 +69,12 @@ void window_building_draw_tollhouse(building_info_context *c)
             x_text, y, text_width, 0, FONT_NORMAL_BLACK, 0);
     }
 
-    // Employment panel + risks at the same Y position as Tavern (HEIGHT_5_24_BLOCKS layout)
-    inner_panel_draw(c->x_offset + 16, c->y_offset + 188, c->width_blocks - 2, 4);
-    window_building_draw_employment(c, 192);
-    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, c->y_offset + 196);
+    // Employment panel + risks
+    inner_panel_draw(c->x_offset + 16, c->y_offset + 200, c->width_blocks - 2, 4);
+    window_building_draw_employment(c, 204);
+    window_building_draw_risks(c, c->x_offset + c->width_blocks * BLOCK_SIZE - 76, c->y_offset + 208);
 
     // Description below the panel
     text_draw_multiline(translation_for(TR_BUILDING_TOLLHOUSE_DESC),
-        x_text, c->y_offset + 264, text_width, 0, FONT_NORMAL_BLACK, 0);
+        x_text, c->y_offset + 280, text_width, 0, FONT_NORMAL_BLACK, 0);
 }
