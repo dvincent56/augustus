@@ -3,7 +3,6 @@
 
 #include "building/building.h"
 
-#define TOLLHOUSE_HIGHWAY_TILES_PER_UNIT 50
 #define TOLLHOUSE_RESOURCE_PER_LOAD 100
 
 int building_tollhouse_is_functional(building *b);
