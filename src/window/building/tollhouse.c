@@ -53,20 +53,24 @@ void window_building_draw_tollhouse(building_info_context *c)
     text_draw_number(need, '@', " ", x_text + width, y, FONT_NORMAL_BLACK, 0);
     y += ROW_HEIGHT + 4;
 
-    // Status line
+    // Status line — green when functional (bonus active), red when not
     int status_tr = 0;
+    font_t status_font = FONT_NORMAL_BLACK;
     if (!c->has_road_access) {
         window_building_draw_description_at(c, y - c->y_offset, 69, 25);
     } else if (b->num_workers <= 0) {
         status_tr = TR_BUILDING_TOLLHOUSE_NO_EMPLOYEES;
+        status_font = FONT_NORMAL_RED;
     } else if (!building_tollhouse_is_functional(b)) {
         status_tr = TR_BUILDING_TOLLHOUSE_NO_RESOURCES;
+        status_font = FONT_NORMAL_RED;
     } else {
         status_tr = TR_BUILDING_TOLLHOUSE_FUNCTIONAL;
+        status_font = FONT_NORMAL_GREEN;
     }
     if (status_tr) {
         text_draw_multiline(translation_for(status_tr),
-            x_text, y, text_width, 0, FONT_NORMAL_BLACK, 0);
+            x_text, y, text_width, 0, status_font, 0);
     }
 
     // Employment panel + risks

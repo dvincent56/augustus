@@ -5,6 +5,7 @@
 #include "building/monument.h"
 #include "building/properties.h"
 #include "building/rotation.h"
+#include "building/tollhouse.h"
 #include "building/variant.h"
 #include "city/festival.h"
 #include "city/view.h"
@@ -289,7 +290,7 @@ int building_image_get(const building *b)
                     return assets_get_image_id("Industry", "Brickworks_C_ON");
             }
         case BUILDING_TOLLHOUSE:
-            if (b->resources[RESOURCE_STONE] > 0 && b->resources[RESOURCE_SAND] > 0 && b->num_workers > 0) {
+            if (building_tollhouse_is_functional((building *) b)) {
                 return assets_get_image_id("Industry", "Tollhouse ON");
             } else {
                 return assets_get_image_id("Industry", "Tollhouse OFF");
