@@ -581,6 +581,11 @@ building_storage_permission_states building_storage_get_permission_from_building
             return BUILDING_STORAGE_PERMISSION_LIGHTHOUSE;
         case BUILDING_ARMOURY:
             return BUILDING_STORAGE_PERMISSION_ARMOURY;
+        case BUILDING_TOLLHOUSE:
+            // Reuse the market permission so any warehouse accepting market
+            // traders will also supply the Tollhouse. Avoids requiring a
+            // dedicated checkbox on every warehouse.
+            return BUILDING_STORAGE_PERMISSION_MARKET;
         default:
             return BUILDING_STORAGE_PERMISSION_MARKET; // assume market for other types (usually priests)
     }
