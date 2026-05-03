@@ -140,8 +140,12 @@ static int take_resource_from_warehouse(figure *f, int warehouse_id, int max_amo
     }
     building_warehouse_try_remove_resource(warehouse, f->collecting_item_id, num_loads);
 
-    // create delivery boys
-    if (f->type != FIGURE_LIGHTHOUSE_SUPPLIER && f->type != FIGURE_TOLLHOUSE_SUPPLIER) {
+    // Track how many loads the supplier is carrying so the return code knows
+    // how much to deposit. Lighthouse and Tollhouse don't spawn delivery boys.
+    if (f->type == FIGURE_LIGHTHOUSE_SUPPLIER || f->type == FIGURE_TOLLHOUSE_SUPPLIER) {
+        f->loads_sold_or_carrying = num_loads;
+    } else {
+        // create delivery boys (one per load above the first)
         int supplier_id = f->id;
         int boy1 = figure_supplier_create_delivery_boy(supplier_id, supplier_id, FIGURE_DELIVERY_BOY);
         if (num_loads > 1) {
@@ -255,7 +259,14 @@ void figure_supplier_action(figure *f)
                 f->previous_tile_y = f->y;
                 int id = f->id;
                 if (!resource_is_food(f->collecting_item_id)) {
-                    int max_amount = (f->type == FIGURE_LIGHTHOUSE_SUPPLIER || f->type == FIGURE_TOLLHOUSE_SUPPLIER) ? 1 : 2;
+                    int max_amount;
+                    if (f->type == FIGURE_LIGHTHOUSE_SUPPLIER) {
+                        max_amount = 1;
+                    } else if (f->type == FIGURE_TOLLHOUSE_SUPPLIER) {
+                        max_amount = 4; // larger trips so monthly consumption can keep accumulating
+                    } else {
+                        max_amount = 2;
+                    }
                     if (!take_resource_from_warehouse(f, f->destination_building_id, max_amount)) {
                         f->state = FIGURE_STATE_DEAD;
                     }
@@ -291,7 +302,8 @@ void figure_supplier_action(figure *f)
                     building_get(f->building_id)->resources[RESOURCE_TIMBER] += 100;
                 } else if (f->direction == DIR_FIGURE_AT_DESTINATION && f->type == FIGURE_TOLLHOUSE_SUPPLIER) {
                     if (f->collecting_item_id == RESOURCE_STONE || f->collecting_item_id == RESOURCE_SAND) {
-                        building_get(f->building_id)->resources[f->collecting_item_id] += 100;
+                        int loads = f->loads_sold_or_carrying ? f->loads_sold_or_carrying : 1;
+                        building_get(f->building_id)->resources[f->collecting_item_id] += loads * 100;
                     }
                 }
                 f->state = FIGURE_STATE_DEAD;
