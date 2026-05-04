@@ -53,6 +53,11 @@ int city_buildings_has_city_mint(void)
     return get_first_working_building(BUILDING_CITY_MINT)->id != 0;
 }
 
+int city_buildings_has_workcamp(void)
+{
+    return get_first_working_building(BUILDING_WORKCAMP)->id != 0;
+}
+
 int city_buildings_get_mess_hall(void)
 {
     return get_first_working_building(BUILDING_MESS_HALL)->id;

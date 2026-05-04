@@ -130,7 +130,7 @@ static int can_get_required_resource(building_type type)
             return is_building_type_allowed(BUILDING_SENATE) &&
                 building_monument_has_required_resources_to_build(type);
         case BUILDING_TOLLHOUSE:
-            return is_building_type_allowed(BUILDING_SENATE);
+            return is_building_type_allowed(BUILDING_WORKCAMP);
         default:
             return building_monument_has_required_resources_to_build(type);
     }

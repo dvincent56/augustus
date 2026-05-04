@@ -21,6 +21,8 @@ int city_buildings_get_caravanserai(void);
 
 int city_buildings_has_city_mint(void);
 
+int city_buildings_has_workcamp(void);
+
 int city_buildings_has_tollhouse(void);
 int city_buildings_get_tollhouse(void);
 int city_buildings_has_working_tollhouse(void);
