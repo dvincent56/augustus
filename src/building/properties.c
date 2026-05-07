@@ -2205,8 +2205,8 @@ static building_properties properties[BUILDING_TYPE_MAX] = {
      [BUILDING_TOLLHOUSE] = {
         .size = 3,
         .fire_proof = 1,
-        .custom_asset.group = "Industry",
-        .custom_asset.id = "Tollhouse OFF",
+        .custom_asset.group = "Admin_Logistics",
+        .custom_asset.id = "Highway_Station_OFF",
         .event_data.attr = "tollhouse",
         .building_model_data = {.cost = 200, .desirability_value = -2, .desirability_step = 1,
             .desirability_step_size = 1, .desirability_range = 3, .laborers = 12}

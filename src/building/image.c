@@ -291,9 +291,9 @@ int building_image_get(const building *b)
             }
         case BUILDING_TOLLHOUSE:
             if (building_tollhouse_is_functional((building *) b)) {
-                return assets_get_image_id("Industry", "Tollhouse ON");
+                return assets_get_image_id("Admin_Logistics", "Highway_Station_ON");
             } else {
-                return assets_get_image_id("Industry", "Tollhouse OFF");
+                return assets_get_image_id("Admin_Logistics", "Highway_Station_OFF");
             }
         case BUILDING_CONCRETE_MAKER:
             switch (scenario_property_climate()) {
