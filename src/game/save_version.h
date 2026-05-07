@@ -101,7 +101,7 @@ typedef enum {
     SAVE_GAME_LAST_NO_WATER_IN_ADVISORS = 0xad,
     SAVE_GAME_LAST_NO_SHARED_BUILDINGS = 0xae,
     SAVE_GAME_LAST_NO_PLEBIANS = 0xaf,
-    SAVE_GAME_LAST_NO_TOLLHOUSE = 0xb0
+    SAVE_GAME_LAST_NO_HIGHWAY_STATION = 0xb0
 } savegame_version_t;
 
 typedef enum {

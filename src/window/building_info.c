@@ -49,7 +49,7 @@
 #include "window/building/house.h"
 #include "window/building/military.h"
 #include "window/building/terrain.h"
-#include "window/building/tollhouse.h"
+#include "window/building/highway_station.h"
 #include "window/building/utility.h"
 
 enum {
@@ -267,7 +267,7 @@ static int get_height_id(void)
             case BUILDING_GRANARY:
             case BUILDING_WAREHOUSE:
             case BUILDING_WAREHOUSE_SPACE:
-            case BUILDING_TOLLHOUSE:
+            case BUILDING_HIGHWAY_STATION:
                 return HEIGHT_11_28_BLOCKS;
 
                 //240px
@@ -729,8 +729,8 @@ static void draw_background(void)
             window_building_draw_pantheon(&context);
         } else if (btype == BUILDING_LIGHTHOUSE) {
             window_building_draw_lighthouse(&context);
-        } else if (btype == BUILDING_TOLLHOUSE) {
-            window_building_draw_tollhouse(&context);
+        } else if (btype == BUILDING_HIGHWAY_STATION) {
+            window_building_draw_highway_station(&context);
         } else if (btype == BUILDING_GOVERNORS_HOUSE || btype == BUILDING_GOVERNORS_VILLA ||
             btype == BUILDING_GOVERNORS_PALACE) {
             window_building_draw_governor_home(&context);

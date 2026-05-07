@@ -1,6 +1,6 @@
 #include "buildings.h"
 
-#include "building/tollhouse.h"
+#include "building/highway_station.h"
 #include "city/data_private.h"
 #include "core/calc.h"
 
@@ -83,23 +83,23 @@ int city_buildings_get_caravanserai(void)
     return get_first_working_building(BUILDING_CARAVANSERAI)->id;
 }
 
-int city_buildings_has_tollhouse(void)
+int city_buildings_has_highway_station(void)
 {
-    return city_buildings_get_tollhouse() != 0;
+    return city_buildings_get_highway_station() != 0;
 }
 
-int city_buildings_get_tollhouse(void)
+int city_buildings_get_highway_station(void)
 {
-    return get_first_working_building(BUILDING_TOLLHOUSE)->id;
+    return get_first_working_building(BUILDING_HIGHWAY_STATION)->id;
 }
 
-int city_buildings_has_working_tollhouse(void)
+int city_buildings_has_working_highway_station(void)
 {
-    int id = city_buildings_get_tollhouse();
+    int id = city_buildings_get_highway_station();
     if (!id) {
         return 0;
     }
-    return building_tollhouse_is_functional(building_get(id));
+    return building_highway_station_is_functional(building_get(id));
 }
 
 int city_buildings_triumphal_arch_available(void)

@@ -339,7 +339,7 @@ static void add_to_map(int type, building *b, int size, int orientation, int wat
             b->data.market.is_mess_hall = 1;
             add_building(b);
             break;
-        case BUILDING_TOLLHOUSE:
+        case BUILDING_HIGHWAY_STATION:
             b->accepted_goods[RESOURCE_STONE] = 1;
             b->accepted_goods[RESOURCE_SAND] = 1;
             add_building(b);
@@ -626,8 +626,8 @@ int building_construction_place_building(building_type type, int x, int y, int e
             return 0;
         }
     }
-    if (type == BUILDING_TOLLHOUSE) {
-        if (city_buildings_has_tollhouse()) {
+    if (type == BUILDING_HIGHWAY_STATION) {
+        if (city_buildings_has_highway_station()) {
             city_warning_show(WARNING_ONE_BUILDING_OF_TYPE, NEW_WARNING_SLOT);
             return 0;
         }

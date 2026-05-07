@@ -14,7 +14,7 @@
 #include "building/properties.h"
 #include "building/tavern.h"
 #include "building/temple.h"
-#include "building/tollhouse.h"
+#include "building/highway_station.h"
 #include "building/warehouse.h"
 #include "city/buildings.h"
 #include "city/data_private.h"
@@ -948,21 +948,21 @@ static void spawn_lighthouse_supplier(building *b, int x, int y)
     send_supplier_to_destination(f, dst_building_id);
 }
 
-static void spawn_tollhouse_supplier(building *b, int x, int y)
+static void spawn_highway_station_supplier(building *b, int x, int y)
 {
     if (b->figure_id) {
         figure *f = figure_get(b->figure_id);
         if (f->state != FIGURE_STATE_ALIVE ||
-            (f->type != FIGURE_TOLLHOUSE_SUPPLIER && f->type != FIGURE_LABOR_SEEKER)) {
+            (f->type != FIGURE_HIGHWAY_STATION_SUPPLIER && f->type != FIGURE_LABOR_SEEKER)) {
             b->figure_id = 0;
         }
         return;
     }
-    int dst_building_id = building_tollhouse_get_storage_destination(b);
+    int dst_building_id = building_highway_station_get_storage_destination(b);
     if (dst_building_id == 0) {
         return;
     }
-    figure *f = figure_create(FIGURE_TOLLHOUSE_SUPPLIER, x, y, DIR_0_TOP);
+    figure *f = figure_create(FIGURE_HIGHWAY_STATION_SUPPLIER, x, y, DIR_0_TOP);
     f->building_id = b->id;
     b->figure_id = f->id;
     f->collecting_item_id = b->data.market.fetch_inventory_id;
@@ -1866,7 +1866,7 @@ static void spawn_figure_lighthouse(building *b)
     }
 }
 
-static void spawn_figure_tollhouse(building *b)
+static void spawn_figure_highway_station(building *b)
 {
     // The Curatorium has no dedicated supplier walker. Workcamp workers deliver
     // stone and sand to it (see figure_workcamp_worker_action). We only need to
@@ -2209,8 +2209,8 @@ void building_figure_generate(void)
                 case BUILDING_LIGHTHOUSE:
                     spawn_figure_lighthouse(b);
                     break;
-                case BUILDING_TOLLHOUSE:
-                    spawn_figure_tollhouse(b);
+                case BUILDING_HIGHWAY_STATION:
+                    spawn_figure_highway_station(b);
                     break;
                 case BUILDING_TAVERN:
                     spawn_figure_tavern(b);

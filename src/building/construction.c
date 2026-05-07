@@ -780,7 +780,7 @@ static int should_mark_for_construction(building_type type)
         return 0;
     } else if (type == BUILDING_CITY_MINT && (city_buildings_has_city_mint() || !city_buildings_has_senate())) {
         return 0;
-    } else if (type == BUILDING_TOLLHOUSE && (city_buildings_has_tollhouse() || !city_buildings_has_workcamp())) {
+    } else if (type == BUILDING_HIGHWAY_STATION && (city_buildings_has_highway_station() || !city_buildings_has_workcamp())) {
         return 0;
     } else if (type == BUILDING_BARRACKS && city_buildings_has_barracks() &&
         !config_get(CONFIG_GP_CH_MULTIPLE_BARRACKS)) {
@@ -1115,7 +1115,7 @@ void building_construction_place(void)
     } else if (type == BUILDING_HIGHWAY) {
         placement_cost *= building_construction_place_highway(0, x_start, y_start, x_end, y_end);
         placement_cost /= 4; // Highway special case: cost is 100dn per 2x2 tiles, so it's 1/4 the price per tile
-        if (city_buildings_has_working_tollhouse()) {
+        if (city_buildings_has_working_highway_station()) {
             placement_cost /= 2;
         }
     } else if (type == BUILDING_PLAZA) {

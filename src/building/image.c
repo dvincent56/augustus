@@ -5,7 +5,7 @@
 #include "building/monument.h"
 #include "building/properties.h"
 #include "building/rotation.h"
-#include "building/tollhouse.h"
+#include "building/highway_station.h"
 #include "building/variant.h"
 #include "city/festival.h"
 #include "city/view.h"
@@ -289,8 +289,8 @@ int building_image_get(const building *b)
                 default:
                     return assets_get_image_id("Industry", "Brickworks_C_ON");
             }
-        case BUILDING_TOLLHOUSE:
-            if (building_tollhouse_is_functional((building *) b)) {
+        case BUILDING_HIGHWAY_STATION:
+            if (building_highway_station_is_functional((building *) b)) {
                 return assets_get_image_id("Admin_Logistics", "Highway_Station_ON");
             } else {
                 return assets_get_image_id("Admin_Logistics", "Highway_Station_OFF");

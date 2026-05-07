@@ -335,6 +335,7 @@ set(BUILDING_FILES
     ${PROJECT_SOURCE_DIR}/src/building/figure.c
     ${PROJECT_SOURCE_DIR}/src/building/government.c
     ${PROJECT_SOURCE_DIR}/src/building/granary.c
+    ${PROJECT_SOURCE_DIR}/src/building/highway_station.c
     ${PROJECT_SOURCE_DIR}/src/building/house.c
     ${PROJECT_SOURCE_DIR}/src/building/house_evolution.c
     ${PROJECT_SOURCE_DIR}/src/building/house_population.c
@@ -355,7 +356,6 @@ set(BUILDING_FILES
     ${PROJECT_SOURCE_DIR}/src/building/storage.c
     ${PROJECT_SOURCE_DIR}/src/building/tavern.c
     ${PROJECT_SOURCE_DIR}/src/building/temple.c
-    ${PROJECT_SOURCE_DIR}/src/building/tollhouse.c
     ${PROJECT_SOURCE_DIR}/src/building/variant.c
     ${PROJECT_SOURCE_DIR}/src/building/warehouse.c
 )
@@ -647,11 +647,11 @@ set(WINDOW_FILES
     ${PROJECT_SOURCE_DIR}/src/window/building/depot.c
     ${PROJECT_SOURCE_DIR}/src/window/building/figures.c
     ${PROJECT_SOURCE_DIR}/src/window/building/government.c
+    ${PROJECT_SOURCE_DIR}/src/window/building/highway_station.c
     ${PROJECT_SOURCE_DIR}/src/window/building/house.c
     ${PROJECT_SOURCE_DIR}/src/window/building/industry.c
     ${PROJECT_SOURCE_DIR}/src/window/building/military.c
     ${PROJECT_SOURCE_DIR}/src/window/building/terrain.c
-    ${PROJECT_SOURCE_DIR}/src/window/building/tollhouse.c
     ${PROJECT_SOURCE_DIR}/src/window/building/utility.c
     ${PROJECT_SOURCE_DIR}/src/window/editor/allowed_buildings.c
     ${PROJECT_SOURCE_DIR}/src/window/editor/attributes.c
