@@ -2205,6 +2205,7 @@ static building_properties properties[BUILDING_TYPE_MAX] = {
      [BUILDING_HIGHWAY_STATION] = {
         .size = 3,
         .fire_proof = 1,
+        .draw_desirability_range = 1,
         .custom_asset.group = "Admin_Logistics",
         .custom_asset.id = "Highway_Station_OFF",
         .event_data.attr = "highway_station",
