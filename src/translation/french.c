@@ -2077,6 +2077,8 @@ static translation_string all_strings[] = {
     {TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_OLIVE, "Champ d'oliviers"},
     {TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_VINES, "Champ de vignes"},
     {TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_PIG, "Champ de porcs"},
+    {TR_BUILDING_NATIVE_WELL, "Puits indigène"},
+    {TR_BUILDING_NATIVE_WELL_DESC, "Ce puits creusé à la main puise l'eau de la terre pour abreuver la tribu locale. Bien que rudimentaire comparé aux aqueducs et fontaines romains, il suffit aux modestes besoins des indigènes. Les villageois s'y rassemblent à l'aube et au crépuscule pour puiser de l'eau, échanger les nouvelles, et observer les rythmes de leurs terres ancestrales."},
 };
 
 void translation_french(const translation_string **strings, int *num_strings)
