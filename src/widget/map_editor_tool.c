@@ -78,9 +78,14 @@ static void draw_building(const map_tile *tile, int x_view, int y_view, building
     } else {
         int image_id;
         if (type == BUILDING_NATIVE_CROPS) {
-            // Editor always shows wheat for any crop variant; in-game decoding
-            // uses the saved per-tile offset.
-            image_id = image_group(GROUP_EDITOR_BUILDING_CROPS);
+            int idx = editor_tool_id();
+            if (idx < 0 || idx > 5) idx = 0;
+            // Use aux atlas (c3.555 game crops) when available for proper variant preview.
+            if (image_aux_is_loaded()) {
+                image_id = image_group_aux(GROUP_BUILDING_FARM_CROPS) + idx * 5;
+            } else {
+                image_id = image_group(GROUP_EDITOR_BUILDING_CROPS);
+            }
         } else if (type == BUILDING_NATIVE_HUT_ALT) {
             switch (scenario_property_climate()) {
                 case CLIMATE_NORTHERN:

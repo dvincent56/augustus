@@ -448,9 +448,16 @@ static void place_building(const map_tile *tile)
             break;
         case TOOL_NATIVE_FIELD:
             type = BUILDING_NATIVE_CROPS;
-            // Always display wheat in editor; variant is stored on the building and
-            // encoded into the tile image only at save time
-            image_id = image_group(GROUP_EDITOR_BUILDING_CROPS);
+            {
+                int variant = (data.id >= 0 && data.id < 6) ? data.id : 0;
+                if (image_aux_is_loaded()) {
+                    // Use game's GROUP_BUILDING_FARM_CROPS (loaded as aux in editor mode)
+                    // so each variant displays its proper sprite.
+                    image_id = image_group_aux(GROUP_BUILDING_FARM_CROPS) + variant * 5;
+                } else {
+                    image_id = image_group(GROUP_EDITOR_BUILDING_CROPS);
+                }
+            }
             size = 1;
             break;
         case TOOL_NATIVE_WELL:
