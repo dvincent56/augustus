@@ -11,6 +11,7 @@
 #include "core/random.h"
 #include "editor/tool_restriction.h"
 #include "game/undo.h"
+#include "map/bridge.h"
 #include "map/building_tiles.h"
 #include "map/elevation.h"
 #include "map/grid.h"
@@ -130,7 +131,8 @@ void editor_tool_foreach_brush_tile(void (*callback)(const void *user_data, int 
 int editor_tool_is_updatable(void)
 {
     return data.type == TOOL_ROAD || data.type == TOOL_SELECT_LAND ||
-           data.type == TOOL_NATIVE_PALISADE;
+           data.type == TOOL_NATIVE_PALISADE ||
+           data.type == TOOL_LOW_BRIDGE || data.type == TOOL_SHIP_BRIDGE;
 }
 
 int editor_tool_is_in_use(void)
@@ -591,6 +593,24 @@ static void place_native_palisade(const map_tile *start_tile, const map_tile *en
     }
 }
 
+static void place_bridge(const map_tile *tile, int is_ship_bridge)
+{
+    int length, direction;
+    grid_slice blocked = { .size = 0 };
+    int min_length = is_ship_bridge ? 5 : 2;
+    if (!map_bridge_calculate_length_direction(tile->x, tile->y, &length, &direction, &blocked) ||
+        length < min_length) {
+        city_warning_show(WARNING_SHORE_NEEDED, NEW_WARNING_SLOT);
+        return;
+    }
+    int placed = map_bridge_add(tile->x, tile->y, is_ship_bridge);
+    if (placed > 0) {
+        scenario_editor_set_as_unsaved();
+    } else {
+        city_warning_show(WARNING_EDITOR_CANNOT_PLACE, NEW_WARNING_SLOT);
+    }
+}
+
 void editor_tool_end_use(const map_tile *tile)
 {
     if (!data.build_in_progress) {
@@ -640,6 +660,12 @@ void editor_tool_end_use(const map_tile *tile)
             break;
         case TOOL_NATIVE_PALISADE:
             place_native_palisade(&data.start_tile, tile);
+            break;
+        case TOOL_LOW_BRIDGE:
+            place_bridge(tile, 0);
+            break;
+        case TOOL_SHIP_BRIDGE:
+            place_bridge(tile, 1);
             break;
         case TOOL_RAISE_LAND:
         case TOOL_LOWER_LAND:

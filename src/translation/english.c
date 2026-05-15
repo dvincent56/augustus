@@ -2106,6 +2106,9 @@ static translation_string all_strings[] = {
     {TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_PIG, "Pig field"},
     {TR_BUILDING_NATIVE_WELL, "Native Well"},
     {TR_BUILDING_NATIVE_WELL_DESC, "This hand-dug well draws water from the earth to sustain the local tribe. Though primitive compared to Roman aqueducts and fountains, it suffices for the natives' modest needs. The villagers gather here at dawn and dusk to draw water, exchange news, and observe the rhythms of their ancestral land."},
+    {TR_EDITOR_BRIDGES, "Bridges"},
+    {TR_EDITOR_SCENARIO_BUILDING_LOW_BRIDGE, "Low bridge"},
+    {TR_EDITOR_SCENARIO_BUILDING_SHIP_BRIDGE, "Ship bridge"},
 };
 
 void translation_english(const translation_string **strings, int *num_strings)

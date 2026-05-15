@@ -38,7 +38,9 @@ typedef enum {
     TOOL_NATIVE_MEETING_ALT = 35,
     TOOL_NATIVE_HUT_ALT_2 = 36,
     TOOL_NATIVE_MEETING_ALT_2 = 37,
-    TOOL_NATIVE_PALISADE = 38
+    TOOL_NATIVE_PALISADE = 38,
+    TOOL_LOW_BRIDGE = 39,
+    TOOL_SHIP_BRIDGE = 40
 } tool_type;
 
 tool_type editor_tool_type(void);

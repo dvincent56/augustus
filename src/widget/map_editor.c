@@ -24,6 +24,8 @@
 #include "map/image_context.h"
 #include "map/point.h"
 #include "map/property.h"
+#include "map/sprite.h"
+#include "widget/city/bridge.h"
 #include "map/terrain.h"
 #include "scenario/custom_variable.h"
 #include "scenario/event/controller.h"
@@ -151,6 +153,10 @@ static void draw_custom_earthquake(int x, int y, int grid_offset)
 static void draw_top(int x, int y, int grid_offset)
 {
     if (!map_property_is_draw_tile(grid_offset)) {
+        return;
+    }
+    if (map_sprite_bridge_at(grid_offset)) {
+        city_draw_bridge(x, y, draw_context.scale, grid_offset);
         return;
     }
     int image_id = map_image_at(grid_offset);

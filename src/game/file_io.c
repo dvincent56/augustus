@@ -114,6 +114,8 @@ typedef struct {
     buffer *end_marker;
     buffer *model_data;
     buffer *production_rates;
+    buffer *sprite_grid;
+    buffer *sprite_backup_grid;
 } scenario_state;
 
 static struct {
@@ -411,6 +413,10 @@ static void init_scenario_data(scenario_version_t version)
         state->model_data = create_scenario_piece(PIECE_SIZE_DYNAMIC, 0);
         state->scenario_formulas = create_scenario_piece(PIECE_SIZE_DYNAMIC, 1);
         state->production_rates = create_scenario_piece(PIECE_SIZE_DYNAMIC, 1);
+    }
+    if (version > SCENARIO_LAST_NO_BRIDGE_SPRITES) {
+        state->sprite_grid = create_scenario_piece(GRID_SIZE_BUF_U8, 1);
+        state->sprite_backup_grid = create_scenario_piece(GRID_SIZE_BUF_U8, 1);
     }
     state->end_marker = create_scenario_piece(4, 0);
 }
@@ -793,6 +799,12 @@ static void scenario_load_from_state(scenario_state *file, scenario_version_t ve
         scenario_events_migrate_to_buys_sells();
     }
 
+    if (version > SCENARIO_LAST_NO_BRIDGE_SPRITES) {
+        map_sprite_load_state(file->sprite_grid, file->sprite_backup_grid);
+    } else {
+        map_sprite_clear();
+    }
+
     buffer_skip(file->end_marker, 4);
 }
 
@@ -822,6 +834,7 @@ static void scenario_save_to_state(scenario_state *file)
     empire_save_custom_map(file->empire_map);
     model_save_model_data(file->model_data);
     production_rates_save(file->production_rates);
+    map_sprite_save_state(file->sprite_grid, file->sprite_backup_grid);
     buffer_skip(file->end_marker, 4);
 }
 

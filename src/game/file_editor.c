@@ -29,6 +29,7 @@
 #include "game/state.h"
 #include "game/time.h"
 #include "map/aqueduct.h"
+#include "map/bridge.h"
 #include "map/building.h"
 #include "map/desirability.h"
 #include "map/elevation.h"
@@ -142,6 +143,11 @@ static void prepare_map_for_editing(void)
     map_tiles_update_all_walls();
     map_tiles_update_all_aqueducts(0);
     widget_map_editor_custom_earthquake_request_refresh();
+    // Reconstruct bridges first: map_natives_init_editor wipes terrain on
+    // tiles with TERRAIN_BUILDING whose image isn't a native — bridges'
+    // image_grid still shows water, so they'd be wiped. Reconstructing first
+    // sets map_building_at so natives skips those tiles.
+    map_bridge_recalculate_sprites_from_buildings();
     map_natives_init_editor();
     map_routing_update_all();
 

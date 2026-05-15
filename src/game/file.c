@@ -45,6 +45,7 @@
 #include "graphics/weather.h"
 #include "map/aqueduct.h"
 #include "map/bookmark.h"
+#include "map/bridge.h"
 #include "map/building.h"
 #include "map/desirability.h"
 #include "map/elevation.h"
@@ -163,6 +164,12 @@ static void initialize_scenario_data(const uint8_t *scenario_name)
 
     // Load climate before to prevent climate related images blinking
     image_load_climate(scenario_property_climate(), 0, 0, 0);
+
+    // Reconstruct bridges first: map_natives_init wipes the terrain on tiles
+    // with TERRAIN_BUILDING whose image isn't a recognised native, which would
+    // include bridge tiles (whose image_grid still shows water). Reconstructing
+    // bridges sets map_building_at so the natives pass skips them.
+    map_bridge_recalculate_sprites_from_buildings();
 
     map_natives_init();
 
