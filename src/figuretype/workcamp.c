@@ -2,10 +2,10 @@
 
 #include "assets/assets.h"
 #include "building/building.h"
+#include "building/highway_station.h"
 #include "building/monument.h"
 #include "building/properties.h"
 #include "building/storage.h"
-#include "building/highway_station.h"
 #include "building/warehouse.h"
 #include "city/buildings.h"
 #include "city/gods.h"
@@ -62,11 +62,14 @@ static int take_resource_from_warehouse(figure *f, int warehouse_id)
         return 0;
     }
 
-    building_warehouse_try_remove_resource(warehouse, resource, num_loads);
+    int amount_taken = building_warehouse_try_remove_resource(warehouse, resource, num_loads);
+    if (amount_taken <= 0) {
+        return 0;
+    }
 
     // create slave workers
     int slave = f->id;
-    for (int i = 0; i < num_loads; i++) {
+    for (int i = 0; i < amount_taken; i++) {
         slave = create_slave_workers(slave, f->id);
     }
     return 1;
@@ -141,7 +144,7 @@ void figure_workcamp_worker_action(figure *f)
                     break;
                 }
             }
-            // Fallback: if no monument needs delivery, supply the Curatorium if it exists and is short on stock
+            // Fallback: if no monument needs delivery, supply the Highway Station if it exists and is short on stock
             if (!f->destination_building_id) {
                 int highway_station_id = city_buildings_get_highway_station();
                 if (highway_station_id) {
@@ -247,8 +250,12 @@ void figure_workcamp_worker_action(figure *f)
                     f->state = FIGURE_STATE_DEAD;
                     break;
                 }
-                building_warehouse_try_remove_resource(warehouse, f->collecting_item_id, num_loads);
-                f->loads_sold_or_carrying = num_loads;
+                int amount_taken = building_warehouse_try_remove_resource(warehouse, f->collecting_item_id, num_loads);
+                if (amount_taken <= 0) {
+                    f->state = FIGURE_STATE_DEAD;
+                    break;
+                }
+                f->loads_sold_or_carrying = amount_taken;
                 int tid = city_buildings_get_highway_station();
                 if (!tid) {
                     f->state = FIGURE_STATE_DEAD;

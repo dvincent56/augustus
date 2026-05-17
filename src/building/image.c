@@ -2,10 +2,10 @@
 
 #include "assets/assets.h"
 #include "building/connectable.h"
+#include "building/highway_station.h"
 #include "building/monument.h"
 #include "building/properties.h"
 #include "building/rotation.h"
-#include "building/highway_station.h"
 #include "building/variant.h"
 #include "city/festival.h"
 #include "city/view.h"

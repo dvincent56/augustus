@@ -139,17 +139,20 @@ static int take_resource_from_warehouse(figure *f, int warehouse_id, int max_amo
     if (num_loads <= 0) {
         return 0;
     }
-    building_warehouse_try_remove_resource(warehouse, f->collecting_item_id, num_loads);
+    int amount_taken = building_warehouse_try_remove_resource(warehouse, f->collecting_item_id, num_loads);
+    if (amount_taken <= 0) {
+        return 0;
+    }
 
     // Track how many loads the supplier is carrying so the return code knows
     // how much to deposit. Lighthouse and Highway Station don't spawn delivery boys.
     if (f->type == FIGURE_LIGHTHOUSE_SUPPLIER || f->type == FIGURE_HIGHWAY_STATION_SUPPLIER) {
-        f->loads_sold_or_carrying = num_loads;
+        f->loads_sold_or_carrying = amount_taken;
     } else {
         // create delivery boys (one per load above the first)
         int supplier_id = f->id;
         int boy1 = figure_supplier_create_delivery_boy(supplier_id, supplier_id, FIGURE_DELIVERY_BOY);
-        if (num_loads > 1) {
+        if (amount_taken > 1) {
             figure_supplier_create_delivery_boy(boy1, supplier_id, FIGURE_DELIVERY_BOY);
         }
     }

@@ -1891,7 +1891,7 @@ static void spawn_figure_lighthouse(building *b)
 
 static void spawn_figure_highway_station(building *b)
 {
-    // The Curatorium has no dedicated supplier walker. Workcamp workers deliver
+    // The Highway Station has no dedicated supplier walker. Workcamp workers deliver
     // stone and sand to it (see figure_workcamp_worker_action). We only need to
     // recruit workforce for the building itself.
     check_labor_problem(b);

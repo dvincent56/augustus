@@ -2,9 +2,9 @@
 
 #include "building/building.h"
 #include "building/count.h"
+#include "building/highway_station.h"
 #include "building/monument.h"
 #include "building/properties.h"
-#include "building/highway_station.h"
 #include "city/buildings.h"
 #include "city/data_private.h"
 #include "city/culture.h"
