@@ -41,6 +41,11 @@ int building_highway_station_monthly_need(void)
     return (blocks + HIGHWAY_STATION_HIGHWAY_BLOCKS_PER_UNIT - 1) / HIGHWAY_STATION_HIGHWAY_BLOCKS_PER_UNIT;
 }
 
+int building_highway_station_max_stock(void)
+{
+    return building_highway_station_monthly_need() * HIGHWAY_STATION_STOCK_MONTHS * HIGHWAY_STATION_RESOURCE_PER_LOAD;
+}
+
 int building_highway_station_is_functional(building *b)
 {
     if (!b || b->state != BUILDING_STATE_IN_USE || b->num_workers <= 0) {
@@ -94,8 +99,12 @@ void building_highway_station_consume_monthly(void)
 
 int building_highway_station_get_storage_destination(building *highway_station)
 {
-    if (highway_station->resources[RESOURCE_STONE] >= HIGHWAY_STATION_MAX_STOCK &&
-        highway_station->resources[RESOURCE_SAND] >= HIGHWAY_STATION_MAX_STOCK) {
+    int max_stock = building_highway_station_max_stock();
+    if (max_stock <= 0) {
+        return 0;
+    }
+    if (highway_station->resources[RESOURCE_STONE] >= max_stock &&
+        highway_station->resources[RESOURCE_SAND] >= max_stock) {
         return 0;
     }
     resource_storage_info info[RESOURCE_MAX] = { 0 };
@@ -109,7 +118,7 @@ int building_highway_station_get_storage_destination(building *highway_station)
         highway_station->data.market.fetch_inventory_id = fetch_inventory;
         return info[fetch_inventory].building_id;
     }
-    fetch_inventory = building_distribution_fetch(highway_station, info, HIGHWAY_STATION_MAX_STOCK, 0);
+    fetch_inventory = building_distribution_fetch(highway_station, info, max_stock, 0);
     if (fetch_inventory != RESOURCE_NONE) {
         highway_station->data.market.fetch_inventory_id = fetch_inventory;
         return info[fetch_inventory].building_id;
