@@ -1007,6 +1007,7 @@ static translation_string all_strings[] = {
     {TR_BUILDING_HIGHWAY_STATION_FUNCTIONAL, "The Highway Station is operating. Highway costs and levies are halved."},
     {TR_BUILDING_HIGHWAY_STATION_NOT_FUNCTIONAL, "The Highway Station is idle. Highway costs and levies are at full price."},
     {TR_BUILDING_HIGHWAY_STATION_MONTHLY_NEED, "Monthly consumption (each):"},
+    {TR_BUILDING_HIGHWAY_STATION_HIGHWAY_TILES, "Highway tiles in city:"},
     {TR_BUILDING_HIGHWAY_STATION_STONE_STOCK, "Stone stock:"},
     {TR_BUILDING_HIGHWAY_STATION_SAND_STOCK, "Sand stock:"},
     {TR_TOOLTIP_BUTTON_HIGHWAY_STATION, "Highway Station"},

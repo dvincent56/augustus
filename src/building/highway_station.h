@@ -5,8 +5,11 @@
 
 #define HIGHWAY_STATION_HIGHWAY_BLOCKS_PER_UNIT 50
 #define HIGHWAY_STATION_RESOURCE_PER_LOAD 100
+#define HIGHWAY_STATION_MAX_STOCK 1500
 
 int building_highway_station_is_functional(building *b);
+
+int building_highway_station_highway_blocks(void);
 
 int building_highway_station_monthly_need(void);
 

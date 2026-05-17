@@ -1007,6 +1007,7 @@ static translation_string all_strings[] = {
     {TR_BUILDING_HIGHWAY_STATION_FUNCTIONAL, "La Station d'autoroute est en activité. Les coûts et redevances des autoroutes sont réduits de moitié."},
     {TR_BUILDING_HIGHWAY_STATION_NOT_FUNCTIONAL, "La Station d'autoroute est inactive. Les coûts et redevances des autoroutes sont au prix plein."},
     {TR_BUILDING_HIGHWAY_STATION_MONTHLY_NEED, "Consommation mensuelle (chaque) :"},
+    {TR_BUILDING_HIGHWAY_STATION_HIGHWAY_TILES, "Tuiles d'autoroute dans la cité :"},
     {TR_BUILDING_HIGHWAY_STATION_STONE_STOCK, "Stock de pierre :"},
     {TR_BUILDING_HIGHWAY_STATION_SAND_STOCK, "Stock de sable :"},
     {TR_TOOLTIP_BUTTON_HIGHWAY_STATION, "Station d'autoroute"},

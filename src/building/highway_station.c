@@ -10,7 +10,6 @@
 #include "map/terrain.h"
 
 #define MAX_DISTANCE 40
-#define HIGHWAY_STATION_MAX_STOCK 500
 
 static int count_highway_tiles(void)
 {
@@ -26,11 +25,16 @@ static int count_highway_tiles(void)
     return tiles;
 }
 
-int building_highway_station_monthly_need(void)
+int building_highway_station_highway_blocks(void)
 {
     // count_highway_tiles() returns sub-tiles. A placed highway is a 2x2 block,
     // so each block contributes 4 sub-tiles. Divide by 4 to get block count.
-    int blocks = count_highway_tiles() / 4;
+    return count_highway_tiles() / 4;
+}
+
+int building_highway_station_monthly_need(void)
+{
+    int blocks = building_highway_station_highway_blocks();
     if (blocks <= 0) {
         return 0;
     }

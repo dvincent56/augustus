@@ -152,7 +152,7 @@ void figure_workcamp_worker_action(figure *f)
                     static const resource_type highway_station_resources[2] = { RESOURCE_STONE, RESOURCE_SAND };
                     for (int i = 0; i < 2; i++) {
                         resource_type r = highway_station_resources[i];
-                        if (highway_station->resources[r] >= 500) {
+                        if (highway_station->resources[r] >= HIGHWAY_STATION_MAX_STOCK) {
                             continue;
                         }
                         warehouse_id = building_warehouse_with_resource(f->x, f->y, r, b->road_network_id, 0, &dst, BUILDING_STORAGE_PERMISSION_WORKCAMP);
