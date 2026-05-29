@@ -6,6 +6,7 @@ typedef struct {
     int group_offset;
     int item_offset;
     int aqueduct_offset;
+    int max_item_offset;
 } terrain_image;
 
 void map_image_context_init(void);
@@ -16,6 +17,7 @@ const terrain_image *map_image_context_get_elevation(int grid_offset, int elevat
 const terrain_image *map_image_context_get_earthquake(int grid_offset);
 const terrain_image *map_image_context_get_future_earthquake(int grid_offset);
 const terrain_image *map_image_context_get_shore(int grid_offset);
+const terrain_image *map_image_context_get_marshland(int grid_offset);
 const terrain_image *map_image_context_get_wall(int grid_offset);
 const terrain_image *map_image_context_get_wall_gatehouse(int grid_offset);
 const terrain_image *map_image_context_get_dirt_road(int grid_offset);

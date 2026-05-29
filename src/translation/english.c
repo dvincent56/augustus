@@ -2107,6 +2107,10 @@ static translation_string all_strings[] = {
     {TR_CONFIG_HEADER_DESIRABILITY, "Desirability"},
     {TR_CONFIG_SHOW_SHORELINE_DESIRABILITY, "Show shoreline desirability in overlay"},
     {TR_CONFIG_SHOW_ELEVATION_DESIRABILITY, "Show elevation desirability in overlay"},
+    {TR_EDITOR_TOOL_MARSHLAND, "Marshland"},
+    {TR_EDITOR_TOOL_WATER, "Water"},
+    {TR_TERRAIN_MARSHLAND, "Marshland"},
+    {TR_TERRAIN_MARSHLAND_DESC, "A fetid swamp. Marshland is impassable and breeds disease: it lowers the desirability of the surrounding area and spreads sickness to nearby houses. No respectable citizen wants to live near it."},
 };
 
 void translation_english(const translation_string **strings, int *num_strings)

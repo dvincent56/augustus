@@ -265,6 +265,32 @@ static struct terrain_image_context terrain_images_aqueduct[16] = {
     {{2, 2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2}, 0, 1},
 };
 
+static struct terrain_image_context terrain_images_marshland[23] = {
+    {{0, 1, 0, 1, 0, 1, 0, 1}, {62, 62, 62, 62}, 0, 1},
+    {{0, 1, 0, 0, 0, 1, 0, 0}, {48, 49, 48, 49}, 0, 1},   // NE+SW fade (screen left+right) -> tile 49
+    {{0, 0, 0, 1, 0, 0, 0, 1}, {49, 48, 49, 48}, 0, 1},   // SE+NW fade (screen top+bottom)  -> tile 50
+    {{0, 1, 0, 0, 0, 0, 0, 0}, {50, 53, 52, 51}, 0, 1},   // NE fade (screen left)   -> tile 51 (left)
+    {{0, 0, 0, 1, 0, 0, 0, 0}, {51, 50, 53, 52}, 0, 1},   // SE fade (screen top)    -> tile 52 (up)
+    {{0, 0, 0, 0, 0, 1, 0, 0}, {52, 51, 50, 53}, 0, 1},   // SW fade (screen right)  -> tile 53 (right)
+    {{0, 0, 0, 0, 0, 0, 0, 1}, {53, 52, 51, 50}, 0, 1},   // NW fade (screen bottom) -> tile 54 (bottom)
+    {{1, 2, 1, 2, 1, 2, 1, 2}, {79, 79, 79, 79}, 0, 1},
+    {{0, 2, 1, 2, 1, 2, 1, 2}, {44, 47, 46, 45}, 0, 1},   // E+S+W fade (N joins)
+    {{1, 2, 0, 2, 1, 2, 1, 2}, {45, 44, 47, 46}, 0, 1},   // N+S+W fade (E joins)
+    {{1, 2, 1, 2, 0, 2, 1, 2}, {46, 45, 44, 47}, 0, 1},   // N+E+W fade (S joins)
+    {{1, 2, 1, 2, 1, 2, 0, 2}, {47, 46, 45, 44}, 0, 1},   // N+E+S fade (W joins)
+    {{1, 2, 0, 2, 1, 2, 0, 2}, {40, 42, 40, 42}, 0, 2},   // N+S fade -> 41-42
+    {{0, 2, 1, 2, 0, 2, 1, 2}, {42, 40, 42, 40}, 0, 2},   // E+W fade -> 43-44
+    {{1, 2, 1, 2, 0, 2, 0, 2}, {32, 28, 24, 36}, 0, 4},   // N+E fade -> tip right 33-36
+    {{0, 2, 1, 2, 1, 2, 0, 2}, {36, 32, 28, 24}, 0, 4},   // E+S fade -> tip down    37-40
+    {{0, 2, 0, 2, 1, 2, 1, 2}, {24, 36, 32, 28}, 0, 4},   // S+W fade -> tip left 25-28
+    {{1, 2, 0, 2, 0, 2, 1, 2}, {28, 24, 36, 32}, 0, 4},   // W+N fade -> tip up   29-32
+    {{1, 2, 0, 2, 0, 2, 0, 2}, {16, 12, 8, 20}, 0, 4},    // N -> 17-20
+    {{0, 2, 1, 2, 0, 2, 0, 2}, {20, 16, 12, 8}, 0, 4},    // E -> 21-24
+    {{0, 2, 0, 2, 1, 2, 0, 2}, {8, 20, 16, 12}, 0, 4},    // S -> 9-12
+    {{0, 2, 0, 2, 0, 2, 1, 2}, {12, 8, 20, 16}, 0, 4},    // W -> 13-16
+    {{2, 2, 2, 2, 2, 2, 2, 2}, {0, 0, 0, 0}, 0, 8},
+};
+
 enum {
     CONTEXT_WATER,
     CONTEXT_WALL,
@@ -274,6 +300,7 @@ enum {
     CONTEXT_DIRT_ROAD,
     CONTEXT_PAVED_ROAD,
     CONTEXT_AQUEDUCT,
+    CONTEXT_MARSHLAND,
     CONTEXT_MAX_ITEMS
 };
 
@@ -288,7 +315,8 @@ static struct {
     {terrain_images_earthquake, 17},
     {terrain_images_dirt_road, 17},
     {terrain_images_paved_road, 48},
-    {terrain_images_aqueduct, 16}
+    {terrain_images_aqueduct, 16},
+    {terrain_images_marshland, 23}
 };
 
 static void clear_current_offset(struct terrain_image_context *items, int num_items)
@@ -342,6 +370,7 @@ static const terrain_image *get_image(int group, int tiles[MAX_TILES])
             result.group_offset = context[i].offset_for_orientation[city_view_orientation() / 2];
             result.item_offset = context[i].current_item_offset;
             result.aqueduct_offset = context[i].aqueduct_offset;
+            result.max_item_offset = context[i].max_item_offset;
             break;
         }
     }
@@ -393,8 +422,15 @@ static void fill_matches(int grid_offset, int terrain, int match_value, int no_m
 const terrain_image *map_image_context_get_shore(int grid_offset)
 {
     int tiles[MAX_TILES];
-    fill_matches(grid_offset, TERRAIN_WATER, 0, 1, tiles);
+    fill_matches(grid_offset, TERRAIN_WATER | TERRAIN_MARSHLAND, 0, 1, tiles);
     return get_image(CONTEXT_WATER, tiles);
+}
+
+const terrain_image *map_image_context_get_marshland(int grid_offset)
+{
+    int tiles[MAX_TILES];
+    fill_matches(grid_offset, TERRAIN_MARSHLAND, 0, 1, tiles);
+    return get_image(CONTEXT_MARSHLAND, tiles);
 }
 
 const terrain_image *map_image_context_get_wall(int grid_offset)

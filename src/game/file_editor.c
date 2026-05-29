@@ -129,6 +129,7 @@ static void prepare_map_for_editing(void)
 
     map_tiles_update_all_elevation_editor();
     map_tiles_update_all_water();
+    map_tiles_update_all_marshland();
     map_tiles_update_all_earthquake();
     map_tiles_update_all_rocks();
     map_tiles_update_all_empty_land();

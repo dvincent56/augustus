@@ -26,6 +26,7 @@
 #include "map/routing_terrain.h"
 #include "map/terrain.h"
 #include "scenario/map.h"
+#include "scenario/property.h"
 
 
 
@@ -1135,6 +1136,82 @@ void map_tiles_set_water(int x, int y)
     foreach_region_tile(x - 1, y - 1, x + 1, y + 1, set_water_image);
 }
 
+// Marshland asset layout per climate: tiles 1-80 (offset 0-79) are the LAND-connection
+// variants (over a Land_C/N/S base); tiles 81-152 are the WATER-connection variants (same
+// edge shapes over a Water base). The water set starts at edge tile 9, so tile 81 == land
+// tile 9 over water => water_offset = land_offset + 72 (only for edge offsets >= 8; the
+// solid interior tiles 1-8 have no water variant). A marsh tile that borders water uses the
+// water variant so it blends into the water as an island; otherwise it uses the land tiles.
+#define MARSHLAND_LAND_TILE_COUNT 80
+#define MARSHLAND_WATER_VARIANT_OFFSET 72
+#define MARSHLAND_FIRST_EDGE_OFFSET 8
+
+static int marshland_borders_water(int grid_offset)
+{
+    for (int i = 0; i < 8; i++) {
+        if (map_terrain_is(grid_offset + map_grid_direction_delta(i), TERRAIN_WATER)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int marshland_base_image(void)
+{
+    switch (scenario_property_climate()) {
+        case CLIMATE_NORTHERN:
+            return assets_get_image_id("Terrain_Maps", "Marshland_N_01");
+        case CLIMATE_DESERT:
+            return assets_get_image_id("Terrain_Maps", "Marshland_S_01");
+        default:
+            return assets_get_image_id("Terrain_Maps", "Marshland_C_01");
+    }
+}
+
+static void set_marshland_image(int x, int y, int grid_offset)
+{
+    if (!map_terrain_is(grid_offset, TERRAIN_MARSHLAND)) {
+        return;
+    }
+    int base = marshland_base_image();
+    if (base <= 0) {
+        base = assets_get_image_id("Terrain_Maps", "Marshland_C_01");
+    }
+    const terrain_image *img = map_image_context_get_marshland(grid_offset);
+    int variants = img->max_item_offset > 0 ? img->max_item_offset : 1;
+    int variant = map_random_get(grid_offset) % variants;
+    int offset = img->group_offset + variant;
+    if (offset < 0 || offset >= MARSHLAND_LAND_TILE_COUNT) {
+        offset = 0;
+    }
+    // If this marsh tile borders water, use the water-connection variant (over a Water base)
+    // so it reads as marsh sitting in the water. Only edge tiles (offset >= 8) have a water
+    // variant; a fully interior tile keeps its solid land tile.
+    if (offset >= MARSHLAND_FIRST_EDGE_OFFSET && marshland_borders_water(grid_offset)) {
+        offset += MARSHLAND_WATER_VARIANT_OFFSET;
+    }
+    map_image_set(grid_offset, base + offset);
+    map_property_set_multi_tile_size(grid_offset, 1);
+    map_property_mark_draw_tile(grid_offset);
+}
+
+static void update_marshland_tile(int x, int y, int grid_offset)
+{
+    if (map_terrain_is(grid_offset, TERRAIN_MARSHLAND)) {
+        foreach_region_tile(x - 1, y - 1, x + 1, y + 1, set_marshland_image);
+    }
+}
+
+void map_tiles_update_all_marshland(void)
+{
+    foreach_map_tile(update_marshland_tile);
+}
+
+void map_tiles_update_region_marshland(int x_min, int y_min, int x_max, int y_max)
+{
+    foreach_region_tile(x_min, y_min, x_max, y_max, update_marshland_tile);
+}
+
 static void set_aqueduct(int grid_offset)
 {
     const terrain_image *img = map_image_context_get_aqueduct(grid_offset, aqueduct_include_construction);
@@ -1460,6 +1537,7 @@ void map_tiles_update_all(void)
 
     map_tiles_update_all_elevation();
     map_tiles_update_all_water();
+    map_tiles_update_all_marshland();
     map_tiles_update_all_earthquake();
     map_tiles_update_all_rocks();
     foreach_map_tile(set_tree_image);

@@ -151,6 +151,7 @@ int editor_tool_is_brush(void)
         case TOOL_SHRUB:
         case TOOL_ROCKS:
         case TOOL_MEADOW:
+        case TOOL_MARSHLAND:
         case TOOL_NATIVE_RUINS:
         case TOOL_RAISE_LAND:
         case TOOL_LOWER_LAND:
@@ -257,6 +258,13 @@ static void add_terrain(const void *tile_data, int dx, int dy)
                 terrain |= TERRAIN_MEADOW;
             }
             break;
+        case TOOL_MARSHLAND:
+            if (!(terrain & TERRAIN_MARSHLAND) && !(terrain & TERRAIN_ELEVATION_ROCK)) {
+                terrain &= TERRAIN_PAINT_MASK;
+                terrain |= TERRAIN_MARSHLAND;
+                map_property_clear_future_earthquake(grid_offset);
+            }
+            break;
         case TOOL_NATIVE_RUINS:
             if (!(terrain & TERRAIN_RUBBLE)) {
                 terrain &= TERRAIN_PAINT_MASK;
@@ -334,6 +342,13 @@ void editor_tool_update_use(const map_tile *tile)
             map_tiles_update_region_water(x_min, y_min, x_max, y_max);
             map_tiles_update_all_rocks();
             map_tiles_update_region_meadow(x_min, y_min, x_max, y_max);
+            break;
+        case TOOL_MARSHLAND:
+            map_image_context_reset_water();
+            map_tiles_update_region_water(x_min, y_min, x_max, y_max);
+            map_tiles_update_all_rocks();
+            map_tiles_update_region_empty_land(x_min, y_min, x_max, y_max);
+            map_tiles_update_region_marshland(x_min, y_min, x_max, y_max);
             break;
         case TOOL_NATIVE_RUINS:
             // Rubble doesn't need terrain updates, just refresh the rubble graphics
@@ -479,6 +494,7 @@ static void update_terrain_after_elevation_changes(void)
     map_tiles_update_all_empty_land();
     map_tiles_update_all_meadow();
     map_tiles_update_all_water();
+    map_tiles_update_all_marshland();
 
     scenario_editor_set_as_unsaved();
 }
