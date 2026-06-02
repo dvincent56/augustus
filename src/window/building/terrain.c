@@ -4,6 +4,8 @@
 #include "military.h"
 #include "utility.h"
 
+#include "core/dir.h"
+#include "core/random.h"
 #include "figure/figure.h"
 #include "graphics/lang_text.h"
 #include "graphics/panel.h"
@@ -44,6 +46,10 @@ void window_building_draw_terrain(building_info_context *c)
             c->can_play_sound = 0;
             if (c->figure.count > 0) {
                 window_building_play_figure_phrase(c);
+            } else if (c->terrain_type == TERRAIN_INFO_MARSHLAND) {
+                sound_speech_play_file((random_byte() & 1)
+                    ? ASSETS_DIRECTORY "/Sounds/Marshland01.ogg"
+                    : ASSETS_DIRECTORY "/Sounds/Marshland02.ogg");
             } else {
                 sound_speech_play_file("wavs/empty_land.wav");
             }

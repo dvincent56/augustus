@@ -422,7 +422,7 @@ static void fill_matches(int grid_offset, int terrain, int match_value, int no_m
 const terrain_image *map_image_context_get_shore(int grid_offset)
 {
     int tiles[MAX_TILES];
-    fill_matches(grid_offset, TERRAIN_WATER | TERRAIN_MARSHLAND, 0, 1, tiles);
+    fill_matches(grid_offset, TERRAIN_WATER, 0, 1, tiles);
     return get_image(CONTEXT_WATER, tiles);
 }
 

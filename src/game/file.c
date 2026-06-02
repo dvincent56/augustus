@@ -125,6 +125,7 @@ static void clear_scenario_data(void)
 
     // clear grids
     map_image_clear();
+    map_marsh_image_clear();
     map_building_clear();
     map_terrain_clear();
     map_aqueduct_clear();
@@ -274,6 +275,7 @@ static void initialize_saved_game(void)
 
     map_image_context_init();
     map_image_clear();
+    map_marsh_image_clear();
     map_image_update_all();
 
     scenario_map_init();
