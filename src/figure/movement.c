@@ -289,12 +289,23 @@ static void advance_route_tile(figure *f, int roaming_enabled)
     }
 }
 
+static void apply_beach_slowdown(figure *f, int terrain, int *num_ticks)
+{
+    if ((terrain & TERRAIN_BEACH) && !(terrain & (TERRAIN_HIGHWAY | TERRAIN_ROAD)) && *num_ticks > 0) {
+        f->beach_slowdown_accumulator += *num_ticks;
+        int lost = f->beach_slowdown_accumulator / 5;
+        f->beach_slowdown_accumulator %= 5;
+        *num_ticks -= lost;
+    }
+}
+
 static void walk_ticks(figure *f, int num_ticks, int roaming_enabled)
 {
     int terrain = map_terrain_get(map_grid_offset(f->x, f->y));
     if (terrain & TERRAIN_HIGHWAY) {
         num_ticks *= 2;
     }
+    apply_beach_slowdown(f, terrain, &num_ticks);
     while (num_ticks > 0) {
         num_ticks--;
         f->progress_on_tile++;
@@ -472,6 +483,7 @@ void figure_movement_follow_ticks(figure *f, int num_ticks)
     if (map_terrain_is(map_grid_offset(leader->x, leader->y), TERRAIN_HIGHWAY)) {
         num_ticks *= 2;
     }
+    apply_beach_slowdown(f, map_terrain_get(map_grid_offset(f->x, f->y)), &num_ticks);
     while (num_ticks > 0) {
         num_ticks--;
         f->progress_on_tile++;
@@ -512,6 +524,7 @@ void figure_movement_follow_ticks_with_percentage(figure *f, int num_ticks, int 
     if (map_terrain_is(map_grid_offset(leader->x, leader->y), TERRAIN_HIGHWAY)) {
         num_ticks *= 2;
     }
+    apply_beach_slowdown(f, map_terrain_get(map_grid_offset(f->x, f->y)), &num_ticks);
 
     while (num_ticks > 0) {
         num_ticks--;
@@ -551,6 +564,7 @@ void figure_movement_roam_ticks(figure *f, int num_ticks)
         }
     }
     // no destination: walk to end of tile and pick a direction
+    apply_beach_slowdown(f, map_terrain_get(map_grid_offset(f->x, f->y)), &num_ticks);
     while (num_ticks > 0) {
         num_ticks--;
         f->progress_on_tile++;
