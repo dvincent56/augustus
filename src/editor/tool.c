@@ -170,7 +170,7 @@ static int raise_land_tile(int x, int y, int grid_offset, int terrain)
         if (!(terrain & (TERRAIN_ACCESS_RAMP | TERRAIN_ELEVATION))) {
             map_property_set_multi_tile_size(grid_offset, 1);
             map_elevation_set(grid_offset, elevation + 1);
-            terrain &= ~(TERRAIN_WATER | TERRAIN_BUILDING | TERRAIN_GARDEN | TERRAIN_ROAD);
+            terrain &= ~(TERRAIN_WATER | TERRAIN_BUILDING | TERRAIN_GARDEN | TERRAIN_ROAD | TERRAIN_MARSHLAND);
         }
     }
     return terrain;
