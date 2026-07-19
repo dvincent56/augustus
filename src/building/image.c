@@ -484,18 +484,17 @@ int building_image_get(const building *b)
         {
             int map_orientation = city_view_orientation();
             int orientation_is_top_bottom = map_orientation == DIR_0_TOP || map_orientation == DIR_4_BOTTOM;
-            if (b->subtype.orientation == 1) {
-                if (orientation_is_top_bottom) {
-                    return image_group(GROUP_BUILDING_TRIUMPHAL_ARCH);
-                } else {
-                    return image_group(GROUP_BUILDING_TRIUMPHAL_ARCH) + 2;
-                }
-            } else {
-                if (orientation_is_top_bottom) {
-                    return image_group(GROUP_BUILDING_TRIUMPHAL_ARCH) + 2;
-                } else {
-                    return image_group(GROUP_BUILDING_TRIUMPHAL_ARCH);
-                }
+            int is_rotated = (b->subtype.orientation == 1 && !orientation_is_top_bottom) ||
+                (b->subtype.orientation != 1 && orientation_is_top_bottom);
+            switch (b->monument.phase) {
+                case MONUMENT_START:
+                    return assets_get_image_id("Monuments", is_rotated ? "Triumphal_Arch_Construction_01_R" :
+                        "Triumphal_Arch_Construction_01");
+                case 2:
+                    return assets_get_image_id("Monuments", is_rotated ? "Triumphal_Arch_Construction_02_R" :
+                        "Triumphal_Arch_Construction_02");
+                default:
+                    return image_group(GROUP_BUILDING_TRIUMPHAL_ARCH) + (is_rotated * 2);
             }
         }
         case BUILDING_SENATE:
@@ -616,7 +615,7 @@ int building_image_get(const building *b)
             }
         case BUILDING_NATIVE_MEETING:
             return image_group(GROUP_BUILDING_NATIVE) + 2;
-        case BUILDING_NATIVE_MEETING_ALT:
+        case BUILDING_NATIVE_LARGE_HUT_ALT:
             switch (scenario_property_climate()) {
                 case CLIMATE_NORTHERN:
                     return assets_get_image_id("Terrain_Maps", "Native_Meeting_Hut_Northern_01");
@@ -625,7 +624,7 @@ int building_image_get(const building *b)
                 default:
                     return assets_get_image_id("Terrain_Maps", "Native_Meeting_Hut_Central_01");
             }
-        case BUILDING_NATIVE_MEETING_ALT_2:
+        case BUILDING_NATIVE_LARGE_HUT_ALT_2:
             switch (scenario_property_climate()) {
                 case CLIMATE_NORTHERN:
                     return assets_get_image_id("Terrain_Maps", "Hellenised_Meeting_Hut_Northern_01");

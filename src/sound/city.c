@@ -28,6 +28,7 @@ typedef enum {
     SOUND_AMBIENT_EMPTY_TERRAIN02,
     SOUND_AMBIENT_EMPTY_LAND,
     SOUND_AMBIENT_WHEAT,
+    SOUND_AMBIENT_HAWK,
     SOUND_AMBIENT_MAX
 } sound_ambient_type;
 
@@ -139,6 +140,7 @@ static struct {
         [SOUND_AMBIENT_EMPTY_TERRAIN02] = { .filenames.total = 1, .filenames.list = (sound_filenames[]) { ASSETS_DIRECTORY "/Sounds/Terrain02.ogg" } },
         [SOUND_AMBIENT_EMPTY_LAND]      = { .filenames.total = 1, .filenames.list = (sound_filenames[]) { "wavs/empty_land.wav" } },
         [SOUND_AMBIENT_WHEAT]           = { .filenames.total = 1, .filenames.list = (sound_filenames[]) { "wavs/wheat.wav" } },
+        [SOUND_AMBIENT_HAWK]            = { .filenames.total = 1, .filenames.list = (sound_filenames[]) { ASSETS_DIRECTORY "/Sounds/Hawk.ogg" } },
     }
 };
 
@@ -199,6 +201,10 @@ void sound_city_mark_building_view(building_type type, int num_workers, int dire
             break;
             // Buildings that always produce sound
         case BUILDING_NATIVE_HUT:
+        case BUILDING_NATIVE_HUT_ALT:
+        case BUILDING_NATIVE_HUT_ALT_2:
+        case BUILDING_NATIVE_LARGE_HUT_ALT:
+        case BUILDING_NATIVE_LARGE_HUT_ALT_2:
         case BUILDING_NATIVE_MEETING:
         case BUILDING_NATIVE_CROPS:
         case BUILDING_NATIVE_WATCHTOWER:

@@ -467,8 +467,8 @@ static void place_building(const map_tile *tile)
             size = 1;
             image_id = building_image_get_for_type(type);
             break;
-        case TOOL_NATIVE_MEETING_ALT:
-            type = BUILDING_NATIVE_MEETING_ALT;
+        case TOOL_NATIVE_LARGE_HUT_ALT:
+            type = BUILDING_NATIVE_LARGE_HUT_ALT;
             size = 2;
             image_id = building_image_get_for_type(type);
             break;
@@ -486,8 +486,8 @@ static void place_building(const map_tile *tile)
             }
             size = 1;
             break;
-        case TOOL_NATIVE_MEETING_ALT_2:
-            type = BUILDING_NATIVE_MEETING_ALT_2;
+        case TOOL_NATIVE_LARGE_HUT_ALT_2:
+            type = BUILDING_NATIVE_LARGE_HUT_ALT_2;
             size = 2;
             image_id = building_image_get_for_type(type);
             break;
@@ -650,8 +650,8 @@ void editor_tool_end_use(const map_tile *tile)
         case TOOL_NATIVE_HUT:
         case TOOL_NATIVE_HUT_ALT:
         case TOOL_NATIVE_HUT_ALT_2:
-        case TOOL_NATIVE_MEETING_ALT:
-        case TOOL_NATIVE_MEETING_ALT_2:
+        case TOOL_NATIVE_LARGE_HUT_ALT:
+        case TOOL_NATIVE_LARGE_HUT_ALT_2:
         case TOOL_NATIVE_WELL:
         case TOOL_NATIVE_MONUMENT:
         case TOOL_NATIVE_WATCHTOWER:

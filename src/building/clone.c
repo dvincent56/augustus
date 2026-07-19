@@ -11,8 +11,8 @@
 
 /**
  * Takes a building and retrieve its proper type for cloning.
- * For example, given a fort, return the enumaration value corresponding to
- * the specific type of fort rather than the general value
+ * For example, given a garden gate, return the enumaration value corresponding to
+ * the garden wall in general
  *
  * @param b Building to examine (can be null for destroyed building)
  * @param clone_type Type of the building to clone (can be original building type before a fire)
@@ -27,19 +27,12 @@ static building_type get_clone_type_from_building(building *b, building_type clo
     switch (clone_type) {
         case BUILDING_RESERVOIR:
             return BUILDING_DRAGGABLE_RESERVOIR;
-        case BUILDING_FORT_LEGIONARIES:
-            return BUILDING_FORT_LEGIONARIES;
-        case BUILDING_FORT_JAVELIN:
-            return BUILDING_FORT_JAVELIN;
-        case BUILDING_FORT_MOUNTED:
-            return BUILDING_FORT_MOUNTED;
-        case BUILDING_FORT_AUXILIA_INFANTRY:
-            return BUILDING_FORT_AUXILIA_INFANTRY;
-        case BUILDING_FORT_ARCHERS:
-            return BUILDING_FORT_ARCHERS;
         case BUILDING_NATIVE_CROPS:
         case BUILDING_NATIVE_HUT:
         case BUILDING_NATIVE_HUT_ALT:
+        case BUILDING_NATIVE_HUT_ALT_2:
+        case BUILDING_NATIVE_LARGE_HUT_ALT:
+        case BUILDING_NATIVE_LARGE_HUT_ALT_2:
         case BUILDING_NATIVE_MEETING:
         case BUILDING_NATIVE_DECORATION:
         case BUILDING_NATIVE_MONUMENT:
@@ -95,7 +88,9 @@ int building_clone_rotation_from_grid_offset(int grid_offset)
     if (!b) {
         return 0;
     }
-    if (building_variant_has_variants(b->type)) {
+    if (building_is_fort(b->type)) {
+        return b->data.fort.orientation;
+    } else if (building_variant_has_variants(b->type)) {
         return b->variant;
     } else if (b->subtype.orientation) {
         return b->subtype.orientation;
