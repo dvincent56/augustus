@@ -34,13 +34,14 @@ typedef enum {
     TOOL_EARTHQUAKE_CUSTOM_REMOVE = 31,
     TOOL_NATIVE_RUINS = 32,
     TOOL_SELECT_LAND = 33,
-    TOOL_NATIVE_WELL = 34,
-    TOOL_NATIVE_LARGE_HUT_ALT = 35,
-    TOOL_NATIVE_HUT_ALT_2 = 36,
-    TOOL_NATIVE_LARGE_HUT_ALT_2 = 37,
-    TOOL_NATIVE_PALISADE = 38,
-    TOOL_LOW_BRIDGE = 39,
-    TOOL_SHIP_BRIDGE = 40
+    TOOL_SELECT_OFFSET = 34,
+    TOOL_NATIVE_WELL = 35,
+    TOOL_NATIVE_LARGE_HUT_ALT = 36,
+    TOOL_NATIVE_HUT_ALT_2 = 37,
+    TOOL_NATIVE_LARGE_HUT_ALT_2 = 38,
+    TOOL_NATIVE_PALISADE = 39,
+    TOOL_LOW_BRIDGE = 40,
+    TOOL_SHIP_BRIDGE = 41
 } tool_type;
 
 tool_type editor_tool_type(void);
@@ -71,6 +72,12 @@ void editor_tool_end_use(const map_tile *tile);
  * @param callback Function to be called when selection is completed, receives grid_slice pointer
  */
 void editor_tool_set_selection_callback(void (*callback)(grid_slice *selection));
+
+/**
+ * @brief Set callback for TOOL_SELECT_OFFSET to receive the selected grid_offset
+ * @param callback Function to be called when selection is completed, receives the selected grid_offset
+ */
+void editor_tool_set_single_selection_callback(void (*callback)(int grid_offset));
 
 /**
  * @brief Get the current land selection from TOOL_SELECT_LAND
