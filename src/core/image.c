@@ -262,7 +262,6 @@ static struct {
     const image_atlas_data *atlas_data;  // valid between prepare and finalize
     image_draw_data *external_draw_data; // kept alive so external aux images can be loaded
     int total_external_images;
-    int external_image_id; // cache: last external aux image id loaded
 } aux_data;
 
 static void read_header_into(buffer *buf, uint16_t *group_image_ids, char (*bitmaps)[200])
@@ -782,7 +781,8 @@ static int image_load_main_aux_prepare(int climate_id)
     }
     aux_data.external_draw_data = data.external_draw_data;
     aux_data.total_external_images = data.total_external_images;
-    aux_data.external_image_id = -1;
+    // aux external images changed, so the cached external image may be wrong
+    data.external_image_id = -1;
 
     data.images_with_tops = saved_images_with_tops;
     data.total_external_images = saved_total_external;
@@ -1460,21 +1460,33 @@ int image_load_external_pixels(color_t *dst, const image *img, int row_width)
     return 1;
 }
 
-void image_load_external_data(const image *img)
+void image_load_external_data(const image *img, int is_aux)
 {
     int external_image_id = img->atlas.id & IMAGE_ATLAS_BIT_MASK;
-    if (data.external_image_id == external_image_id && graphics_renderer()->has_custom_image(CUSTOM_IMAGE_EXTERNAL)) {
+    // main and aux use the same custom image, so keep the aux flag in the cached id
+    int cached_id = is_aux ? (external_image_id | IMAGE_AUX_FLAG) : external_image_id;
+    if (data.external_image_id == cached_id && graphics_renderer()->has_custom_image(CUSTOM_IMAGE_EXTERNAL)) {
         return;
     }
-    data.external_image_id = external_image_id;
-    image_draw_data *draw_data = &data.external_draw_data[external_image_id];
+    image_draw_data *draw_data;
+    if (is_aux) {
+        if (!aux_data.external_draw_data || external_image_id >= aux_data.total_external_images) {
+            return;
+        }
+        draw_data = &aux_data.external_draw_data[external_image_id];
+    } else {
+        draw_data = &data.external_draw_data[external_image_id];
+    }
+    data.external_image_id = cached_id;
     graphics_renderer()->create_custom_image(CUSTOM_IMAGE_EXTERNAL, draw_data->width, draw_data->height, 0);
     int row_width;
     color_t *dst = graphics_renderer()->get_custom_image_buffer(CUSTOM_IMAGE_EXTERNAL, &row_width);
     if (!dst) {
         return;
     }
-    if (image_load_external_pixels(dst, img, row_width)) {
+    int loaded = is_aux ? image_load_external_pixels_aux(dst, img, row_width) :
+        image_load_external_pixels(dst, img, row_width);
+    if (loaded) {
         graphics_renderer()->update_custom_image(CUSTOM_IMAGE_EXTERNAL);
     }
     graphics_renderer()->release_custom_image_buffer(CUSTOM_IMAGE_EXTERNAL);

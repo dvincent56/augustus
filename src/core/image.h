@@ -136,8 +136,9 @@ int image_load_external_pixels(color_t *dst, const image *img, int row_width);
 /**
  * Loads the external data of an image
  * @param img Image to load
+ * @param is_aux Whether to load from aux_data
  */
-void image_load_external_data(const image *img);
+void image_load_external_data(const image *img, int is_aux);
 
 /**
  * Gets the real width and height of an external image
