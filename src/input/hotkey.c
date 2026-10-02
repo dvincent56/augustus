@@ -513,6 +513,12 @@ static void set_definition_for_action(hotkey_action action, hotkey_definition *d
         case HOTKEY_EDITOR_EMPIRE_PICK_TOOL:
             def->action = &data.hotkey_state.pick_empire_tool;
             break;
+        case HOTKEY_SAVE_QUICKSAVE:
+            def->action = &data.hotkey_state.quicksave;
+            break;
+        case HOTKEY_SAVE_QUICKLOAD:
+            def->action = &data.hotkey_state.quickload;
+            break;
         case HOTKEY_CLOSE:
             def->action = &data.hotkey_state.close_pressed;
             break;
