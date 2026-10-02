@@ -1,7 +1,7 @@
 #include "tab_view.h"
 
 #include "graphics/button.h"
-#include "graphics/complex_button.h"
+#include "widget/complex_button.h"
 #include "graphics/graphics.h"
 #include "graphics/panel.h"
 #include "graphics/window.h"
@@ -58,7 +58,7 @@ static complex_button_style button_style_for_tab_style(tab_view_style style)
         case TAB_VIEW_STYLE_GRAY:
             return COMPLEX_BUTTON_STYLE_GRAY;
         case TAB_VIEW_STYLE_DEFAULT_SMALL:
-            return COMPLEX_BUTTON_STYLE_DEFAULT_SMALL;
+            return COMPLEX_BUTTON_STYLE_DEFAULT;
         default:
             return COMPLEX_BUTTON_STYLE_DEFAULT;
     }
@@ -161,13 +161,12 @@ void tab_view_init_simple(tab_view *view, int x, int y, int width, int height, i
     // Initialize tab buttons with defaults
     for (int i = 0; i < tab_count; i++) {
         memset(&view->tabs[i].button, 0, sizeof(complex_button));
+        complex_button_init_style(&view->tabs[i].button, button_style_for_tab_style(style));
         view->tabs[i].button.left_click_handler = tab_click_handler;
         view->tabs[i].button.user_data = view;
-        view->tabs[i].button.style = button_style_for_tab_style(style);
         view->tabs[i].button.font = button_font_for_tab_style(style);
         view->tabs[i].button.sequence_position = SEQUENCE_POSITION_CENTER;
-        view->tabs[i].button.color_mask = 0; // default color mask, can be overridden later
-        view->tabs[i].button.sequence_size = 1;
+        view->tabs[i].button.bg_primary = COLOR_MASK_NONE; // default background color, can be overridden later
         view->tabs[i].visible = 1;
         view->tabs[i].enabled = 1;
     }
@@ -212,7 +211,9 @@ int tab_view_layout(tab_view *view)
         if (!view->tabs[i].initialised) {
             return TAB_ERR_UNINITIALISED_TAB; // indicate layout was not successful due to uninitialised tabs
         }
-        sum_text_w += lang_text_get_sequence_width(view->tabs[i].button.sequence, 1, view->view_properties.tab_font);
+        if (view->tabs[i].button.sequence.fragments && view->tabs[i].button.sequence.count > 0) {
+            sum_text_w += lang_seq_get_width(&view->tabs[i].button.sequence, view->view_properties.tab_font);
+        }
     }
 
     // === Step 1 - determine tab widths===
@@ -262,11 +263,16 @@ int tab_view_layout(tab_view *view)
 
     // First determine final button widths
     for (int i = 0; i < tab_count; i++) {
-        int text_w = lang_text_get_sequence_width(view->tabs[i].button.sequence, 1, view->view_properties.tab_font);
+        int text_w = 0;
+        if (view->tabs[i].button.sequence.fragments && view->tabs[i].button.sequence.count > 0) {
+            text_w = lang_seq_get_width(&view->tabs[i].button.sequence, view->view_properties.tab_font);
+        }
 
         switch (view->view_properties.width_mode) {
             case TAB_WIDTH_MAX:
-                view->tabs[i].button.width = available_for_tabs / tab_count;
+                // Keep all available pixels so the first and last borders align with the content panel.
+                view->tabs[i].button.width = available_for_tabs / tab_count +
+                    (i < available_for_tabs % tab_count);
                 break;
             case TAB_WIDTH_TO_CONTENT:
                 view->tabs[i].button.width = text_w + TAB_DEFAULT_MARGIN;
@@ -314,7 +320,7 @@ int tab_view_layout(tab_view *view)
 
         case TAB_POS_LEFT:
         default:
-            tab_x = view->x; //miniature offset to align with border of the content area
+            tab_x = view->x;
             break;
     }
 
@@ -324,17 +330,16 @@ int tab_view_layout(tab_view *view)
 
     // Apply final geometry to buttons
     for (int i = 0; i < tab_count; i++) {
-        view->tabs[i].button.x = tab_x + (i == tab_count - 1) - (i == 0);// first pass -1, last pass +1. see note* below
+        // Both tab and content borders use the same border sprites and coordinate origin.
+        view->tabs[i].button.x = tab_x;
         view->tabs[i].button.y = tab_y;
-        view->tabs[i].button.color_mask = color_for_active_tab_button(
+        view->tabs[i].button.bg_primary = color_for_active_tab_button(
             view->view_properties.style,
             view->state.active_tab == i
         );
 
         tab_x += view->tabs[i].button.width + single_gap;
     }
-    //*note - button borders are drawn 1 pixel to the right to account for red border for 'focused' state. 
-    //in order to not rewrite the 15 lines of code that affect the entire codebase, adjusting the first and last only.
 
     // === Step 3 - content area ===
     view->content.x = view->x;
@@ -356,8 +361,8 @@ void tab_view_init_tab(tab_view *view, int tab_index, content_draw_callback call
     }
 
     view->tabs[tab_index].draw_callback = callback;
-    view->tabs[tab_index].button.sequence = frag;
-    view->tabs[tab_index].button.sequence_size = frag ? 1 : 0; // only one fragment per tab allowed in simple init
+    view->tabs[tab_index].button.sequence.fragments = (lang_fragment *) frag;
+    view->tabs[tab_index].button.sequence.count = frag ? 1 : 0; // only one fragment per tab allowed in simple init
     // if you'd like to make a more complex tab title, you will need to set properties yourself
     view->tabs[tab_index].visible = 1;
     view->tabs[tab_index].enabled = 1;
@@ -370,7 +375,8 @@ void tab_view_set_tab_text(tab_view *view, int tab_index, const lang_fragment *f
         return;
     }
 
-    view->tabs[tab_index].button.sequence = frag;
+    view->tabs[tab_index].button.sequence.fragments = (lang_fragment *) frag;
+    view->tabs[tab_index].button.sequence.count = frag ? 1 : 0;
     if (view->tabs[tab_index].draw_callback) {
         // if draw_callback is already set, the tab is initialised
         view->tabs[tab_index].initialised = 1;
@@ -384,7 +390,7 @@ void tab_view_set_tab_draw_callback(tab_view *view, int tab_index, content_draw_
     }
 
     view->tabs[tab_index].draw_callback = callback;
-    if (view->tabs[tab_index].button.sequence) {
+    if (view->tabs[tab_index].button.sequence.fragments && view->tabs[tab_index].button.sequence.count > 0) {
         // if button.sequence is already set, the tab is initialised
         view->tabs[tab_index].initialised = 1;
     }
@@ -398,16 +404,15 @@ void tab_view_draw(tab_view *view)
 
     // Draw all visible tab buttons BEFORE the content section
     for (int i = 0; i < view->view_properties.count; i++) {
+        view->tabs[i].button.flush_with_background = i == view->state.active_tab;
         if (view->tabs[i].visible && i != view->state.active_tab) {
             complex_button_draw(&view->tabs[i].button);
         }
     }
     // Draw inner panel for content area (no outer border for tab_view itself)
-    int red_content = view->tabs[view->state.active_tab].button.is_focused;
+    int red_content = view->tabs[view->state.active_tab].button.is_hovered;
     color_t content_color = color_for_tab_background(view->view_properties.style);
     bordered_panel_draw_colored(view->content.x, view->content.y, view->content.width, view->content.height, red_content, content_color, content_color);
-    // y+1 to ever so slightly lower the border 
-    view->tabs[view->state.active_tab].button.flush_with_background = 1; // active tab flushes with background
     complex_button_draw(&view->tabs[view->state.active_tab].button); // draw active tab last so it looks flushed
     // Draw content for active tab
     int active_tab = view->state.active_tab;
