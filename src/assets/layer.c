@@ -449,7 +449,7 @@ int layer_add_from_image_id(layer *l, const char *group_id, const char *image_id
         }
         if (l->calculated_image_id & IMAGE_AUX_FLAG) {
             original_image = image_get(l->calculated_image_id);
-            if (!original_image || original_image->width == 0) {
+            if (!original_image || !original_image->width) {
                 l->calculated_image_id = 0;
                 original_image = 0;
             }
