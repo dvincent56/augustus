@@ -745,6 +745,8 @@ const uint8_t *lang_get_string(int group, int index)
                 return translation_for(TR_EDITOR_TOOL_SHALLOW);
             case TOOL_MARSHLAND:
                 return translation_for(TR_EDITOR_TOOL_MARSHLAND);
+            case TOOL_BEACH:
+                return translation_for(TR_EDITOR_TOOL_BEACH);
             default:
                 break;
         }
