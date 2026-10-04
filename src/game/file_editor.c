@@ -89,6 +89,7 @@ static void clear_map_data(void)
     map_image_clear();
     map_marsh_image_clear();
     map_building_clear();
+    building_clear_all();
     map_terrain_clear();
     map_aqueduct_clear();
     map_figure_clear();
