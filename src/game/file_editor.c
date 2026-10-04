@@ -147,7 +147,7 @@ static void prepare_map_for_editing(void)
     // tiles with TERRAIN_BUILDING whose image isn't a native — bridges'
     // image_grid still shows water, so they'd be wiped. Reconstructing first
     // sets map_building_at so natives skips those tiles.
-    map_bridge_recalculate_sprites_from_buildings();
+    map_bridge_recalculate_buildings_from_sprites();
     map_natives_init_editor();
     map_routing_update_all();
 

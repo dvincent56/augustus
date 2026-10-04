@@ -227,10 +227,17 @@ static void add_terrain(const void *tile_data, int dx, int dy)
         if (terrain & TERRAIN_BUILDING) {
             // Fetch id before the tiles get cleared
             unsigned int building_id = map_building_at(grid_offset);
-            map_building_tiles_remove(0, x, y);
+            building *b = building_get(building_id);
+            if (building_id && building_type_is_bridge(b->type)) {
+                // Remove the whole bridge, not only this tile
+                map_bridge_remove(grid_offset, 0);
+            } else {
+                map_building_tiles_remove(0, x, y);
+            }
             if (building_id) {
                 // Delete the building too, otherwise palisades get their image back on connection updates
-                building_delete(building_get(building_id));
+                // and bridges stay in memory (no game tick in the editor to clean them up)
+                building_delete(b);
             }
             terrain = map_terrain_get(grid_offset);
         }

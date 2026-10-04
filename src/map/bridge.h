@@ -31,7 +31,7 @@ int map_bridge_find_start_and_direction(int grid_offset, int *axis, int *axis_di
 
 void map_bridge_update_after_rotate(int counter_clockwise);
 
-void map_bridge_recalculate_sprites_from_buildings(void);
+void map_bridge_recalculate_buildings_from_sprites(void);
 
 int map_bridge_has_figures(int grid_offset);
 

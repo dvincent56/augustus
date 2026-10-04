@@ -410,10 +410,8 @@ int map_bridge_has_figures(int grid_offset)
 }
 
 // Reconstruct a single bridge starting at `seed`. Walks the contiguous chain
-// in both axial directions to find the endpoints, then either creates a
-// building (when none exists yet) or registers the existing one across the
-// chain. Returns the offset just past the end of the bridge so a scanning
-// caller can skip ahead.
+// in both axial directions to find the endpoints, then creates the bridge
+// building and registers it across the chain.
 static void reconstruct_bridge_chain(int seed)
 {
     // Find axis by checking which neighbour is also a bridge tile.
@@ -467,7 +465,7 @@ static void reconstruct_bridge_chain(int seed)
     }
 }
 
-void map_bridge_recalculate_sprites_from_buildings(void)
+void map_bridge_recalculate_buildings_from_sprites(void)
 {
     // For scenarios, buildings aren't persisted but sprite_grid + terrain are.
     // Walk the map and reconstruct each bridge as a building so routing,

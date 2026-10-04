@@ -172,7 +172,7 @@ static void initialize_scenario_data(const uint8_t *scenario_name)
     // with TERRAIN_BUILDING whose image isn't a recognised native, which would
     // include bridge tiles (whose image_grid still shows water). Reconstructing
     // bridges sets map_building_at so the natives pass skips them.
-    map_bridge_recalculate_sprites_from_buildings();
+    map_bridge_recalculate_buildings_from_sprites();
 
     map_natives_init();
 
