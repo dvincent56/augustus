@@ -2238,6 +2238,7 @@ static translation_string all_strings[] = {
     {TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_PIG, "Pig field"},
     {TR_BUILDING_NATIVE_WELL, "Native Well"},
     {TR_BUILDING_NATIVE_WELL_DESC, "This hand-dug well draws water from the earth to sustain the local tribe. Though primitive compared to Roman aqueducts and fountains, it suffices for the natives' modest needs. The villagers gather here at dawn and dusk to draw water, exchange news, and observe the rhythms of their ancestral land."},
+    {TR_BUILDING_NATIVE_PALISADE_DESC, "This wooden stockade shelters the village from wild beasts and rival tribes. Built from sharpened stakes driven deep into the earth, it is a clear sign that the natives mean to defend their land. It will stand for as long as the tribe that raised it."},
     {TR_EDITOR_BRIDGES, "Bridges"},
     {TR_EDITOR_SCENARIO_BUILDING_LOW_BRIDGE, "Low bridge"},
     {TR_EDITOR_SCENARIO_BUILDING_SHIP_BRIDGE, "Ship bridge"},
@@ -2386,6 +2387,8 @@ static translation_string all_strings[] = {
     {TR_UI_LEDGER_CELL_BALANCE, "a trade balance of"},
     {TR_UI_LEDGER_CELL_DENARII_FROM, "Denarii from trading"},
     {TR_UI_LEDGER_HIDE_TOOLTIPS, "Hide list tooltips"},
+    {TR_ADVISOR_RELIGION_PEOPLE, "People"},
+    {TR_ADVISOR_RELIGION_COVERED, "covered"},
 };
 
 void translation_english(const translation_string **strings, int *num_strings)

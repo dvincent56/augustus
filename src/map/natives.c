@@ -23,6 +23,9 @@
 #include "scenario/data.h" // TODO remove this dependency
 #include "scenario/property.h"
 
+// "Pal Wall X 01" to "Pal Wall X 21": connectable offsets range from 0 to 20
+#define NATIVE_PALISADE_IMAGES 21
+
 static void mark_native_land(int x, int y, int size, int radius)
 {
     int x_min, y_min, x_max, y_max;
@@ -105,17 +108,6 @@ static int native_hut_alt_get_image_id(void) {
     }
 }
 
-static int native_hut_alt_2_get_image_id(void) {
-    switch (scenario_property_climate()) {
-        case CLIMATE_NORTHERN:
-            return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Northern_01");
-        case CLIMATE_DESERT:
-            return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Southern_01");
-        default:
-            return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Central_01");
-    }
-}
-
 void map_natives_init(void)
 {
     int image_hut = scenario.native_images.hut;
@@ -132,7 +124,7 @@ void map_natives_init(void)
     int scenario_image_palisade = scenario.native_images.palisade;
     int native_image = image_group(GROUP_BUILDING_NATIVE);
     int native_hut_alt_image = native_hut_alt_get_image_id();
-    int native_hut_alt_2_image = native_hut_alt_2_get_image_id();
+    int native_hut_alt_2_image = building_image_get_native_hut_alt_2_base(scenario_property_climate());
     int grid_offset = map_data.start_offset;
     for (int y = 0; y < map_data.height; y++, grid_offset += map_data.border_size) {
         for (int x = 0; x < map_data.width; x++, grid_offset++) {
@@ -173,7 +165,7 @@ void map_natives_init(void)
                 type = BUILDING_NATIVE_HUT_ALT_2;
                 map_image_set(grid_offset, native_hut_alt_2_image + (image_id - scenario_image_hut_alt_2));
             } else if (scenario_image_palisade != 0 &&
-                image_id >= scenario_image_palisade && image_id < scenario_image_palisade + 16) {
+                image_id >= scenario_image_palisade && image_id < scenario_image_palisade + NATIVE_PALISADE_IMAGES) {
                 type = BUILDING_NATIVE_PALISADE;
                 // Image is updated by building_connectable_update_connections later
             } else if (image_id == image_meeting) {
@@ -256,7 +248,7 @@ void map_natives_init_editor(void)
     int image_crops = scenario.native_images.crops;
     int native_image = image_group(GROUP_EDITOR_BUILDING_NATIVE);
     int native_hut_alt_image = native_hut_alt_get_image_id();
-    int native_hut_alt_2_image = native_hut_alt_2_get_image_id();
+    int native_hut_alt_2_image = building_image_get_native_hut_alt_2_base(scenario_property_climate());
     int scenario_image_alt_hut = scenario.native_images.alt_hut;
     int scenario_image_decoration = scenario.native_images.decoration;
     int scenario_image_monument = scenario.native_images.monument;
@@ -306,7 +298,7 @@ void map_natives_init_editor(void)
                 type = BUILDING_NATIVE_HUT_ALT_2;
                 map_image_set(grid_offset, native_hut_alt_2_image + (image_id - scenario_image_hut_alt_2));
             } else if (scenario_image_palisade != 0 &&
-                image_id >= scenario_image_palisade && image_id < scenario_image_palisade + 16) {
+                image_id >= scenario_image_palisade && image_id < scenario_image_palisade + NATIVE_PALISADE_IMAGES) {
                 type = BUILDING_NATIVE_PALISADE;
             } else if (image_id == image_meeting) {
                 type = BUILDING_NATIVE_MEETING;

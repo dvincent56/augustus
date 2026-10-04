@@ -635,6 +635,8 @@ static void show_overlay_from_grid_offset(int grid_offset)
         case BUILDING_NATIVE_WATCHTOWER:
         case BUILDING_NATIVE_MONUMENT:
         case BUILDING_NATIVE_DECORATION:
+        case BUILDING_NATIVE_WELL:
+        case BUILDING_NATIVE_PALISADE:
             overlay = OVERLAY_NATIVE;
             break;
         case BUILDING_WAREHOUSE:

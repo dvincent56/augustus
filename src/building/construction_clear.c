@@ -54,6 +54,7 @@ static building *get_deletable_building(int grid_offset)
         b->type == BUILDING_NATIVE_LARGE_HUT_ALT_2 ||
         b->type == BUILDING_NATIVE_MEETING || b->type == BUILDING_NATIVE_MONUMENT ||
         b->type == BUILDING_NATIVE_DECORATION || b->type == BUILDING_NATIVE_WATCHTOWER ||
+        b->type == BUILDING_NATIVE_WELL || b->type == BUILDING_NATIVE_PALISADE ||
         building_properties_for_type(b->type)->shared) {
         return 0;
     }
