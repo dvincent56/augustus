@@ -11,6 +11,7 @@
 #include "core/random.h"
 #include "editor/tool_restriction.h"
 #include "game/undo.h"
+#include "map/building.h"
 #include "map/building_tiles.h"
 #include "map/elevation.h"
 #include "map/grid.h"
@@ -222,7 +223,13 @@ static void add_terrain(const void *tile_data, int dx, int dy)
     if (data.type != TOOL_EARTHQUAKE_CUSTOM && data.type != TOOL_EARTHQUAKE_CUSTOM_REMOVE &&
         data.type != TOOL_OUTSKIRTS && data.type != TOOL_OUTSKIRTS_REMOVE) {
         if (terrain & TERRAIN_BUILDING) {
+            // Fetch id before the tiles get cleared
+            unsigned int building_id = map_building_at(grid_offset);
             map_building_tiles_remove(0, x, y);
+            if (building_id) {
+                // Delete the building too, otherwise palisades get their image back on connection updates
+                building_delete(building_get(building_id));
+            }
             terrain = map_terrain_get(grid_offset);
         }
         if (!(terrain & (TERRAIN_ELEVATION | TERRAIN_ACCESS_RAMP))) {
@@ -399,6 +406,8 @@ void editor_tool_update_use(const map_tile *tile)
         default:
             break;
     }
+    // Brushes may have removed palisades: refresh the images of the remaining ones
+    building_connectable_update_connections();
 
     scenario_editor_set_as_unsaved();
     widget_minimap_invalidate();
@@ -487,16 +496,7 @@ static void place_building(const map_tile *tile)
             break;
         case TOOL_NATIVE_HUT_ALT_2:
             type = BUILDING_NATIVE_HUT_ALT_2;
-            switch (scenario_property_climate()) {
-                case CLIMATE_NORTHERN:
-                    image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Northern_01") + (random_byte() % 3);
-                    break;
-                case CLIMATE_DESERT:
-                    image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Southern_01") + (random_byte() % 3);
-                    break;
-                default:
-                    image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Central_01") + (random_byte() % 3);
-            }
+            image_id = building_image_get_native_hut_alt_2_base(scenario_property_climate()) + (random_byte() % 3);
             size = 1;
             break;
         case TOOL_NATIVE_LARGE_HUT_ALT_2:

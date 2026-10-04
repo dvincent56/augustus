@@ -675,24 +675,8 @@ static void update_native_images(int old_climate, int new_climate)
     }
 
     // Hellenised Hut alt 2: 3 variants per climate, preserve variant index across climate change.
-    int hut_alt_2_old_image_id;
-    int hut_alt_2_new_image_id;
-    switch (old_climate) {
-        case CLIMATE_NORTHERN:
-            hut_alt_2_old_image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Northern_01"); break;
-        case CLIMATE_DESERT:
-            hut_alt_2_old_image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Southern_01"); break;
-        default:
-            hut_alt_2_old_image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Central_01");
-    }
-    switch (new_climate) {
-        case CLIMATE_NORTHERN:
-            hut_alt_2_new_image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Northern_01"); break;
-        case CLIMATE_DESERT:
-            hut_alt_2_new_image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Southern_01"); break;
-        default:
-            hut_alt_2_new_image_id = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Central_01");
-    }
+    int hut_alt_2_old_image_id = building_image_get_native_hut_alt_2_base(old_climate);
+    int hut_alt_2_new_image_id = building_image_get_native_hut_alt_2_base(new_climate);
     for (building *b = building_first_of_type(BUILDING_NATIVE_HUT_ALT_2); b; b = b->next_of_type) {
         map_image_set(b->grid_offset, hut_alt_2_new_image_id + map_image_at(b->grid_offset) - hut_alt_2_old_image_id);
     }

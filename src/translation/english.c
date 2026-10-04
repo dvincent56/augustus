@@ -2238,6 +2238,7 @@ static translation_string all_strings[] = {
     {TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_PIG, "Pig field"},
     {TR_BUILDING_NATIVE_WELL, "Native Well"},
     {TR_BUILDING_NATIVE_WELL_DESC, "This hand-dug well draws water from the earth to sustain the local tribe. Though primitive compared to Roman aqueducts and fountains, it suffices for the natives' modest needs. The villagers gather here at dawn and dusk to draw water, exchange news, and observe the rhythms of their ancestral land."},
+    {TR_BUILDING_NATIVE_PALISADE_DESC, "This wooden stockade shelters the village from wild beasts and rival tribes. Built from sharpened stakes driven deep into the earth, it is a clear sign that the natives mean to defend their land. It will stand for as long as the tribe that raised it."},
     {TR_BUILDING_TRIUMPHAL_ARCH_PHASE_1, "(Supports)"},
     {TR_BUILDING_TRIUMPHAL_ARCH_PHASE_2, "(Facade)"},
     {TR_BUILDING_TRIUMPHAL_ARCH_PHASE_1_TEXT, "Masons are laying the stonework and erecting towering pillars for a colossal arch that will immortalize the valor of your armies and proclaim their triumphant deeds to generations across the ages."},

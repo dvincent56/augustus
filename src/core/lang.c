@@ -697,6 +697,16 @@ const uint8_t *lang_get_string(int group, int index)
                 return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_MONUMENT);
             case TOOL_NATIVE_WATCHTOWER:
                 return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_WATCHTOWER);
+            case TOOL_NATIVE_WELL:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_WELL);
+            case TOOL_NATIVE_LARGE_HUT_ALT:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_LARGE_HUT_ALT);
+            case TOOL_NATIVE_HUT_ALT_2:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_HUT_ALT_2);
+            case TOOL_NATIVE_LARGE_HUT_ALT_2:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_LARGE_HUT_ALT_2);
+            case TOOL_NATIVE_PALISADE:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_PALISADE);
             case TOOL_EARTHQUAKE_CUSTOM:
                 return translation_for(TR_EDITOR_TOOL_EARTHQUAKE_CUSTOM);
             case TOOL_EARTHQUAKE_CUSTOM_REMOVE:

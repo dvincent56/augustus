@@ -78,6 +78,18 @@ int building_image_get_garden_gate_image(int grid_offset)
     }
 }
 
+int building_image_get_native_hut_alt_2_base(int climate)
+{
+    switch (climate) {
+        case CLIMATE_NORTHERN:
+            return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Northern_01");
+        case CLIMATE_DESERT:
+            return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Southern_01");
+        default:
+            return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Central_01");
+    }
+}
+
 int building_image_get(const building *b)
 {
     switch (b->type) {
@@ -605,14 +617,7 @@ int building_image_get(const building *b)
                     return assets_get_image_id("Terrain_Maps", "Native_Hut_Central_01") + (random_byte() & 1);
             }
         case BUILDING_NATIVE_HUT_ALT_2:
-            switch (scenario_property_climate()) {
-                case CLIMATE_NORTHERN:
-                    return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Northern_01") + (random_byte() % 3);
-                case CLIMATE_DESERT:
-                    return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Southern_01") + (random_byte() % 3);
-                default:
-                    return assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Central_01") + (random_byte() % 3);
-            }
+            return building_image_get_native_hut_alt_2_base(scenario_property_climate()) + (random_byte() % 3);
         case BUILDING_NATIVE_MEETING:
             return image_group(GROUP_BUILDING_NATIVE) + 2;
         case BUILDING_NATIVE_LARGE_HUT_ALT:

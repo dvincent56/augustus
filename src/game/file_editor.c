@@ -191,19 +191,16 @@ int game_file_editor_write_scenario(const char *scenario_file)
     int image_native_well = building_image_get_for_type(BUILDING_NATIVE_WELL);
     int image_native_large_hut_alt = building_image_get_for_type(BUILDING_NATIVE_LARGE_HUT_ALT);
     int image_native_large_hut_alt_2 = building_image_get_for_type(BUILDING_NATIVE_LARGE_HUT_ALT_2);
-    int image_native_hut_alt_2;
+    int image_native_hut_alt_2 = building_image_get_native_hut_alt_2_base(scenario_property_climate());
     int image_native_palisade;
     switch (scenario_property_climate()) {
         case CLIMATE_NORTHERN:
-            image_native_hut_alt_2 = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Northern_01");
             image_native_palisade = assets_get_image_id("Military", "Pal Wall N 01");
             break;
         case CLIMATE_DESERT:
-            image_native_hut_alt_2 = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Southern_01");
             image_native_palisade = assets_get_image_id("Military", "Pal Wall S 01");
             break;
         default:
-            image_native_hut_alt_2 = assets_get_image_id("Terrain_Maps", "Hellenised_Hut_Central_01");
             image_native_palisade = assets_get_image_id("Military", "Pal Wall C 01");
     }
 
