@@ -43,7 +43,9 @@ typedef enum {
     TOOL_NATIVE_HUT_ALT_2 = 40,
     TOOL_NATIVE_LARGE_HUT_ALT_2 = 41,
     TOOL_NATIVE_PALISADE = 42,
-    TOOL_MARSHLAND = 43
+    TOOL_LOW_BRIDGE = 43,
+    TOOL_SHIP_BRIDGE = 44,
+    TOOL_MARSHLAND = 45
 } tool_type;
 
 tool_type editor_tool_type(void);
