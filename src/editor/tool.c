@@ -532,6 +532,7 @@ static void place_building(const map_tile *tile)
         }
         map_building_tiles_add(b->id, tile->x, tile->y, size, image_id, TERRAIN_BUILDING);
         scenario_editor_set_as_unsaved();
+        widget_minimap_invalidate();
     } else {
         city_warning_show(WARNING_EDITOR_CANNOT_PLACE, NEW_WARNING_SLOT);
     }
