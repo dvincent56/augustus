@@ -6,6 +6,7 @@
 #include "core/io.h"
 #include "core/log.h"
 #include "core/string.h"
+#include "editor/tool.h"
 #include "translation/translation.h"
 
 #include <stdlib.h>
@@ -641,6 +642,30 @@ const uint8_t *lang_get_string(int group, int index)
                 return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_MONUMENT);
             case TR_EDITOR_SCENARIO_BUILDING_NATIVE_WATCHTOWER:
                 return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_WATCHTOWER);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_WELL:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_WELL);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_LARGE_HUT_ALT:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_LARGE_HUT_ALT);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_HUT_ALT_2:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_HUT_ALT_2);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_LARGE_HUT_ALT_2:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_LARGE_HUT_ALT_2);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_PALISADE:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_PALISADE);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELDS:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELDS);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_WHEAT:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_WHEAT);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_VEGETABLES:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_VEGETABLES);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_FRUIT:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_FRUIT);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_OLIVE:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_OLIVE);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_VINES:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_VINES);
+            case TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_PIG:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_FIELD_PIG);
             case TR_EDITOR_TOOL_EARTHQUAKE_POINT:
                 return translation_for(TR_EDITOR_TOOL_EARTHQUAKE_POINT);
             case TR_EDITOR_TOOL_EARTHQUAKE_CUSTOM:
@@ -649,6 +674,10 @@ const uint8_t *lang_get_string(int group, int index)
                 return translation_for(TR_EDITOR_TOOL_EARTHQUAKE_REMOVE);
             case TR_EDITOR_RUBBLE:
                 return translation_for(TR_EDITOR_RUBBLE);
+            case TR_EDITOR_TOOL_OUTSKIRTS:
+                return translation_for(TR_EDITOR_TOOL_OUTSKIRTS);
+            case TR_EDITOR_TOOL_OUTSKIRTS_REMOVE:
+                return translation_for(TR_EDITOR_TOOL_OUTSKIRTS_REMOVE);
             case TR_EDITOR_TOOL_WATER:
                 return translation_for(TR_EDITOR_TOOL_WATER);
             case TR_EDITOR_TOOL_SHALLOW:
@@ -659,6 +688,51 @@ const uint8_t *lang_get_string(int group, int index)
                 return translation_for(TR_EDITOR_TOOL_LAND);
             case TR_EDITOR_TOOL_BEACH:
                 return translation_for(TR_EDITOR_TOOL_BEACH);
+            default:
+                break;
+        }
+    }
+
+    if (group == 49) {
+        switch (index) {
+            case TOOL_NATIVE_HUT_ALT:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_HUT_ALT);
+            case TOOL_NATIVE_DECORATION:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_DECORATION);
+            case TOOL_NATIVE_MONUMENT:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_MONUMENT);
+            case TOOL_NATIVE_WATCHTOWER:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_WATCHTOWER);
+            case TOOL_NATIVE_WELL:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_WELL);
+            case TOOL_NATIVE_LARGE_HUT_ALT:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_LARGE_HUT_ALT);
+            case TOOL_NATIVE_HUT_ALT_2:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_HUT_ALT_2);
+            case TOOL_NATIVE_LARGE_HUT_ALT_2:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_LARGE_HUT_ALT_2);
+            case TOOL_NATIVE_PALISADE:
+                return translation_for(TR_EDITOR_SCENARIO_BUILDING_NATIVE_PALISADE);
+            case TOOL_EARTHQUAKE_CUSTOM:
+                return translation_for(TR_EDITOR_TOOL_EARTHQUAKE_CUSTOM);
+            case TOOL_EARTHQUAKE_CUSTOM_REMOVE:
+                return translation_for(TR_EDITOR_TOOL_EARTHQUAKE_REMOVE);
+            case TOOL_NATIVE_RUINS:
+                return translation_for(TR_EDITOR_RUBBLE);
+            case TOOL_OUTSKIRTS:
+                return translation_for(TR_EDITOR_TOOL_OUTSKIRTS);
+            case TOOL_OUTSKIRTS_REMOVE:
+                return translation_for(TR_EDITOR_TOOL_OUTSKIRTS_REMOVE);
+            case TOOL_SELECT_LAND:
+                return translation_for(TR_EDITOR_SELECT_LAND);
+            case TOOL_SELECT_OFFSET:
+                return translation_for(TR_EDITOR_SELECT_OFFSET);
+            case TOOL_NATIVE_FIELD: // fix og spelling mistake "native feild"
+                return lang_get_string(41, BUILDING_NATIVE_CROPS);
+            case TOOL_WATER:
+                return translation_for(TR_EDITOR_TOOL_WATER);
+            case TOOL_SHALLOW:
+                return translation_for(TR_EDITOR_TOOL_SHALLOW);
             default:
                 break;
         }

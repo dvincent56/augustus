@@ -263,7 +263,7 @@ int empire_city_get_for_trade_route(int route_id)
             return array_index;
         }
     }
-    return -1; //should this be 0 for consitency? I think -1 can cause overflow?
+    return 0;
 }
 
 int empire_city_buys_resource(int city_id, int resource)
@@ -310,8 +310,8 @@ int empire_city_is_trade_route_open(int route_id)
 int empire_city_is_trade_route_sea(int route_id)
 {
     int city_id = empire_city_get_for_trade_route(route_id);
-    if (city_id <= 0) {
-        return -1;
+    if (!city_id) {
+        return 0;
     }
     empire_city *city = empire_city_get(city_id);
     return city->is_sea_trade;
@@ -819,7 +819,8 @@ int empire_city_get_icon_image_id(empire_city_icon_type type)
         case EMPIRE_CITY_ICON_TOWER:
             return assets_lookup_image_id(ASSET_UI_EMP_ICON_OLD_WATCHTOWER); // old_watchtower
         case EMPIRE_CITY_ICON_BUTTON:
-            return image_group(GROUP_SELECT_MISSION_BUTTON); // button
+            return editor_is_active() ? image_group_aux(GROUP_SELECT_MISSION_BUTTON) :
+                image_group(GROUP_SELECT_MISSION_BUTTON); // button
         default:
             return -1;
     }
