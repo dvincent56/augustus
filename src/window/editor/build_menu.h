@@ -13,8 +13,9 @@ enum {
     MENU_EARTHQUAKE = 7,
     MENU_WATER = 8,
     MENU_NATIVE_FIELDS = 9,
-    MENU_LAND = 10,
-    MENU_NUM_ITEMS = 11
+    MENU_BRIDGES = 10,
+    MENU_LAND = 11,
+    MENU_NUM_ITEMS = 12
 };
 
 void window_editor_build_menu_show(int submenu);
