@@ -1679,6 +1679,7 @@ void map_tiles_update_all(void)
     map_tiles_update_all_elevation();
     map_tiles_update_all_water();
     map_tiles_update_all_marshland();
+    map_tiles_update_all_beach();
     map_tiles_update_all_earthquake();
     map_tiles_update_all_rocks();
     foreach_map_tile(set_tree_image);
