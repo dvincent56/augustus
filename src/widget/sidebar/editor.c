@@ -75,6 +75,7 @@ static void draw_status(void)
         case TOOL_MEADOW:
         case TOOL_MARSHLAND:
         case TOOL_BEACH:
+        case TOOL_HILLS:
         case TOOL_RAISE_LAND:
         case TOOL_LOWER_LAND:
             lang_text_draw(48, brush_size, text_offset, 194, FONT_NORMAL_GREEN);
