@@ -1336,9 +1336,6 @@ static void set_marshland_image(int x, int y, int grid_offset)
     }
     set_overlay_native_ground(grid_offset);
     int base = marshland_base_image();
-    if (base <= 0) {
-        base = assets_get_image_id("Terrain_Maps", "Marshland_C_01");
-    }
     int offset = overlay_tile_offset(grid_offset, TERRAIN_MARSHLAND);
     if (offset < 0) {
         offset = map_random_get(grid_offset) % 8; // fully-surrounded / no-edge: full-tile variant 1-8
@@ -1375,9 +1372,6 @@ static void set_beach_image(int x, int y, int grid_offset)
     }
     set_overlay_native_ground(grid_offset);
     int base = beach_base_image();
-    if (base <= 0) {
-        base = assets_get_image_id("Terrain_Maps", "Beach_C_01");
-    }
     int offset = overlay_tile_offset(grid_offset, TERRAIN_BEACH);
     if (offset < 0) {
         offset = map_random_get(grid_offset) % 8; // fully-surrounded / no-edge: full-tile variant 1-8
