@@ -71,6 +71,9 @@ static void draw_status(void)
         case TOOL_ROCKS:
         case TOOL_SHALLOW:
         case TOOL_SHRUB:
+        case TOOL_TREES:
+        case TOOL_WATER:
+        case TOOL_NATIVE_RUINS:
         case TOOL_RAISE_LAND:
         case TOOL_LOWER_LAND:
         case TOOL_EARTHQUAKE_CUSTOM:
