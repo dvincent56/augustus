@@ -152,7 +152,7 @@ void editor_tool_start_use(const map_tile *tile)
     data.build_in_progress = 1;
     data.start_elevation = map_elevation_at(tile->grid_offset);
     data.start_tile = *tile;
-    if (data.type == TOOL_ROAD) {
+    if (editor_tool_is_updatable()) {
         game_undo_start_build(BUILDING_ROAD);
         map_routing_update_land();
     }
@@ -541,7 +541,8 @@ static void place_building(const map_tile *tile)
                 if (image_aux_is_loaded()) {
                     // Use game's GROUP_BUILDING_FARM_CROPS (loaded as aux in editor mode)
                     // so each variant displays its proper sprite.
-                    image_id = image_group_aux(GROUP_BUILDING_FARM_CROPS) + variant * 5;
+                    image_id = image_group_aux(GROUP_BUILDING_FARM_CROPS) +
+                        building_image_get_native_crop_offset(variant);
                 } else {
                     image_id = image_group(GROUP_EDITOR_BUILDING_CROPS);
                 }
@@ -668,6 +669,7 @@ static void place_native_palisade(const map_tile *start_tile, const map_tile *en
     if (items_placed > 0) {
         building_connectable_update_connections();
         scenario_editor_set_as_unsaved();
+        widget_minimap_invalidate();
     } else {
         city_warning_show(WARNING_EDITOR_CANNOT_PLACE, NEW_WARNING_SLOT);
     }
