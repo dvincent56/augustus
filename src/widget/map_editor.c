@@ -206,12 +206,15 @@ static void draw_top(int x, int y, int grid_offset)
         color_t faded_outskirts = COLOR_MASK_OUTSKIRTS_FADE(distance_to_non_outskirts);
         color_mask = color_mask ? COLOR_MIX_COLORS(faded_outskirts, color_mask) : faded_outskirts;
     }
-    image_draw_isometric_top_from_draw_tile(image_id, x, y, color_mask, draw_context.scale);
     int marsh_image = map_marsh_image_at(grid_offset);
+    int beach_image = map_beach_image_at(grid_offset);
+    if (!marsh_image && !beach_image) {
+        // a marsh or beach overlay covers the whole tile, so the bushes of the ground top must not show through
+        image_draw_isometric_top_from_draw_tile(image_id, x, y, color_mask, draw_context.scale);
+    }
     if (marsh_image > 0) {
         image_draw_isometric_top_from_draw_tile(marsh_image, x, y, color_mask, draw_context.scale);
     }
-    int beach_image = map_beach_image_at(grid_offset);
     if (beach_image > 0) {
         image_draw_isometric_top_from_draw_tile(beach_image, x, y, color_mask, draw_context.scale);
     }

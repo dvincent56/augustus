@@ -308,14 +308,12 @@ static void add_terrain(const void *tile_data, int dx, int dy)
             if (!(terrain & TERRAIN_MARSHLAND) && !(terrain & TERRAIN_ELEVATION_ROCK)) {
                 terrain &= ~(TERRAIN_TREE | TERRAIN_ROCK | TERRAIN_SHRUB | TERRAIN_GARDEN | TERRAIN_BEACH);
                 terrain |= TERRAIN_MARSHLAND;
-                map_property_clear_future_earthquake(grid_offset);
             }
             break;
-        case TOOL_BEACH:            
+        case TOOL_BEACH:
             if (!(terrain & TERRAIN_BEACH) && !(terrain & TERRAIN_ELEVATION_ROCK)) {
                 terrain &= ~(TERRAIN_TREE | TERRAIN_ROCK | TERRAIN_SHRUB | TERRAIN_GARDEN | TERRAIN_MARSHLAND);
                 terrain |= TERRAIN_BEACH;
-                map_property_clear_future_earthquake(grid_offset);
             }
             break;
         case TOOL_NATIVE_RUINS:

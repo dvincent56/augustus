@@ -121,7 +121,8 @@ void map_routing_update_land_citizen(void)
             } else if (terrain & (TERRAIN_RUBBLE | TERRAIN_ACCESS_RAMP | TERRAIN_GARDEN)) {
                 terrain_land_citizen.items[grid_offset] = CITIZEN_2_PASSABLE_TERRAIN;
             } else if (terrain & TERRAIN_BEACH) {
-                terrain_land_citizen.items[grid_offset] = CITIZEN_4_CLEAR_TERRAIN; // beach is walkable (even over water: a sandbank)
+                // beach is walkable (even over water: a sandbank), but roads, aqueducts and walls cannot be built on it
+                terrain_land_citizen.items[grid_offset] = CITIZEN_2_PASSABLE_TERRAIN;
             } else if (terrain & TERRAIN_AQUEDUCT) {
                 terrain_land_citizen.items[grid_offset] = get_land_type_citizen_aqueduct(grid_offset);
             }  else if (terrain & (TERRAIN_BUILDING | TERRAIN_GATEHOUSE)) {
